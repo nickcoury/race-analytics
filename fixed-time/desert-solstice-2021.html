@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Desert Solstice 2021 — 24 Hour American Record — Nick Coury Race Analytics</title>
 <link rel="stylesheet" href="../../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <header>
@@ -35,6 +36,16 @@
 <div class="stat"><div class="value">32</div><div class="label">Stops</div></div>
 </div>
 <div class="section">
+<h2>Pace Over 173 Miles</h2>
+<p style="color:var(--text-muted);margin-bottom:16px"><span style="color:#3498db">Blue</span> = elapsed, <span style="color:#27ae60">green</span> = moving (stops removed). The spikes are bathroom breaks. The trend line tells the real story — a negative split.</p>
+<div style="height:350px;margin-bottom:24px"><canvas id="dsPaceChart"></canvas></div>
+</div>
+<div class="section">
+<h2>Heart Rate</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Remarkably stable across 24 hours — cardiac drift stayed controlled even through the negative split.</p>
+<div style="height:200px;margin-bottom:24px"><canvas id="dsHRChart"></canvas></div>
+</div>
+<div class="section">
 <h2>10-Mile Block Pacing</h2>
 <p style="color:var(--text-muted);margin-bottom:16px">Moving pace shows a clear negative split — getting faster from 8:26 to 8:03 over the final 60 miles.</p>
 <div class="table-wrapper"><table><thead><tr><th>Miles</th><th>Elapsed Pace</th><th>Moving Pace</th><th>Stop Time</th><th>Stops</th></tr></thead><tbody><tr><td>1-10</td><td>8:26</td><td>8:26</td><td>7s</td><td>1</td></tr><tr><td>11-20</td><td>8:26</td><td>8:26</td><td>-</td><td>-</td></tr><tr><td>21-30</td><td>8:24</td><td>8:23</td><td>8s</td><td>1</td></tr><tr><td>31-40</td><td>8:27</td><td>8:26</td><td>10s</td><td>1</td></tr><tr><td>41-50</td><td>8:27</td><td>8:26</td><td>7s</td><td>1</td></tr><tr><td>51-60</td><td>8:26</td><td>8:25</td><td>6s</td><td>1</td></tr><tr><td>61-70</td><td>8:24</td><td>8:20</td><td>34s</td><td>1</td></tr><tr><td>71-80</td><td>8:21</td><td>8:18</td><td>30s</td><td>1</td></tr><tr><td>81-90</td><td>8:19</td><td>8:16</td><td>38s</td><td>2</td></tr><tr><td>91-100</td><td>8:18</td><td>8:16</td><td>21s</td><td>1</td></tr><tr><td>101-110</td><td>8:21</td><td>8:16</td><td>51s</td><td>3</td></tr><tr><td>111-120</td><td>8:13</td><td>8:11</td><td>11s</td><td>1</td></tr><tr><td>121-130</td><td>8:16</td><td>8:12</td><td>45s</td><td>5</td></tr><tr><td>131-140</td><td>8:24</td><td>8:14</td><td>1m40s</td><td>3</td></tr><tr><td>141-150</td><td>8:12</td><td>8:10</td><td>20s</td><td>1</td></tr><tr><td>151-160</td><td>8:09</td><td>8:03</td><td>1m01s</td><td>3</td></tr><tr><td>161-170</td><td>8:10</td><td>8:04</td><td>51s</td><td>3</td></tr><tr><td>171-173</td><td>7:38</td><td>7:30</td><td>25s</td><td>1</td></tr></tbody></table></div>
@@ -52,5 +63,87 @@
 
 </main>
 <footer><div class="container">Built by <a href="https://github.com/nickcoury">Nick Coury</a> &amp; Claw</div></footer>
+<script>
+Chart.defaults.color = '#8b949e';
+Chart.defaults.borderColor = 'rgba(139,148,158,0.15)';
+
+const dsSplits = [{"mile":1,"split":500.83826944000003,"moving":493.83826944000003,"hasStop":true,"hr":152},{"mile":2,"split":505.84711455999997,"moving":505.84711455999997,"hasStop":false,"hr":164},{"mile":3,"split":504.67013280000003,"moving":504.67013280000003,"hasStop":false,"hr":171},{"mile":4,"split":505.49941824000007,"moving":505.49941824000007,"hasStop":false,"hr":174},{"mile":5,"split":502.9588745599997,"moving":502.9588745599997,"hasStop":false,"hr":171},{"mile":6,"split":508.41866112000025,"moving":508.41866112000025,"hasStop":false,"hr":171},{"mile":7,"split":510.1648848,"moving":510.1648848,"hasStop":false,"hr":171},{"mile":8,"split":508.8684745600008,"moving":508.8684745600008,"hasStop":false,"hr":171},{"mile":9,"split":510.18999551999923,"moving":510.18999551999923,"hasStop":false,"hr":172},{"mile":10,"split":506.5812560000004,"moving":506.5812560000004,"hasStop":false,"hr":171},{"mile":11,"split":508.6267180800005,"moving":508.6267180800005,"hasStop":false,"hr":172},{"mile":12,"split":508.63343936,"moving":508.63343936,"hasStop":false,"hr":174},{"mile":13,"split":505.67868031999933,"moving":505.67868031999933,"hasStop":false,"hr":174},{"mile":14,"split":512.6335910400003,"moving":512.6335910400003,"hasStop":false,"hr":170},{"mile":15,"split":511.7594448,"moving":511.7594448,"hasStop":false,"hr":169},{"mile":16,"split":505.8102806400002,"moving":505.8102806400002,"hasStop":false,"hr":171},{"mile":17,"split":503.31233343999975,"moving":503.31233343999975,"hasStop":false,"hr":172},{"mile":18,"split":502.03048703999775,"moving":502.03048703999775,"hasStop":false,"hr":171},{"mile":19,"split":502.1877171200031,"moving":502.1877171200031,"hasStop":false,"hr":168},{"mile":20,"split":496.3135113600001,"moving":496.3135113600001,"hasStop":false,"hr":168},{"mile":21,"split":502.53701183999874,"moving":502.53701183999874,"hasStop":false,"hr":168},{"mile":22,"split":509.9219075200035,"moving":509.9219075200035,"hasStop":false,"hr":169},{"mile":23,"split":503.4904617600023,"moving":503.4904617600023,"hasStop":false,"hr":171},{"mile":24,"split":499.1912588799987,"moving":499.1912588799987,"hasStop":false,"hr":168},{"mile":25,"split":509.77881119999984,"moving":509.77881119999984,"hasStop":false,"hr":170},{"mile":26,"split":506.2736140799989,"moving":506.2736140799989,"hasStop":false,"hr":170},{"mile":27,"split":499.39493504000166,"moving":499.39493504000166,"hasStop":false,"hr":172},{"mile":28,"split":508.06964384000094,"moving":508.06964384000094,"hasStop":false,"hr":173},{"mile":29,"split":499.6390691199995,"moving":491.6390691199995,"hasStop":true,"hr":174},{"mile":30,"split":504.1957875199987,"moving":504.1957875199987,"hasStop":false,"hr":173},{"mile":31,"split":507.69768767999994,"moving":507.69768767999994,"hasStop":false,"hr":168},{"mile":32,"split":510.0655686399987,"moving":500.0655686399987,"hasStop":true,"hr":170},{"mile":33,"split":504.6781225599989,"moving":504.6781225599989,"hasStop":false,"hr":173},{"mile":34,"split":507.5347897600004,"moving":507.5347897600004,"hasStop":false,"hr":172},{"mile":35,"split":507.7993257599992,"moving":507.7993257599992,"hasStop":false,"hr":174},{"mile":36,"split":512.926936959997,"moving":512.926936959997,"hasStop":false,"hr":176},{"mile":37,"split":505.6158265600061,"moving":505.6158265600061,"hasStop":false,"hr":176},{"mile":38,"split":507.04784991999986,"moving":507.04784991999986,"hasStop":false,"hr":175},{"mile":39,"split":505.38655519999884,"moving":505.38655519999884,"hasStop":false,"hr":177},{"mile":40,"split":503.1320041600047,"moving":503.1320041600047,"hasStop":false,"hr":178},{"mile":41,"split":502.9397824000007,"moving":502.9397824000007,"hasStop":false,"hr":176},{"mile":42,"split":506.19310079999923,"moving":506.19310079999923,"hasStop":false,"hr":176},{"mile":43,"split":512.5743977600032,"moving":512.5743977600032,"hasStop":false,"hr":175},{"mile":44,"split":506.95005952000065,"moving":499.95005952000065,"hasStop":true,"hr":174},{"mile":45,"split":508.7035907200043,"moving":508.7035907200043,"hasStop":false,"hr":176},{"mile":46,"split":503.6303462399992,"moving":503.6303462399992,"hasStop":false,"hr":178},{"mile":47,"split":506.64399424000294,"moving":506.64399424000294,"hasStop":false,"hr":175},{"mile":48,"split":503.01206752000144,"moving":503.01206752000144,"hasStop":false,"hr":176},{"mile":49,"split":511.1252438400006,"moving":511.1252438400006,"hasStop":false,"hr":175},{"mile":50,"split":506.0660441600012,"moving":506.0660441600012,"hasStop":false,"hr":177},{"mile":51,"split":509.3470460799981,"moving":509.3470460799981,"hasStop":false,"hr":173},{"mile":52,"split":503.3975267200003,"moving":503.3975267200003,"hasStop":false,"hr":176},{"mile":53,"split":503.9627651200062,"moving":497.9627651200062,"hasStop":true,"hr":177},{"mile":54,"split":512.1805260799993,"moving":512.1805260799993,"hasStop":false,"hr":176},{"mile":55,"split":509.6467503999993,"moving":509.6467503999993,"hasStop":false,"hr":176},{"mile":56,"split":508.6516976000021,"moving":508.6516976000021,"hasStop":false,"hr":174},{"mile":57,"split":508.09572928000125,"moving":508.09572928000125,"hasStop":false,"hr":173},{"mile":58,"split":498.7204492799974,"moving":498.7204492799974,"hasStop":false,"hr":176},{"mile":59,"split":504.0977164800024,"moving":504.0977164800024,"hasStop":false,"hr":178},{"mile":60,"split":500.83619936000105,"moving":500.83619936000105,"hasStop":false,"hr":178},{"mile":61,"split":504.1905904000014,"moving":504.1905904000014,"hasStop":false,"hr":177},{"mile":62,"split":504.9980336000008,"moving":504.9980336000008,"hasStop":false,"hr":175},{"mile":63,"split":503.2107273599977,"moving":503.2107273599977,"hasStop":false,"hr":177},{"mile":64,"split":505.4211673599966,"moving":505.4211673599966,"hasStop":false,"hr":174},{"mile":65,"split":500.2255436800042,"moving":500.2255436800042,"hasStop":false,"hr":177},{"mile":66,"split":503.2036015999911,"moving":503.2036015999911,"hasStop":false,"hr":179},{"mile":67,"split":502.868375359998,"moving":502.868375359998,"hasStop":false,"hr":178},{"mile":68,"split":497.3679171199983,"moving":497.3679171199983,"hasStop":false,"hr":178},{"mile":69,"split":499.924488640012,"moving":499.924488640012,"hasStop":false,"hr":179},{"mile":70,"split":514.0598300799902,"moving":480.0598300799902,"hasStop":true,"hr":176},{"mile":71,"split":495.49493568000617,"moving":495.49493568000617,"hasStop":false,"hr":177},{"mile":72,"split":503.03105695999693,"moving":503.03105695999693,"hasStop":false,"hr":180},{"mile":73,"split":499.72100096000213,"moving":499.72100096000213,"hasStop":false,"hr":180},{"mile":74,"split":497.59074944000895,"moving":497.59074944000895,"hasStop":false,"hr":178},{"mile":75,"split":499.9739193599962,"moving":499.9739193599962,"hasStop":false,"hr":178},{"mile":76,"split":510.9294428800058,"moving":480.9294428800058,"hasStop":true,"hr":177},{"mile":77,"split":494.884941119999,"moving":494.884941119999,"hasStop":false,"hr":176},{"mile":78,"split":502.96177024000644,"moving":502.96177024000644,"hasStop":false,"hr":178},{"mile":79,"split":502.17812799999956,"moving":502.17812799999956,"hasStop":false,"hr":176},{"mile":80,"split":498.62925535999966,"moving":498.62925535999966,"hasStop":false,"hr":177},{"mile":81,"split":497.32764000001043,"moving":484.32764000001043,"hasStop":true,"hr":178},{"mile":82,"split":494.19006944000284,"moving":494.19006944000284,"hasStop":false,"hr":179},{"mile":83,"split":495.75658912000654,"moving":495.75658912000654,"hasStop":false,"hr":180},{"mile":84,"split":513.8162863999969,"moving":488.8162863999969,"hasStop":true,"hr":179},{"mile":85,"split":494.1352502400041,"moving":494.1352502400041,"hasStop":false,"hr":179},{"mile":86,"split":491.2704655999987,"moving":491.2704655999987,"hasStop":false,"hr":180},{"mile":87,"split":508.56994752000173,"moving":508.56994752000173,"hasStop":false,"hr":154},{"mile":88,"split":494.41523423999024,"moving":494.41523423999024,"hasStop":false,"hr":72},{"mile":89,"split":501.03809375999845,"moving":501.03809375999845,"hasStop":false,"hr":null},{"mile":90,"split":504.11744927999825,"moving":504.11744927999825,"hasStop":false,"hr":124},{"mile":91,"split":492.3661830399942,"moving":492.3661830399942,"hasStop":false,"hr":146},{"mile":92,"split":494.0634288000074,"moving":494.0634288000074,"hasStop":false,"hr":164},{"mile":93,"split":518.7943363199884,"moving":497.79433631998836,"hasStop":true,"hr":170},{"mile":94,"split":496.9895692800055,"moving":496.9895692800055,"hasStop":false,"hr":172},{"mile":95,"split":500.7171497599993,"moving":500.7171497599993,"hasStop":false,"hr":174},{"mile":96,"split":497.84292512000684,"moving":497.84292512000684,"hasStop":false,"hr":175},{"mile":97,"split":495.5746736000074,"moving":495.5746736000074,"hasStop":false,"hr":175},{"mile":98,"split":496.1459011199913,"moving":496.1459011199913,"hasStop":false,"hr":179},{"mile":99,"split":492.8137884800017,"moving":492.8137884800017,"hasStop":false,"hr":179},{"mile":100,"split":492.74813727998844,"moving":492.74813727998844,"hasStop":false,"hr":177},{"mile":101,"split":513.1640505600008,"moving":503.16405056000076,"hasStop":true,"hr":176},{"mile":102,"split":496.0977388799947,"moving":496.0977388799947,"hasStop":false,"hr":178},{"mile":103,"split":517.4959280000039,"moving":517.4959280000039,"hasStop":false,"hr":175},{"mile":104,"split":505.91923007999867,"moving":471.91923007999867,"hasStop":true,"hr":179},{"mile":105,"split":496.47613887999614,"moving":496.47613887999614,"hasStop":false,"hr":180},{"mile":106,"split":504.9809420800084,"moving":497.9809420800084,"hasStop":true,"hr":180},{"mile":107,"split":487.3302201599945,"moving":487.3302201599945,"hasStop":false,"hr":181},{"mile":108,"split":495.18360864000715,"moving":495.18360864000715,"hasStop":false,"hr":182},{"mile":109,"split":494.533512639995,"moving":494.533512639995,"hasStop":false,"hr":182},{"mile":110,"split":495.6814556800091,"moving":495.6814556800091,"hasStop":false,"hr":183},{"mile":111,"split":496.2385219199932,"moving":496.2385219199932,"hasStop":false,"hr":182},{"mile":112,"split":496.8724713599877,"moving":485.8724713599877,"hasStop":true,"hr":180},{"mile":113,"split":478.86169216000417,"moving":478.86169216000417,"hasStop":false,"hr":182},{"mile":114,"split":493.7084748799971,"moving":493.7084748799971,"hasStop":false,"hr":184},{"mile":115,"split":490.15252608000446,"moving":490.15252608000446,"hasStop":false,"hr":185},{"mile":116,"split":495.3302649599864,"moving":495.3302649599864,"hasStop":false,"hr":184},{"mile":117,"split":495.70806656000786,"moving":495.70806656000786,"hasStop":false,"hr":184},{"mile":118,"split":494.0434812800013,"moving":494.0434812800013,"hasStop":false,"hr":184},{"mile":119,"split":490.21514656000363,"moving":490.21514656000363,"hasStop":false,"hr":184},{"mile":120,"split":494.1905430399929,"moving":494.1905430399929,"hasStop":false,"hr":183},{"mile":121,"split":496.0024905600003,"moving":485.0024905600003,"hasStop":true,"hr":182},{"mile":122,"split":500.94715424000606,"moving":491.94715424000606,"hasStop":true,"hr":177},{"mile":123,"split":484.9985065600049,"moving":484.9985065600049,"hasStop":false,"hr":178},{"mile":124,"split":489.6431523200008,"moving":481.6431523200008,"hasStop":true,"hr":180},{"mile":125,"split":493.8472419200043,"moving":493.8472419200043,"hasStop":false,"hr":181},{"mile":126,"split":490.82157248000294,"moving":490.82157248000294,"hasStop":false,"hr":181},{"mile":127,"split":506.3024470399978,"moving":494.3024470399978,"hasStop":true,"hr":181},{"mile":128,"split":491.4829408000078,"moving":491.4829408000078,"hasStop":false,"hr":179},{"mile":129,"split":503.7322105600033,"moving":498.7322105600033,"hasStop":true,"hr":181},{"mile":130,"split":503.6627475200148,"moving":503.6627475200148,"hasStop":false,"hr":181},{"mile":131,"split":573.2610297599895,"moving":525.2610297599895,"hasStop":true,"hr":182},{"mile":132,"split":487.79115648001607,"moving":487.79115648001607,"hasStop":false,"hr":183},{"mile":133,"split":495.1476230400003,"moving":495.1476230400003,"hasStop":false,"hr":181},{"mile":134,"split":489.0487267199933,"moving":489.0487267199933,"hasStop":false,"hr":182},{"mile":135,"split":495.7649856000062,"moving":495.7649856000062,"hasStop":false,"hr":175},{"mile":136,"split":514.8560947200167,"moving":482.8560947200167,"hasStop":true,"hr":172},{"mile":137,"split":490.4572886399983,"moving":490.4572886399983,"hasStop":false,"hr":179},{"mile":138,"split":489.0898787200131,"moving":489.0898787200131,"hasStop":false,"hr":181},{"mile":139,"split":514.0144284799899,"moving":494.0144284799899,"hasStop":true,"hr":180},{"mile":140,"split":493.1655622399994,"moving":493.1655622399994,"hasStop":false,"hr":182},{"mile":141,"split":489.4314288000169,"moving":489.4314288000169,"hasStop":false,"hr":183},{"mile":142,"split":486.1159107199928,"moving":486.1159107199928,"hasStop":false,"hr":185},{"mile":143,"split":485.3367721600225,"moving":485.3367721600225,"hasStop":false,"hr":184},{"mile":144,"split":516.6748793599982,"moving":496.67487935999816,"hasStop":true,"hr":184},{"mile":145,"split":488.34135616000276,"moving":488.34135616000276,"hasStop":false,"hr":185},{"mile":146,"split":492.0283369599929,"moving":492.0283369599929,"hasStop":false,"hr":185},{"mile":147,"split":492.7870591999963,"moving":492.7870591999963,"hasStop":false,"hr":183},{"mile":148,"split":485.25172639999073,"moving":485.25172639999073,"hasStop":false,"hr":184},{"mile":149,"split":490.32539167998766,"moving":490.32539167998766,"hasStop":false,"hr":185},{"mile":150,"split":491.7621257599967,"moving":491.7621257599967,"hasStop":false,"hr":185},{"mile":151,"split":501.7746297600097,"moving":483.7746297600097,"hasStop":true,"hr":180},{"mile":152,"split":486.0918035200011,"moving":486.0918035200011,"hasStop":false,"hr":182},{"mile":153,"split":495.2012262399803,"moving":465.2012262399803,"hasStop":true,"hr":183},{"mile":154,"split":483.23883807999664,"moving":483.23883807999664,"hasStop":false,"hr":183},{"mile":155,"split":483.7504143999977,"moving":483.7504143999977,"hasStop":false,"hr":182},{"mile":156,"split":503.29547679999087,"moving":490.29547679999087,"hasStop":true,"hr":179},{"mile":157,"split":484.348319680008,"moving":484.348319680008,"hasStop":false,"hr":183},{"mile":158,"split":485.58803679996345,"moving":485.58803679996345,"hasStop":false,"hr":184},{"mile":159,"split":489.5818332799972,"moving":489.5818332799972,"hasStop":false,"hr":184},{"mile":160,"split":481.082365440001,"moving":481.082365440001,"hasStop":false,"hr":185},{"mile":161,"split":480.2037708800053,"moving":480.2037708800053,"hasStop":false,"hr":185},{"mile":162,"split":492.51888672000496,"moving":486.51888672000496,"hasStop":true,"hr":183},{"mile":163,"split":485.4254636800033,"moving":485.4254636800033,"hasStop":false,"hr":185},{"mile":164,"split":509.233756799993,"moving":496.233756799993,"hasStop":true,"hr":181},{"mile":165,"split":515.8440595200082,"moving":483.84405952000816,"hasStop":true,"hr":180},{"mile":166,"split":483.99580704000255,"moving":483.99580704000255,"hasStop":false,"hr":181},{"mile":167,"split":481.3079231999727,"moving":481.3079231999727,"hasStop":false,"hr":186},{"mile":168,"split":486.53371488000266,"moving":486.53371488000266,"hasStop":false,"hr":183},{"mile":169,"split":487.00920352000685,"moving":487.00920352000685,"hasStop":false,"hr":183},{"mile":170,"split":473.7541817599995,"moving":473.7541817599995,"hasStop":false,"hr":185},{"mile":171,"split":516.739316480016,"moving":491.739316480016,"hasStop":true,"hr":180},{"mile":172,"split":473.47669055998267,"moving":473.47669055998267,"hasStop":false,"hr":180},{"mile":173,"split":383.3229878400016,"moving":383.3229878400016,"hasStop":false,"hr":191}];
+
+new Chart(document.getElementById('dsPaceChart'), {
+  type: 'line',
+  data: {
+    labels: dsSplits.map(s => s.mile),
+    datasets: [{
+      label: 'Elapsed Pace',
+      data: dsSplits.map(s => s.split),
+      borderColor: '#3498db',
+      backgroundColor: '#3498db22',
+      pointRadius: 2,
+      pointHoverRadius: 5,
+      borderWidth: 1.5,
+      fill: false,
+    }, {
+      label: 'Moving Pace',
+      data: dsSplits.map(s => s.moving),
+      borderColor: '#27ae60',
+      backgroundColor: '#27ae6022',
+      pointRadius: 2,
+      pointHoverRadius: 5,
+      borderWidth: 1.5,
+      fill: false,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      tooltip: { callbacks: { label: function(ctx) {
+        var s = ctx.raw; var m = Math.floor(s/60); var sec = Math.round(s%60);
+        return ctx.dataset.label + ': ' + m + ':' + (sec<10?'0':'') + sec + '/mi';
+      }}}
+    },
+    scales: {
+      y: {
+        reverse: true,
+        ticks: { callback: function(v) { var m=Math.floor(v/60); var s=Math.round(v%60); return m+':'+(s<10?'0':'')+s; } },
+        title: { display: true, text: 'Pace (min/mi)' }
+      },
+      x: { title: { display: true, text: 'Mile' }, grid: { display: false },
+        ticks: { callback: function(v,i) { return (i+1) % 10 === 0 ? i+1 : ''; } }
+      }
+    }
+  }
+});
+
+new Chart(document.getElementById('dsHRChart'), {
+  type: 'line',
+  data: {
+    labels: dsSplits.map(s => s.mile),
+    datasets: [{
+      label: 'Heart Rate',
+      data: dsSplits.map(s => s.hr),
+      borderColor: '#e74c3c',
+      backgroundColor: '#e74c3c22',
+      pointRadius: 1.5,
+      borderWidth: 1.5,
+      fill: true,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      tooltip: { callbacks: { label: function(ctx) { return ctx.raw + ' bpm'; } } }
+    },
+    scales: {
+      y: { title: { display: true, text: 'BPM' } },
+      x: { grid: { display: false },
+        ticks: { callback: function(v,i) { return (i+1) % 10 === 0 ? i+1 : ''; } }
+      }
+    }
+  }
+});
+</script>
 </body>
 </html>

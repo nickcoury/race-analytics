@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Training Overview — Nick Coury Race Analytics</title>
 <link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <header>
@@ -33,8 +34,17 @@
 <div class="stat"><div class="value">118</div><div class="label">Longest Streak</div></div>
 </div>
 <div class="section">
-<h2>Yearly Volume</h2>
-<p style="color:var(--text-muted);margin-bottom:16px"><span style="color:var(--green)">Green</span> = 5,000+ mile years. <span style="color:var(--blue)">Blue</span> = 4,000+ mile years. Peak: 2021 at 5,210 miles (100 mi/wk avg) during the American Record buildup.</p>
+<h2>Yearly Mileage</h2>
+<p style="color:var(--text-muted);margin-bottom:16px"><span style="color:#27ae60">Green</span> = 5,000+ miles, <span style="color:#2980b9">blue</span> = 4,000+. Peak: 2021 at 5,210 miles during the American Record buildup.</p>
+<div style="height:300px;margin-bottom:24px"><canvas id="yearlyChart"></canvas></div>
+</div>
+<div class="section">
+<h2>Yearly Elevation</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">2024 was the biggest climbing year at 466k ft — more mountains, more vert.</p>
+<div style="height:250px;margin-bottom:24px"><canvas id="elevChart"></canvas></div>
+</div>
+<div class="section">
+<h2>Year-by-Year Detail</h2>
 <div class="table-wrapper"><table><thead><tr><th>Year</th><th>Runs</th><th>Miles</th><th>Mi/Wk</th><th>Hours</th><th>Elev (ft)</th><th>Avg Run</th><th>Longest</th></tr></thead><tbody><tr><td>2012</td><td>55</td><td>541</td><td>10</td><td>75</td><td>61,351</td><td>9.8 mi</td><td>50.6 mi</td></tr><tr><td>2013</td><td>59</td><td>639</td><td>12</td><td>97</td><td>71,550</td><td>10.8 mi</td><td>49.4 mi</td></tr><tr><td>2014</td><td>54</td><td>540</td><td>10</td><td>83</td><td>70,969</td><td>10 mi</td><td>46.4 mi</td></tr><tr><td>2015</td><td>305</td><td>2,416</td><td>46</td><td>385</td><td>277,210</td><td>7.9 mi</td><td>49.7 mi</td></tr><tr><td>2016</td><td>265</td><td>2,205</td><td>42</td><td>355</td><td>167,130</td><td>8.3 mi</td><td>100 mi</td></tr><tr><td>2017</td><td>339</td><td>2,678</td><td>52</td><td>409</td><td>287,309</td><td>7.9 mi</td><td>55.7 mi</td></tr><tr><td>2018</td><td>395</td><td>3,764</td><td>72</td><td>546</td><td>309,003</td><td>9.5 mi</td><td>155 mi</td></tr><tr><td>2019</td><td>364</td><td>3,862</td><td>74</td><td>564</td><td>186,198</td><td>10.6 mi</td><td>120.5 mi</td></tr><tr style="color:var(--blue)"><td>2020</td><td>392</td><td>4,613</td><td>89</td><td>695</td><td>350,574</td><td>11.8 mi</td><td>155.4 mi</td></tr><tr class="closing"><td>2021</td><td>352</td><td>5,210</td><td>100</td><td>776</td><td>383,840</td><td>14.8 mi</td><td>178.7 mi</td></tr><tr><td>2022</td><td>349</td><td>3,461</td><td>67</td><td>546</td><td>369,004</td><td>9.9 mi</td><td>100.3 mi</td></tr><tr><td>2023</td><td>286</td><td>2,845</td><td>55</td><td>426</td><td>216,299</td><td>9.9 mi</td><td>124.1 mi</td></tr><tr class="closing"><td>2024</td><td>454</td><td>5,003</td><td>96</td><td>776</td><td>466,285</td><td>11 mi</td><td>102.5 mi</td></tr><tr style="color:var(--blue)"><td>2025</td><td>459</td><td>4,070</td><td>78</td><td>596</td><td>287,733</td><td>8.9 mi</td><td>73.2 mi</td></tr><tr><td>2026</td><td>85</td><td>690</td><td>58</td><td>98</td><td>34,892</td><td>8.1 mi</td><td>18.4 mi</td></tr></tbody></table></div>
 </div>
 <div class="section">
@@ -56,5 +66,58 @@
 
 </main>
 <footer><div class="container">Built by <a href="https://github.com/nickcoury">Nick Coury</a> &amp; Claw</div></footer>
+<script>
+Chart.defaults.color = '#8b949e';
+Chart.defaults.borderColor = 'rgba(139,148,158,0.15)';
+Chart.defaults.font.family = '-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif';
+
+new Chart(document.getElementById('yearlyChart'), {
+  type: 'bar',
+  data: {
+    labels: [2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],
+    datasets: [{
+      label: 'Miles',
+      data: [541,639,540,2416,2205,2678,3764,3862,4613,5210,3461,2845,5003,4070,690],
+      backgroundColor: ["#3498db33","#3498db33","#3498db33","#3498db55","#3498db55","#3498db55","#3498db55","#3498db55","#2980b9","#27ae60","#3498db55","#3498db55","#27ae60","#2980b9","#3498db33"],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.raw.toLocaleString() + ' miles' } }
+    },
+    scales: {
+      y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString() } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+new Chart(document.getElementById('elevChart'), {
+  type: 'bar',
+  data: {
+    labels: [2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],
+    datasets: [{
+      label: 'Elevation (ft)',
+      data: [61351,71550,70969,277210,167130,287309,309003,186198,350574,383840,369004,216299,466285,287733,34892],
+      backgroundColor: ["#e67e2244","#e67e2244","#e67e2244","#e67e2244","#e67e2244","#e67e2244","#e67e2288","#e67e2244","#e67e2288","#e67e2288","#e67e2288","#e67e2244","#e67e22","#e67e2244","#e67e2244"],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.raw.toLocaleString() + ' ft' } }
+    },
+    scales: {
+      y: { beginAtZero: true, ticks: { callback: v => (v/1000).toFixed(0) + 'k' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+</script>
 </body>
 </html>
