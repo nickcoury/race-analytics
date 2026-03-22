@@ -28,11 +28,43 @@
 <p>3 races — 2019 to 2023</p>
 </div>
 <div class="section">
+<h2>Pace Progression</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Average pace across years. <span style="color:#27ae60">Green</span> = PR.</p>
+<div style="height:150px;margin-bottom:24px"><canvas id="paceProgChart"></canvas></div>
+</div>
+<div class="section">
 <h2>Race Comparison</h2>
 <div class="table-wrapper"><table><thead><tr><th>Year</th><th>Name</th><th>Distance</th><th>Time</th><th>Pace</th></tr></thead><tbody><tr><td>2019</td><td>Black Canyon 100k</td><td>61.2 mi</td><td>9:13</td><td>9:02/mi</td></tr><tr><td>2021</td><td>Black Canyon 100k — 3rd Place</td><td>61.5 mi</td><td>8:16</td><td>8:04/mi</td></tr><tr><td>2023</td><td>Black Canyon 100k</td><td>61.1 mi</td><td>9:07</td><td>8:57/mi</td></tr></tbody></table></div>
 </div>
 </main>
 <footer><div class="container">Built by <a href="https://github.com/nickcoury">Nick Coury</a> &amp; Claw</div></footer>
+<script>
+Chart.defaults.color = '#8b949e';
+Chart.defaults.borderColor = 'rgba(139,148,158,0.15)';
+function fmtPaceJS(s) { var m = Math.floor(s/60); var sec = Math.round(s%60); return m + ':' + (sec<10?'0':'') + sec; }
 
+new Chart(document.getElementById('paceProgChart'), {
+  type: 'bar',
+  data: {
+    labels: ["2019","2021","2023"],
+    datasets: [{
+      label: 'Pace',
+      data: [542,484,537],
+      backgroundColor: ["#3498db88","#27ae60","#3498db88"],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: function(ctx) { return fmtPaceJS(ctx.raw) + '/mi'; } } }
+    },
+    scales: {
+      x: { ticks: { callback: function(v) { return fmtPaceJS(v); } }, title: { display: true, text: 'Pace (min/mi)' } },
+      y: { grid: { display: false } }
+    }
+  }
+});</script>
 </body>
 </html>

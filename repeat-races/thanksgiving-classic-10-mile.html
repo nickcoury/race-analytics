@@ -28,11 +28,43 @@
 <p>5 races — 2021 to 2025</p>
 </div>
 <div class="section">
+<h2>Pace Progression</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Average pace across years. <span style="color:#27ae60">Green</span> = PR.</p>
+<div style="height:250px;margin-bottom:24px"><canvas id="paceProgChart"></canvas></div>
+</div>
+<div class="section">
 <h2>Race Comparison</h2>
 <div class="table-wrapper"><table><thead><tr><th>Year</th><th>Name</th><th>Distance</th><th>Time</th><th>Pace</th></tr></thead><tbody><tr><td>2021</td><td>Thanksgiving Day Classic — 2nd Place</td><td>10 mi</td><td>54:00</td><td>5:24/mi</td></tr><tr><td>2022</td><td>Thanksgiving Classic — 2nd Place</td><td>10 mi</td><td>55:48</td><td>5:35/mi</td></tr><tr><td>2023</td><td>Thanksgiving Day Classic — 1st Place</td><td>10 mi</td><td>55:12</td><td>5:31/mi</td></tr><tr><td>2024</td><td>Thanksgiving Classic — 1st Place</td><td>10 mi</td><td>57:00</td><td>5:42/mi</td></tr><tr><td>2025</td><td>Thanksgiving Classic — 1st Place</td><td>10 mi</td><td>54:00</td><td>5:24/mi</td></tr></tbody></table></div>
 </div>
 </main>
 <footer><div class="container">Built by <a href="https://github.com/nickcoury">Nick Coury</a> &amp; Claw</div></footer>
+<script>
+Chart.defaults.color = '#8b949e';
+Chart.defaults.borderColor = 'rgba(139,148,158,0.15)';
+function fmtPaceJS(s) { var m = Math.floor(s/60); var sec = Math.round(s%60); return m + ':' + (sec<10?'0':'') + sec; }
 
+new Chart(document.getElementById('paceProgChart'), {
+  type: 'bar',
+  data: {
+    labels: ["2021","2022","2023","2024","2025"],
+    datasets: [{
+      label: 'Pace',
+      data: [324,335,331,342,324],
+      backgroundColor: ["#27ae60","#3498db88","#3498db88","#3498db88","#27ae60"],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: function(ctx) { return fmtPaceJS(ctx.raw) + '/mi'; } } }
+    },
+    scales: {
+      x: { ticks: { callback: function(v) { return fmtPaceJS(v); } }, title: { display: true, text: 'Pace (min/mi)' } },
+      y: { grid: { display: false } }
+    }
+  }
+});</script>
 </body>
 </html>
