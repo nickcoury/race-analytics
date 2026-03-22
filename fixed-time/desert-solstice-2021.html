@@ -79,9 +79,14 @@ function fmtPaceJS(s) { var m = Math.floor(s/60); var sec = Math.round(s%60); re
 // Compute rolling 10-mile average (moving pace)
 var rolling10 = dsSplits.map(function(s, i) {
   var start = Math.max(0, i - 9);
-  var window = dsSplits.slice(start, i + 1);
-  var avg = window.reduce(function(a, x) { return a + x.moving; }, 0) / window.length;
+  var w = dsSplits.slice(start, i + 1);
+  var avg = w.reduce(function(a, x) { return a + x.moving; }, 0) / w.length;
   return avg;
+});
+
+// Absolute deviation from rolling average
+var deviation = dsSplits.map(function(s, i) {
+  return Math.abs(s.moving - rolling10[i]);
 });
 
 new Chart(document.getElementById('dsRollingChart'), {
@@ -97,6 +102,7 @@ new Chart(document.getElementById('dsRollingChart'), {
       pointBorderColor: function(ctx) { return dsSplits[ctx.dataIndex]?.hasStop ? '#e74c3c' : '#3498db'; },
       borderWidth: 1,
       fill: false,
+      yAxisID: 'y',
     }, {
       label: '10-Mile Rolling Avg',
       data: rolling10,
@@ -106,6 +112,16 @@ new Chart(document.getElementById('dsRollingChart'), {
       pointHoverRadius: 5,
       fill: false,
       tension: 0.3,
+      yAxisID: 'y',
+    }, {
+      label: 'Deviation from Avg',
+      data: deviation,
+      borderColor: '#9b59b688',
+      backgroundColor: '#9b59b622',
+      borderWidth: 1,
+      pointRadius: 0,
+      fill: true,
+      yAxisID: 'y2',
     }]
   },
   options: {
@@ -114,6 +130,7 @@ new Chart(document.getElementById('dsRollingChart'), {
     interaction: { mode: 'index', intersect: false },
     plugins: {
       tooltip: { callbacks: { label: function(ctx) {
+        if (ctx.datasetIndex === 2) return 'Deviation: ' + ctx.raw.toFixed(1) + 's';
         var extra = '';
         if (ctx.datasetIndex === 0 && dsSplits[ctx.dataIndex]?.hasStop) extra = ' (STOP)';
         return ctx.dataset.label + ': ' + fmtPaceJS(ctx.raw) + '/mi' + extra;
@@ -122,9 +139,17 @@ new Chart(document.getElementById('dsRollingChart'), {
     },
     scales: {
       y: {
+        position: 'left',
         reverse: true,
         ticks: { callback: function(v) { return fmtPaceJS(v); } },
         title: { display: true, text: 'Pace (min/mi)' }
+      },
+      y2: {
+        position: 'right',
+        beginAtZero: true,
+        grid: { drawOnChartArea: false },
+        ticks: { callback: function(v) { return v + 's'; } },
+        title: { display: true, text: 'Deviation (seconds)' }
       },
       x: { title: { display: true, text: 'Mile' }, grid: { display: false },
         ticks: { callback: function(v,i) { return (i+1) % 10 === 0 ? i+1 : ''; } }
