@@ -36,6 +36,20 @@
 <h2>Race Comparison</h2>
 <div class="table-wrapper"><table><thead><tr><th>Year</th><th>Name</th><th>Distance</th><th>Time</th><th>Pace</th></tr></thead><tbody><tr><td>2018</td><td>Stagecoach 55k — 3rd Place</td><td>32.5 mi</td><td>4:13</td><td>7:47/mi</td></tr><tr><td>2019</td><td>Stagecoach 55k — 1st Place</td><td>32 mi</td><td>4:01</td><td>7:32/mi</td></tr></tbody></table></div>
 </div>
+<div class="section">
+<h2>Mile-by-Mile Comparison</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Each year overlaid. Checkboxes toggle visibility.</p>
+<div style="margin-bottom:12px" id="yearToggles"></div>
+<div style="height:350px;margin-bottom:24px"><canvas id="mileOverlayChart"></canvas></div>
+</div>
+<div class="section">
+<h2>Cumulative Time Gap</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Seconds ahead (+) or behind (−) the fastest year at each mile.</p>
+<div style="height:300px;margin-bottom:24px"><canvas id="timeGapChart"></canvas></div>
+</div>
+<div class="section"><h2>Split Heatmap</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Color shows fastest (<span style="color:#27ae60">green</span>) and slowest (<span style="color:#e74c3c">red</span>) year per mile.</p>
+<div class="table-wrapper"><table><thead><tr><th>Mile</th><th>2018</th><th>2019</th><th>Spread</th></tr></thead><tbody><tr><td>1</td><td style="color:#e74c3c">9:57</td><td style="color:#27ae60;font-weight:600">9:33</td><td style="color:var(--text-muted)">24s</td></tr><tr><td>2</td><td style="color:#27ae60;font-weight:600">9:37</td><td style="color:#e74c3c">9:46</td><td style="color:var(--text-muted)">9s</td></tr><tr><td>3</td><td style="color:#27ae60;font-weight:600">9:31</td><td style="color:#e74c3c">9:46</td><td style="color:var(--text-muted)">15s</td></tr><tr><td>4</td><td style="color:#27ae60;font-weight:600">10:20</td><td style="color:#e74c3c">11:04</td><td style="color:var(--text-muted)">44s</td></tr><tr><td>5</td><td style="color:#27ae60;font-weight:600">10:14</td><td style="color:#e74c3c">10:47</td><td style="color:var(--text-muted)">33s</td></tr><tr><td>6</td><td style="color:#e74c3c">9:27</td><td style="color:#27ae60;font-weight:600">7:23</td><td style="color:var(--text-muted)">124s</td></tr><tr><td>7</td><td style="color:#e74c3c">9:08</td><td style="color:#27ae60;font-weight:600">8:08</td><td style="color:var(--text-muted)">60s</td></tr><tr><td>8</td><td style="color:#e74c3c">8:17</td><td style="color:#27ae60;font-weight:600">7:11</td><td style="color:var(--text-muted)">66s</td></tr><tr><td>9</td><td style="color:#e74c3c">10:16</td><td style="color:#27ae60;font-weight:600">7:18</td><td style="color:var(--text-muted)">178s</td></tr><tr><td>10</td><td style="color:#e74c3c">8:14</td><td style="color:#27ae60;font-weight:600">7:01</td><td style="color:var(--text-muted)">73s</td></tr><tr><td>11</td><td style="color:#e74c3c">8:33</td><td style="color:#27ae60;font-weight:600">7:36</td><td style="color:var(--text-muted)">57s</td></tr><tr><td>12</td><td style="color:#e74c3c">8:37</td><td style="color:#27ae60;font-weight:600">8:19</td><td style="color:var(--text-muted)">18s</td></tr><tr><td>13</td><td style="color:#e74c3c">9:01</td><td style="color:#27ae60;font-weight:600">8:07</td><td style="color:var(--text-muted)">54s</td></tr><tr><td>14</td><td style="color:#27ae60;font-weight:600">7:43</td><td style="color:#e74c3c">7:52</td><td style="color:var(--text-muted)">9s</td></tr><tr><td>15</td><td style="color:#27ae60;font-weight:600">7:27</td><td style="color:#e74c3c">8:44</td><td style="color:var(--text-muted)">77s</td></tr><tr><td>16</td><td style="color:#27ae60;font-weight:600">7:04</td><td style="color:#e74c3c">7:06</td><td style="color:var(--text-muted)">2s</td></tr><tr><td>17</td><td style="color:#27ae60;font-weight:600">6:42</td><td style="color:#e74c3c">6:49</td><td style="color:var(--text-muted)">7s</td></tr><tr><td>18</td><td style="color:#e74c3c">6:42</td><td style="color:#27ae60;font-weight:600">6:40</td><td style="color:var(--text-muted)">2s</td></tr><tr><td>19</td><td style="color:#27ae60;font-weight:600">6:38</td><td style="color:#e74c3c">6:43</td><td style="color:var(--text-muted)">5s</td></tr><tr><td>20</td><td style="color:#27ae60;font-weight:600">7:05</td><td style="color:#e74c3c">7:22</td><td style="color:var(--text-muted)">17s</td></tr><tr><td>21</td><td style="color:#e74c3c">6:39</td><td style="color:#27ae60;font-weight:600">6:36</td><td style="color:var(--text-muted)">3s</td></tr><tr><td>22</td><td style="color:#e74c3c">6:57</td><td style="color:#27ae60;font-weight:600">6:45</td><td style="color:var(--text-muted)">12s</td></tr><tr><td>23</td><td style="color:#e74c3c">6:41</td><td style="color:#27ae60;font-weight:600">6:07</td><td style="color:var(--text-muted)">34s</td></tr><tr><td>24</td><td style="color:#e74c3c">6:41</td><td style="color:#27ae60;font-weight:600">6:15</td><td style="color:var(--text-muted)">26s</td></tr><tr><td>25</td><td style="color:#e74c3c">6:39</td><td style="color:#27ae60;font-weight:600">6:19</td><td style="color:var(--text-muted)">20s</td></tr><tr><td>26</td><td style="color:#e74c3c">6:56</td><td style="color:#27ae60;font-weight:600">6:30</td><td style="color:var(--text-muted)">26s</td></tr><tr><td>27</td><td style="color:#e74c3c">6:58</td><td style="color:#27ae60;font-weight:600">6:21</td><td style="color:var(--text-muted)">37s</td></tr><tr><td>28</td><td style="color:#e74c3c">6:47</td><td style="color:#27ae60;font-weight:600">6:14</td><td style="color:var(--text-muted)">33s</td></tr><tr><td>29</td><td style="color:#27ae60;font-weight:600">6:28</td><td style="color:#e74c3c">6:29</td><td style="color:var(--text-muted)">1s</td></tr><tr><td>30</td><td style="color:#e74c3c">7:05</td><td style="color:#27ae60;font-weight:600">6:54</td><td style="color:var(--text-muted)">11s</td></tr><tr><td>31</td><td style="color:#27ae60;font-weight:600">6:54</td><td style="color:#e74c3c">6:59</td><td style="color:var(--text-muted)">5s</td></tr></tbody></table></div></div>
 </main>
 <footer><div class="container">Built by <a href="https://github.com/nickcoury">Nick Coury</a> &amp; Claw</div></footer>
 <script>
@@ -63,6 +77,100 @@ new Chart(document.getElementById('paceProgChart'), {
     scales: {
       x: { ticks: { callback: function(v) { return fmtPaceJS(v); } }, title: { display: true, text: 'Pace (min/mi)' } },
       y: { grid: { display: false } }
+    }
+  }
+});
+var mileData = [{"year":2018,"splits":[597,577,571,620,614,567,548,497,616,494,513,517,541,463,447,424,402,402,398,425,399,417,401,401,399,416,418,407,388,425,414]},{"year":2019,"splits":[573,586,586,664,647,443,488,431,438,421,456,499,487,472,524,426,409,400,403,442,396,405,367,375,379,390,381,374,389,414,419]}];
+var mColors = ["#3498db","#27ae60"];
+var maxMiles = Math.max.apply(null, mileData.map(function(d) { return d.splits.length; }));
+
+var overlayChart = new Chart(document.getElementById('mileOverlayChart'), {
+  type: 'line',
+  data: {
+    labels: Array.from({length: maxMiles}, function(_, i) { return i + 1; }),
+    datasets: mileData.map(function(d, i) {
+      return {
+        label: String(d.year),
+        data: d.splits,
+        borderColor: mColors[i],
+        pointRadius: 0, pointHoverRadius: 5,
+        borderWidth: 2, tension: 0.2,
+      };
+    })
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + fmtPaceJS(ctx.raw) + '/mi'; } } },
+      legend: { labels: { usePointStyle: true } }
+    },
+    scales: {
+      y: { reverse: true, ticks: { callback: function(v) { return fmtPaceJS(v); } }, title: { display: true, text: 'Pace (min/mi)' } },
+      x: { title: { display: true, text: 'Mile' }, grid: { display: false }, ticks: { callback: function(v,i) { return (i+1) % 10 === 0 ? i+1 : ''; } } }
+    }
+  }
+});
+
+var toggleDiv = document.getElementById('yearToggles');
+if (toggleDiv) {
+  mileData.forEach(function(d, i) {
+    var lbl = document.createElement('label');
+    lbl.style.cssText = 'margin-right:16px;cursor:pointer;user-select:none';
+    var cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = true; cb.style.marginRight = '4px';
+    cb.addEventListener('change', function() {
+      overlayChart.data.datasets[i].hidden = !this.checked;
+      overlayChart.update();
+    });
+    lbl.appendChild(cb);
+    var sp = document.createElement('span');
+    sp.style.color = mColors[i]; sp.style.fontWeight = '600';
+    sp.textContent = d.year;
+    lbl.appendChild(sp);
+    toggleDiv.appendChild(lbl);
+  });
+}
+
+var baseIdx = mileData.reduce(function(best, d, i) {
+  var a = d.splits.reduce(function(s, v) { return s + v; }, 0) / d.splits.length;
+  var b = mileData[best].splits.reduce(function(s, v) { return s + v; }, 0) / mileData[best].splits.length;
+  return a < b ? i : best;
+}, 0);
+var baseCum = []; var cs = 0;
+mileData[baseIdx].splits.forEach(function(t) { cs += t; baseCum.push(cs); });
+
+new Chart(document.getElementById('timeGapChart'), {
+  type: 'line',
+  data: {
+    labels: Array.from({length: maxMiles}, function(_, i) { return i + 1; }),
+    datasets: mileData.map(function(d, i) {
+      var cum = []; var s = 0;
+      d.splits.forEach(function(t, j) { s += t; cum.push(s - (baseCum[j] || baseCum[baseCum.length-1])); });
+      return {
+        label: d.year + (i === baseIdx ? ' (fastest)' : ''),
+        data: cum,
+        borderColor: mColors[i],
+        borderWidth: i === baseIdx ? 3 : 2,
+        borderDash: i === baseIdx ? [] : [5, 3],
+        pointRadius: 0, pointHoverRadius: 4,
+        tension: 0.2, fill: false,
+      };
+    })
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      tooltip: { callbacks: { label: function(ctx) {
+        var v = ctx.raw;
+        return ctx.dataset.label + ': ' + (v > 0 ? '+' : '') + v.toFixed(0) + 's';
+      }}},
+      legend: { labels: { usePointStyle: true } }
+    },
+    scales: {
+      y: { title: { display: true, text: 'Gap (seconds)' }, ticks: { callback: function(v) { return (v > 0 ? '+' : '') + v + 's'; } } },
+      x: { title: { display: true, text: 'Mile' }, grid: { display: false }, ticks: { callback: function(v,i) { return (i+1) % 10 === 0 ? i+1 : ''; } } }
     }
   }
 });</script>

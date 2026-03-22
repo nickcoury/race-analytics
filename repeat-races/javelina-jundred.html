@@ -36,6 +36,20 @@
 <h2>Race Comparison</h2>
 <div class="table-wrapper"><table><thead><tr><th>Year</th><th>Name</th><th>Distance</th><th>Time</th><th>Pace</th></tr></thead><tbody><tr><td>2020</td><td>Javelina Jundred — 2nd Place</td><td>97.8 mi</td><td>14:06</td><td>8:39/mi</td></tr><tr><td>2022</td><td>Javelina Jundred — 5th Place</td><td>99.1 mi</td><td>13:49</td><td>8:22/mi</td></tr></tbody></table></div>
 </div>
+<div class="section">
+<h2>Mile-by-Mile Comparison</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Each year overlaid. Checkboxes toggle visibility.</p>
+<div style="margin-bottom:12px" id="yearToggles"></div>
+<div style="height:350px;margin-bottom:24px"><canvas id="mileOverlayChart"></canvas></div>
+</div>
+<div class="section">
+<h2>Cumulative Time Gap</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Seconds ahead (+) or behind (−) the fastest year at each mile.</p>
+<div style="height:300px;margin-bottom:24px"><canvas id="timeGapChart"></canvas></div>
+</div>
+<div class="section"><h2>Split Heatmap</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Color shows fastest (<span style="color:#27ae60">green</span>) and slowest (<span style="color:#e74c3c">red</span>) year per mile.</p>
+<div class="table-wrapper"><table><thead><tr><th>Mile</th><th>2020</th><th>2022</th><th>Spread</th></tr></thead><tbody><tr><td>1</td><td style="color:#e74c3c">8:47</td><td style="color:#27ae60;font-weight:600">8:19</td><td style="color:var(--text-muted)">28s</td></tr><tr><td>2</td><td style="color:#e74c3c">9:21</td><td style="color:#27ae60;font-weight:600">8:21</td><td style="color:var(--text-muted)">60s</td></tr><tr><td>3</td><td style="color:#e74c3c">8:59</td><td style="color:#27ae60;font-weight:600">7:54</td><td style="color:var(--text-muted)">65s</td></tr><tr><td>4</td><td style="color:#e74c3c">8:56</td><td style="color:#27ae60;font-weight:600">8:25</td><td style="color:var(--text-muted)">31s</td></tr><tr><td>5</td><td style="color:#e74c3c">9:33</td><td style="color:#27ae60;font-weight:600">8:43</td><td style="color:var(--text-muted)">50s</td></tr><tr><td>6</td><td style="color:#e74c3c">9:24</td><td style="color:#27ae60;font-weight:600">8:41</td><td style="color:var(--text-muted)">43s</td></tr><tr><td>7</td><td style="color:#e74c3c">9:39</td><td style="color:#27ae60;font-weight:600">8:26</td><td style="color:var(--text-muted)">73s</td></tr><tr><td>8</td><td style="color:#e74c3c">9:24</td><td style="color:#27ae60;font-weight:600">8:47</td><td style="color:var(--text-muted)">37s</td></tr><tr><td>9</td><td style="color:#e74c3c">9:16</td><td style="color:#27ae60;font-weight:600">8:25</td><td style="color:var(--text-muted)">51s</td></tr><tr><td>10</td><td style="color:#e74c3c">9:04</td><td style="color:#27ae60;font-weight:600">8:14</td><td style="color:var(--text-muted)">50s</td></tr><tr><td>11</td><td style="color:#e74c3c">9:16</td><td style="color:#27ae60;font-weight:600">8:13</td><td style="color:var(--text-muted)">63s</td></tr><tr><td>12</td><td style="color:#e74c3c">9:03</td><td style="color:#27ae60;font-weight:600">8:15</td><td style="color:var(--text-muted)">48s</td></tr><tr><td>13</td><td style="color:#e74c3c">9:02</td><td style="color:#27ae60;font-weight:600">8:02</td><td style="color:var(--text-muted)">60s</td></tr><tr><td>14</td><td style="color:#e74c3c">9:00</td><td style="color:#27ae60;font-weight:600">7:51</td><td style="color:var(--text-muted)">69s</td></tr><tr><td>15</td><td style="color:#e74c3c">8:49</td><td style="color:#27ae60;font-weight:600">7:47</td><td style="color:var(--text-muted)">62s</td></tr><tr><td>16</td><td style="color:#e74c3c">8:50</td><td style="color:#27ae60;font-weight:600">7:44</td><td style="color:var(--text-muted)">66s</td></tr><tr><td>17</td><td style="color:#e74c3c">8:59</td><td style="color:#27ae60;font-weight:600">7:51</td><td style="color:var(--text-muted)">68s</td></tr><tr><td>18</td><td style="color:#e74c3c">9:08</td><td style="color:#27ae60;font-weight:600">8:01</td><td style="color:var(--text-muted)">67s</td></tr><tr><td>19</td><td style="color:#e74c3c">9:32</td><td style="color:#27ae60;font-weight:600">8:14</td><td style="color:var(--text-muted)">78s</td></tr><tr><td>20</td><td style="color:#e74c3c">9:13</td><td style="color:#27ae60;font-weight:600">8:05</td><td style="color:var(--text-muted)">68s</td></tr><tr><td>21</td><td style="color:#e74c3c">9:21</td><td style="color:#27ae60;font-weight:600">8:19</td><td style="color:var(--text-muted)">62s</td></tr><tr><td>22</td><td style="color:#e74c3c">9:02</td><td style="color:#27ae60;font-weight:600">7:57</td><td style="color:var(--text-muted)">65s</td></tr><tr><td>23</td><td style="color:#e74c3c">9:13</td><td style="color:#27ae60;font-weight:600">8:35</td><td style="color:var(--text-muted)">38s</td></tr><tr><td>24</td><td style="color:#e74c3c">9:18</td><td style="color:#27ae60;font-weight:600">8:31</td><td style="color:var(--text-muted)">47s</td></tr><tr><td>25</td><td style="color:#e74c3c">8:50</td><td style="color:#27ae60;font-weight:600">8:11</td><td style="color:var(--text-muted)">39s</td></tr><tr><td>26</td><td style="color:#e74c3c">8:48</td><td style="color:#27ae60;font-weight:600">8:05</td><td style="color:var(--text-muted)">43s</td></tr><tr><td>27</td><td style="color:#e74c3c">9:43</td><td style="color:#27ae60;font-weight:600">8:51</td><td style="color:var(--text-muted)">52s</td></tr><tr><td>28</td><td style="color:#e74c3c">9:22</td><td style="color:#27ae60;font-weight:600">8:30</td><td style="color:var(--text-muted)">52s</td></tr><tr><td>29</td><td style="color:#e74c3c">9:20</td><td style="color:#27ae60;font-weight:600">8:37</td><td style="color:var(--text-muted)">43s</td></tr><tr><td>30</td><td style="color:#e74c3c">9:28</td><td style="color:#27ae60;font-weight:600">8:40</td><td style="color:var(--text-muted)">48s</td></tr><tr><td>31</td><td style="color:#e74c3c">9:08</td><td style="color:#27ae60;font-weight:600">8:22</td><td style="color:var(--text-muted)">46s</td></tr><tr><td>32</td><td style="color:#e74c3c">9:01</td><td style="color:#27ae60;font-weight:600">8:04</td><td style="color:var(--text-muted)">57s</td></tr><tr><td>33</td><td style="color:#e74c3c">9:10</td><td style="color:#27ae60;font-weight:600">8:09</td><td style="color:var(--text-muted)">61s</td></tr><tr><td>34</td><td style="color:#e74c3c">8:36</td><td style="color:#27ae60;font-weight:600">7:56</td><td style="color:var(--text-muted)">40s</td></tr><tr><td>35</td><td style="color:#e74c3c">8:47</td><td style="color:#27ae60;font-weight:600">7:52</td><td style="color:var(--text-muted)">55s</td></tr><tr><td>36</td><td style="color:#e74c3c">8:39</td><td style="color:#27ae60;font-weight:600">7:32</td><td style="color:var(--text-muted)">67s</td></tr><tr><td>37</td><td style="color:#e74c3c">8:36</td><td style="color:#27ae60;font-weight:600">7:38</td><td style="color:var(--text-muted)">58s</td></tr><tr><td>38</td><td style="color:#e74c3c">8:44</td><td style="color:#27ae60;font-weight:600">7:43</td><td style="color:var(--text-muted)">61s</td></tr><tr><td>39</td><td style="color:#e74c3c">8:54</td><td style="color:#27ae60;font-weight:600">8:00</td><td style="color:var(--text-muted)">54s</td></tr><tr><td>40</td><td style="color:#e74c3c">8:39</td><td style="color:#27ae60;font-weight:600">7:44</td><td style="color:var(--text-muted)">55s</td></tr><tr><td>41</td><td style="color:#e74c3c">9:02</td><td style="color:#27ae60;font-weight:600">7:56</td><td style="color:var(--text-muted)">66s</td></tr><tr><td>42</td><td style="color:#e74c3c">9:12</td><td style="color:#27ae60;font-weight:600">8:07</td><td style="color:var(--text-muted)">65s</td></tr><tr><td>43</td><td style="color:#e74c3c">9:39</td><td style="color:#27ae60;font-weight:600">8:23</td><td style="color:var(--text-muted)">76s</td></tr><tr><td>44</td><td style="color:#e74c3c">8:59</td><td style="color:#27ae60;font-weight:600">8:07</td><td style="color:var(--text-muted)">52s</td></tr><tr><td>45</td><td style="color:#e74c3c">9:16</td><td style="color:#27ae60;font-weight:600">8:09</td><td style="color:var(--text-muted)">67s</td></tr><tr><td>46</td><td style="color:#e74c3c">10:01</td><td style="color:#27ae60;font-weight:600">9:20</td><td style="color:var(--text-muted)">41s</td></tr><tr><td>47</td><td style="color:#e74c3c">9:08</td><td style="color:#27ae60;font-weight:600">8:53</td><td style="color:var(--text-muted)">15s</td></tr><tr><td>48</td><td style="color:#e74c3c">9:22</td><td style="color:#27ae60;font-weight:600">8:54</td><td style="color:var(--text-muted)">28s</td></tr><tr><td>49</td><td style="color:#e74c3c">9:29</td><td style="color:#27ae60;font-weight:600">9:14</td><td style="color:var(--text-muted)">15s</td></tr><tr><td>50</td><td style="color:#e74c3c">9:03</td><td style="color:#27ae60;font-weight:600">8:48</td><td style="color:var(--text-muted)">15s</td></tr><tr><td>51</td><td style="color:#e74c3c">8:40</td><td style="color:#27ae60;font-weight:600">8:22</td><td style="color:var(--text-muted)">18s</td></tr><tr><td>52</td><td style="color:#e74c3c">10:07</td><td style="color:#27ae60;font-weight:600">8:44</td><td style="color:var(--text-muted)">83s</td></tr><tr><td>53</td><td style="color:#e74c3c">8:53</td><td style="color:#27ae60;font-weight:600">8:01</td><td style="color:var(--text-muted)">52s</td></tr><tr><td>54</td><td style="color:#e74c3c">8:37</td><td style="color:#27ae60;font-weight:600">7:44</td><td style="color:var(--text-muted)">53s</td></tr><tr><td>55</td><td style="color:#e74c3c">8:37</td><td style="color:#27ae60;font-weight:600">7:48</td><td style="color:var(--text-muted)">49s</td></tr><tr><td>56</td><td style="color:#e74c3c">8:05</td><td style="color:#27ae60;font-weight:600">7:39</td><td style="color:var(--text-muted)">26s</td></tr><tr><td>57</td><td style="color:#e74c3c">8:12</td><td style="color:#27ae60;font-weight:600">7:44</td><td style="color:var(--text-muted)">28s</td></tr><tr><td>58</td><td style="color:#e74c3c">8:10</td><td style="color:#27ae60;font-weight:600">7:42</td><td style="color:var(--text-muted)">28s</td></tr><tr><td>59</td><td style="color:#e74c3c">8:25</td><td style="color:#27ae60;font-weight:600">7:36</td><td style="color:var(--text-muted)">49s</td></tr><tr><td>60</td><td style="color:#e74c3c">8:33</td><td style="color:#27ae60;font-weight:600">7:38</td><td style="color:var(--text-muted)">55s</td></tr><tr><td>61</td><td style="color:#27ae60;font-weight:600">8:25</td><td style="color:#e74c3c">8:29</td><td style="color:var(--text-muted)">4s</td></tr><tr><td>62</td><td style="color:#27ae60;font-weight:600">8:34</td><td style="color:#e74c3c">8:56</td><td style="color:var(--text-muted)">22s</td></tr><tr><td>63</td><td style="color:#27ae60;font-weight:600">8:02</td><td style="color:#e74c3c">8:51</td><td style="color:var(--text-muted)">49s</td></tr><tr><td>64</td><td style="color:#e74c3c">8:11</td><td style="color:#27ae60;font-weight:600">8:04</td><td style="color:var(--text-muted)">7s</td></tr><tr><td>65</td><td style="color:#27ae60;font-weight:600">8:36</td><td style="color:#e74c3c">9:20</td><td style="color:var(--text-muted)">44s</td></tr><tr><td>66</td><td style="color:#27ae60;font-weight:600">7:59</td><td style="color:#e74c3c">9:02</td><td style="color:var(--text-muted)">63s</td></tr><tr><td>67</td><td style="color:#27ae60;font-weight:600">8:22</td><td style="color:#e74c3c">9:01</td><td style="color:var(--text-muted)">39s</td></tr><tr><td>68</td><td style="color:#27ae60;font-weight:600">8:41</td><td style="color:#e74c3c">9:53</td><td style="color:var(--text-muted)">72s</td></tr><tr><td>69</td><td style="color:#27ae60;font-weight:600">8:41</td><td style="color:#e74c3c">10:04</td><td style="color:var(--text-muted)">83s</td></tr><tr><td>70</td><td style="color:#27ae60;font-weight:600">8:32</td><td style="color:#e74c3c">9:24</td><td style="color:var(--text-muted)">52s</td></tr><tr><td>71</td><td style="color:#27ae60;font-weight:600">8:42</td><td style="color:#e74c3c">9:28</td><td style="color:var(--text-muted)">46s</td></tr><tr><td>72</td><td style="color:#27ae60;font-weight:600">7:58</td><td style="color:#e74c3c">9:52</td><td style="color:var(--text-muted)">114s</td></tr><tr><td>73</td><td style="color:#27ae60;font-weight:600">7:44</td><td style="color:#e74c3c">8:05</td><td style="color:var(--text-muted)">21s</td></tr><tr><td>74</td><td style="color:#27ae60;font-weight:600">7:32</td><td style="color:#e74c3c">7:49</td><td style="color:var(--text-muted)">17s</td></tr><tr><td>75</td><td style="color:#27ae60;font-weight:600">7:32</td><td style="color:#e74c3c">7:58</td><td style="color:var(--text-muted)">26s</td></tr><tr><td>76</td><td style="color:#27ae60;font-weight:600">7:36</td><td style="color:#e74c3c">7:58</td><td style="color:var(--text-muted)">22s</td></tr><tr><td>77</td><td style="color:#27ae60;font-weight:600">7:15</td><td style="color:#e74c3c">8:24</td><td style="color:var(--text-muted)">69s</td></tr><tr><td>78</td><td style="color:#27ae60;font-weight:600">7:12</td><td style="color:#e74c3c">7:39</td><td style="color:var(--text-muted)">27s</td></tr><tr><td>79</td><td style="color:#e74c3c">7:53</td><td style="color:#27ae60;font-weight:600">7:38</td><td style="color:var(--text-muted)">15s</td></tr><tr><td>80</td><td style="color:#27ae60;font-weight:600">7:43</td><td style="color:#e74c3c">7:46</td><td style="color:var(--text-muted)">3s</td></tr><tr><td>81</td><td style="color:#27ae60;font-weight:600">8:08</td><td style="color:#e74c3c">8:38</td><td style="color:var(--text-muted)">30s</td></tr><tr><td>82</td><td style="color:#27ae60;font-weight:600">7:44</td><td style="color:#e74c3c">8:30</td><td style="color:var(--text-muted)">46s</td></tr><tr><td>83</td><td style="color:#e74c3c">7:53</td><td style="color:#27ae60;font-weight:600">7:46</td><td style="color:var(--text-muted)">7s</td></tr><tr><td>84</td><td style="color:#27ae60;font-weight:600">8:29</td><td style="color:#e74c3c">8:41</td><td style="color:var(--text-muted)">12s</td></tr><tr><td>85</td><td style="color:#27ae60;font-weight:600">8:17</td><td style="color:#e74c3c">9:44</td><td style="color:var(--text-muted)">87s</td></tr><tr><td>86</td><td style="color:#27ae60;font-weight:600">8:37</td><td style="color:#e74c3c">9:20</td><td style="color:var(--text-muted)">43s</td></tr><tr><td>87</td><td style="color:#27ae60;font-weight:600">8:53</td><td style="color:#e74c3c">9:33</td><td style="color:var(--text-muted)">40s</td></tr><tr><td>88</td><td style="color:#27ae60;font-weight:600">8:53</td><td style="color:#e74c3c">9:41</td><td style="color:var(--text-muted)">48s</td></tr><tr><td>89</td><td style="color:#27ae60;font-weight:600">8:32</td><td style="color:#e74c3c">9:33</td><td style="color:var(--text-muted)">61s</td></tr><tr><td>90</td><td style="color:#27ae60;font-weight:600">8:25</td><td style="color:#e74c3c">9:27</td><td style="color:var(--text-muted)">62s</td></tr><tr><td>91</td><td style="color:#27ae60;font-weight:600">8:00</td><td style="color:#e74c3c">9:34</td><td style="color:var(--text-muted)">94s</td></tr><tr><td>92</td><td style="color:#27ae60;font-weight:600">7:55</td><td style="color:#e74c3c">8:34</td><td style="color:var(--text-muted)">39s</td></tr><tr><td>93</td><td style="color:#27ae60;font-weight:600">7:52</td><td style="color:#e74c3c">8:38</td><td style="color:var(--text-muted)">46s</td></tr><tr><td>94</td><td style="color:#27ae60;font-weight:600">8:07</td><td style="color:#e74c3c">8:26</td><td style="color:var(--text-muted)">19s</td></tr><tr><td>95</td><td style="color:#e74c3c">8:11</td><td style="color:#27ae60;font-weight:600">7:49</td><td style="color:var(--text-muted)">22s</td></tr><tr><td>96</td><td style="color:#27ae60;font-weight:600">7:25</td><td style="color:#e74c3c">8:26</td><td style="color:var(--text-muted)">61s</td></tr><tr><td>97</td><td style="color:#27ae60;font-weight:600">7:39</td><td style="color:#e74c3c">8:18</td><td style="color:var(--text-muted)">39s</td></tr></tbody></table></div></div>
 </main>
 <footer><div class="container">Built by <a href="https://github.com/nickcoury">Nick Coury</a> &amp; Claw</div></footer>
 <script>
@@ -63,6 +77,100 @@ new Chart(document.getElementById('paceProgChart'), {
     scales: {
       x: { ticks: { callback: function(v) { return fmtPaceJS(v); } }, title: { display: true, text: 'Pace (min/mi)' } },
       y: { grid: { display: false } }
+    }
+  }
+});
+var mileData = [{"year":2020,"splits":[527,561,539,536,573,564,579,564,556,544,556,543,542,540,529,530,539,548,572,553,561,542,553,558,530,528,583,562,560,568,548,541,550,516,527,519,516,524,534,519,542,552,579,539,556,601,548,562,569,543,520,607,533,517,517,485,492,490,505,513,505,514,482,491,516,479,502,521,521,512,522,478,464,452,452,456,435,432,473,463,488,464,473,509,497,517,533,533,512,505,480,475,472,487,491,445,459]},{"year":2022,"splits":[499,501,474,505,523,521,506,527,505,494,493,495,482,471,467,464,471,481,494,485,499,477,515,511,491,485,531,510,517,520,502,484,489,476,472,452,458,463,480,464,476,487,503,487,489,560,533,534,554,528,502,524,481,464,468,459,464,462,456,458,509,536,531,484,560,542,541,593,604,564,568,592,485,469,478,478,504,459,458,466,518,510,466,521,584,560,573,581,573,567,574,514,518,506,469,506,498]}];
+var mColors = ["#3498db","#27ae60"];
+var maxMiles = Math.max.apply(null, mileData.map(function(d) { return d.splits.length; }));
+
+var overlayChart = new Chart(document.getElementById('mileOverlayChart'), {
+  type: 'line',
+  data: {
+    labels: Array.from({length: maxMiles}, function(_, i) { return i + 1; }),
+    datasets: mileData.map(function(d, i) {
+      return {
+        label: String(d.year),
+        data: d.splits,
+        borderColor: mColors[i],
+        pointRadius: 0, pointHoverRadius: 5,
+        borderWidth: 2, tension: 0.2,
+      };
+    })
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + fmtPaceJS(ctx.raw) + '/mi'; } } },
+      legend: { labels: { usePointStyle: true } }
+    },
+    scales: {
+      y: { reverse: true, ticks: { callback: function(v) { return fmtPaceJS(v); } }, title: { display: true, text: 'Pace (min/mi)' } },
+      x: { title: { display: true, text: 'Mile' }, grid: { display: false }, ticks: { callback: function(v,i) { return (i+1) % 10 === 0 ? i+1 : ''; } } }
+    }
+  }
+});
+
+var toggleDiv = document.getElementById('yearToggles');
+if (toggleDiv) {
+  mileData.forEach(function(d, i) {
+    var lbl = document.createElement('label');
+    lbl.style.cssText = 'margin-right:16px;cursor:pointer;user-select:none';
+    var cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = true; cb.style.marginRight = '4px';
+    cb.addEventListener('change', function() {
+      overlayChart.data.datasets[i].hidden = !this.checked;
+      overlayChart.update();
+    });
+    lbl.appendChild(cb);
+    var sp = document.createElement('span');
+    sp.style.color = mColors[i]; sp.style.fontWeight = '600';
+    sp.textContent = d.year;
+    lbl.appendChild(sp);
+    toggleDiv.appendChild(lbl);
+  });
+}
+
+var baseIdx = mileData.reduce(function(best, d, i) {
+  var a = d.splits.reduce(function(s, v) { return s + v; }, 0) / d.splits.length;
+  var b = mileData[best].splits.reduce(function(s, v) { return s + v; }, 0) / mileData[best].splits.length;
+  return a < b ? i : best;
+}, 0);
+var baseCum = []; var cs = 0;
+mileData[baseIdx].splits.forEach(function(t) { cs += t; baseCum.push(cs); });
+
+new Chart(document.getElementById('timeGapChart'), {
+  type: 'line',
+  data: {
+    labels: Array.from({length: maxMiles}, function(_, i) { return i + 1; }),
+    datasets: mileData.map(function(d, i) {
+      var cum = []; var s = 0;
+      d.splits.forEach(function(t, j) { s += t; cum.push(s - (baseCum[j] || baseCum[baseCum.length-1])); });
+      return {
+        label: d.year + (i === baseIdx ? ' (fastest)' : ''),
+        data: cum,
+        borderColor: mColors[i],
+        borderWidth: i === baseIdx ? 3 : 2,
+        borderDash: i === baseIdx ? [] : [5, 3],
+        pointRadius: 0, pointHoverRadius: 4,
+        tension: 0.2, fill: false,
+      };
+    })
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      tooltip: { callbacks: { label: function(ctx) {
+        var v = ctx.raw;
+        return ctx.dataset.label + ': ' + (v > 0 ? '+' : '') + v.toFixed(0) + 's';
+      }}},
+      legend: { labels: { usePointStyle: true } }
+    },
+    scales: {
+      y: { title: { display: true, text: 'Gap (seconds)' }, ticks: { callback: function(v) { return (v > 0 ? '+' : '') + v + 's'; } } },
+      x: { title: { display: true, text: 'Mile' }, grid: { display: false }, ticks: { callback: function(v,i) { return (i+1) % 10 === 0 ? i+1 : ''; } } }
     }
   }
 });</script>
