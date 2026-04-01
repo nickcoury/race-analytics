@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pat's Run 4.2 Mile — Nick Coury Race Analytics</title>
+<link rel="stylesheet" href="../../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<header>
+<div class="container">
+<h1><a href="../../index.html" style="color:inherit">Race Analytics</a></h1>
+<nav>
+<a href="../../index.html#fixed-time">Fixed Time</a>
+<a href="../../index.html#repeat-races">Repeat Races</a>
+<a href="../../training/index.html">Training</a>
+<a href="../../patterns/index.html">Patterns</a>
+<a href="../../records/index.html">Records</a>
+</nav>
+</div>
+</header>
+<main class="container">
+<div class="breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Repeat Races</a> / Pat's Run 4.2 Mile</div>
+
+<div class="hero">
+<h2>Pat's Run 4.2 Mile</h2>
+<p>3 races — 2017 to 2019</p>
+</div>
+<div class="section">
+<h2>Pace Progression</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Average pace across years. <span style="color:#27ae60">Green</span> = PR.</p>
+<div style="height:150px;margin-bottom:24px"><canvas id="paceProgChart"></canvas></div>
+</div>
+<div class="section">
+<h2>Race Comparison</h2>
+<div class="table-wrapper"><table><thead><tr><th>Year</th><th>Name</th><th>Distance</th><th>Time</th><th>Pace</th></tr></thead><tbody><tr><td>2017</td><td>Pat's Run 4.2 Mile</td><td>4.1 mi</td><td>22:42</td><td>5:32/mi</td></tr><tr><td>2018</td><td>Pat's Run 4.2 Mile</td><td>4.16 mi</td><td>22:00</td><td>5:17/mi</td></tr><tr><td>2019</td><td>Pat's Run 4.2 Mile</td><td>4.15 mi</td><td>22:28</td><td>5:24/mi</td></tr></tbody></table></div>
+</div>
+<div class="section">
+<h2>Mile-by-Mile Comparison</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Each year overlaid. Checkboxes toggle visibility.</p>
+<div style="margin-bottom:12px" id="yearToggles"></div>
+<div style="height:350px;margin-bottom:24px"><canvas id="mileOverlayChart"></canvas></div>
+</div>
+<div class="section">
+<h2>Cumulative Time Gap</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Seconds ahead (+) or behind (−) the fastest year at each mile.</p>
+<div style="height:300px;margin-bottom:24px"><canvas id="timeGapChart"></canvas></div>
+</div>
+<div class="section"><h2>Split Heatmap</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Color shows fastest (<span style="color:#27ae60">green</span>) and slowest (<span style="color:#e74c3c">red</span>) year per mile.</p>
+<div class="table-wrapper"><table><thead><tr><th>Mile</th><th>2017</th><th>2018</th><th>2019</th><th>Spread</th></tr></thead><tbody><tr><td>1</td><td style="color:#e74c3c">5:32</td><td>5:27</td><td style="color:#27ae60;font-weight:600">5:16</td><td style="color:var(--text-muted)">16s</td></tr><tr><td>2</td><td style="color:#e74c3c">5:44</td><td style="color:#27ae60;font-weight:600">5:23</td><td>5:28</td><td style="color:var(--text-muted)">21s</td></tr><tr><td>3</td><td style="color:#e74c3c">5:30</td><td style="color:#27ae60;font-weight:600">5:09</td><td>5:21</td><td style="color:var(--text-muted)">21s</td></tr><tr><td>4</td><td>5:27</td><td style="color:#27ae60;font-weight:600">5:10</td><td style="color:#e74c3c">5:31</td><td style="color:var(--text-muted)">21s</td></tr></tbody></table></div></div>
+</main>
+<footer><div class="container">Built by <a href="https://github.com/nickcoury">Nick Coury</a> &amp; Claw</div></footer>
+<script>
+Chart.defaults.color = '#8b949e';
+Chart.defaults.borderColor = 'rgba(139,148,158,0.15)';
+function fmtPaceJS(s) { var m = Math.floor(s/60); var sec = Math.round(s%60); return m + ':' + (sec<10?'0':'') + sec; }
+
+new Chart(document.getElementById('paceProgChart'), {
+  type: 'bar',
+  data: {
+    labels: ["2017","2018","2019"],
+    datasets: [{
+      label: 'Pace',
+      data: [332,317,324],
+      backgroundColor: ["#3498db88","#27ae60","#3498db88"],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: function(ctx) { return fmtPaceJS(ctx.raw) + '/mi'; } } }
+    },
+    scales: {
+      x: { ticks: { callback: function(v) { return fmtPaceJS(v); } }, title: { display: true, text: 'Pace (min/mi)' } },
+      y: { grid: { display: false } }
+    }
+  }
+});
+var mileData = [{"year":2017,"splits":[332,344,330,327]},{"year":2018,"splits":[327,323,309,310]},{"year":2019,"splits":[316,328,321,331]}];
+var mColors = ["#3498db","#27ae60","#e67e22"];
+var maxMiles = Math.max.apply(null, mileData.map(function(d) { return d.splits.length; }));
+
+var overlayChart = new Chart(document.getElementById('mileOverlayChart'), {
+  type: 'line',
+  data: {
+    labels: Array.from({length: maxMiles}, function(_, i) { return i + 1; }),
+    datasets: mileData.map(function(d, i) {
+      return {
+        label: String(d.year),
+        data: d.splits,
+        borderColor: mColors[i],
+        pointRadius: 4, pointHoverRadius: 5,
+        borderWidth: 2, tension: 0.2,
+      };
+    })
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + fmtPaceJS(ctx.raw) + '/mi'; } } },
+      legend: { labels: { usePointStyle: true } }
+    },
+    scales: {
+      y: { reverse: true, ticks: { callback: function(v) { return fmtPaceJS(v); } }, title: { display: true, text: 'Pace (min/mi)' } },
+      x: { title: { display: true, text: 'Mile' }, grid: { display: false } }
+    }
+  }
+});
+
+var toggleDiv = document.getElementById('yearToggles');
+if (toggleDiv) {
+  mileData.forEach(function(d, i) {
+    var lbl = document.createElement('label');
+    lbl.style.cssText = 'margin-right:16px;cursor:pointer;user-select:none';
+    var cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = true; cb.style.marginRight = '4px';
+    cb.addEventListener('change', function() {
+      overlayChart.data.datasets[i].hidden = !this.checked;
+      overlayChart.update();
+    });
+    lbl.appendChild(cb);
+    var sp = document.createElement('span');
+    sp.style.color = mColors[i]; sp.style.fontWeight = '600';
+    sp.textContent = d.year;
+    lbl.appendChild(sp);
+    toggleDiv.appendChild(lbl);
+  });
+}
+
+var baseIdx = mileData.reduce(function(best, d, i) {
+  var a = d.splits.reduce(function(s, v) { return s + v; }, 0) / d.splits.length;
+  var b = mileData[best].splits.reduce(function(s, v) { return s + v; }, 0) / mileData[best].splits.length;
+  return a < b ? i : best;
+}, 0);
+var baseCum = []; var cs = 0;
+mileData[baseIdx].splits.forEach(function(t) { cs += t; baseCum.push(cs); });
+
+new Chart(document.getElementById('timeGapChart'), {
+  type: 'line',
+  data: {
+    labels: Array.from({length: maxMiles}, function(_, i) { return i + 1; }),
+    datasets: mileData.map(function(d, i) {
+      var cum = []; var s = 0;
+      d.splits.forEach(function(t, j) { s += t; cum.push(s - (baseCum[j] || baseCum[baseCum.length-1])); });
+      return {
+        label: d.year + (i === baseIdx ? ' (fastest)' : ''),
+        data: cum,
+        borderColor: mColors[i],
+        borderWidth: i === baseIdx ? 3 : 2,
+        borderDash: i === baseIdx ? [] : [5, 3],
+        pointRadius: 3, pointHoverRadius: 4,
+        tension: 0.2, fill: false,
+      };
+    })
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      tooltip: { callbacks: { label: function(ctx) {
+        var v = ctx.raw;
+        return ctx.dataset.label + ': ' + (v > 0 ? '+' : '') + v.toFixed(0) + 's';
+      }}},
+      legend: { labels: { usePointStyle: true } }
+    },
+    scales: {
+      y: { title: { display: true, text: 'Gap (seconds)' }, ticks: { callback: function(v) { return (v > 0 ? '+' : '') + v + 's'; } } },
+      x: { title: { display: true, text: 'Mile' }, grid: { display: false } }
+    }
+  }
+});</script>
+</body>
+</html>
