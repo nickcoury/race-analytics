@@ -75,6 +75,13 @@
 <a href="#training-load">Training Load</a>
 <a href="#rhythm">Running Rhythm</a>
 <a href="#cumulative">Cumulative Growth</a>
+<a href="#seasonality">Seasonality</a>
+<a href="#fresh-legs">Fresh Legs</a>
+<a href="#doubles">Double Days</a>
+<a href="#hr-drift">Heart Rate Drift</a>
+<a href="#elev-efficiency">Elevation vs Pace</a>
+<a href="#taper">Taper Patterns</a>
+<a href="#comeback">Comeback Curve</a>
 </div>
 
 <!-- ===== MOON PHASE ===== -->
@@ -312,6 +319,143 @@ Monday is recovery day at 8.5 mi average. Peak start time: 3-4 PM (afternoon run
 <strong>The curve inflects around 2015</strong> when mileage jumped from ~50 mi/month to 300+.
 The steepest climb is 2020-2021 (the American Record year). A visible plateau in 2023 marks the injury.
 At current pace, 50,000 career miles will arrive around early 2028.
+</div>
+</div>
+
+<!-- ===== SEASONALITY ===== -->
+<div class="section section-anchor" id="seasonality">
+<h2>The Seasonal Rhythm <span class="tag" style="background:#d2992233;color:var(--yellow)">Seasons</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Average run distance and pace by month, aggregated across 14 years.</p>
+<div class="insight-grid">
+<div class="insight-card">
+<h3>Monthly Average Distance</h3>
+<div class="subtitle">How far the average run is each month</div>
+<canvas id="seasonDistChart"></canvas>
+</div>
+<div class="insight-card">
+<h3>Monthly Average Pace</h3>
+<div class="subtitle">Lower = faster. Arizona summer effect visible.</div>
+<canvas id="seasonPaceChart"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>July and August are the slowest months</strong> at 9:19-9:20/mi — a 50-second penalty vs February's 8:30/mi.
+October has the highest average distance (11.3 mi) as fall race season ramps up.
+The summer-to-fall swing is the biggest seasonal shift: pace drops 30s/mi as temps cool.
+</div>
+</div>
+
+<!-- ===== FRESH LEGS ===== -->
+<div class="section section-anchor" id="fresh-legs">
+<h2>The Fresh Legs Effect <span class="tag" style="background:#3fb95033;color:var(--green)">Recovery</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Does rest actually make you faster? Pace compared by number of rest days before a run.</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>Rest Days vs Pace</h3>
+<div class="subtitle">Average pace based on how many days off preceded the run</div>
+<canvas id="freshChart" style="max-height:280px"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>Two rest days is the sweet spot:</strong> 8:32/mi after 2 days off vs 8:47 on back-to-back days — a 15-second benefit.
+But 3 days off averages 9:14/mi — suggesting those gaps are injury/illness-related rather than planned recovery.
+Running daily (rest=0) is surprisingly close to optimal at 8:47/mi across 3,286 runs.
+</div>
+</div>
+
+<!-- ===== DOUBLE DAYS ===== -->
+<div class="section section-anchor" id="doubles">
+<h2>Double Days <span class="tag" style="background:#db6d2833;color:var(--orange)">Volume</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Days with 2+ separate runs. How often, and how extreme?</p>
+<div class="insight-grid">
+<div class="insight-card">
+<h3>By the Numbers</h3>
+<div class="subtitle">Multi-run days across career</div>
+<div style="padding:16px 0">
+<div class="mini-stat"><div class="val" id="dblTotal"></div><div class="lbl">Double Days</div></div>
+<div class="mini-stat"><div class="val" id="dblMax"></div><div class="lbl">Max Runs in Day</div></div>
+<div class="mini-stat"><div class="val" id="dblMaxMi"></div><div class="lbl">Max Day Miles</div></div>
+<div class="mini-stat"><div class="val" id="dblAvg"></div><div class="lbl">Avg Double Miles</div></div>
+</div>
+<div id="dblDist" style="margin-top:16px"></div>
+</div>
+<div class="insight-card">
+<h3>Distribution</h3>
+<div class="subtitle">How many runs per multi-run day?</div>
+<canvas id="dblChart"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>762 days with multiple runs</strong> — that's 18% of all running days. Most are doubles (607 days), but there's a day with 9 separate runs totaling 182 miles — that's a 24-hour race where each lap was recorded as a separate activity.
+Average multi-run day: 19.4 miles combined.
+</div>
+</div>
+
+<!-- ===== HR DRIFT ===== -->
+<div class="section section-anchor" id="hr-drift">
+<h2>Heart Rate vs Distance <span class="tag" style="background:#f8514933;color:var(--red)">Cardiac</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Does average heart rate climb with run distance? 2,252 runs with HR data.</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>Average HR by Run Distance</h3>
+<div class="subtitle">Grouped by 5-mile distance buckets</div>
+<canvas id="hrChart" style="max-height:280px"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>Heart rate climbs steadily from 142 bpm (short runs) to 157 bpm (50+ miles)</strong> — a 15 bpm drift over distance.
+The steepest jump is 25-30 miles (149→156 bpm), right at marathon distance where the body starts drawing on reserves.
+Interestingly, 100-mile runs average 153 bpm — slightly lower than 50-milers, suggesting more disciplined pacing at ultra distances.
+</div>
+</div>
+
+<!-- ===== ELEVATION EFFICIENCY ===== -->
+<div class="section section-anchor" id="elev-efficiency">
+<h2>Elevation vs Pace <span class="tag" style="background:#3fb95033;color:var(--green)">Terrain</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">How much does climbing slow you down? 1,685 runs with elevation data.</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>Vertical Gain per Mile vs Pace</h3>
+<div class="subtitle">Each dot is a run. X = feet of climbing per mile. Y = pace. The cost of going uphill.</div>
+<canvas id="elevPaceChart" style="max-height:380px"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>Every 100 ft/mi of climbing costs roughly 1:30/mi of pace.</strong>
+Flat runs (0-20 ft/mi) average ~8:00/mi. Moderate mountain runs (100 ft/mi) average ~9:30/mi.
+Steep mountain runs (200+ ft/mi) push past 11:00/mi. The relationship is remarkably linear up to about 150 ft/mi, then the curve steepens.
+</div>
+</div>
+
+<!-- ===== TAPER ===== -->
+<div class="section section-anchor" id="taper">
+<h2>Taper Patterns <span class="tag" style="background:#d2992233;color:var(--yellow)">Strategy</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">How does training volume change in the 4 weeks before races (26+ miles)?</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>Pre-Race Weekly Mileage</h3>
+<div class="subtitle">Average weekly miles in the 4 weeks before all 26+ mile races. W-4 = 4 weeks before, W-1 = race week.</div>
+<canvas id="taperChart" style="max-height:300px"></canvas>
+</div>
+</div>
+<div class="finding" id="taperFinding"></div>
+</div>
+
+<!-- ===== COMEBACK ===== -->
+<div class="section section-anchor" id="comeback">
+<h2>The Comeback Curve <span class="tag" style="background:#58a6ff22;color:var(--accent)">Resilience</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">After taking time off, how does the first run back compare to pre-break pace?</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>Pace Change After Rest</h3>
+<div class="subtitle">Difference in pace (seconds) for the first run back vs average of 5 runs before the break. Negative = faster.</div>
+<canvas id="comebackChart" style="max-height:280px"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>Short breaks make you faster.</strong> After 3-5 days off, the first run back is 14 seconds/mi faster than before.
+After 6-7 days: 25 seconds faster. The body genuinely supercompensates.
+The crossover happens around 2 weeks — after 8-14 days off, you're 12 seconds slower. Detraining kicks in fast.
 </div>
 </div>
 
@@ -671,6 +815,193 @@ new Chart(document.getElementById('cumulativeChart'), {
     scales: {
       x: { ticks: { callback: showLabel, maxRotation: 0 } },
       y: { ticks: { callback: v => (v/1000) + 'k' }, title: { display: true, text: 'Cumulative Miles' } }
+    }
+  }
+});
+
+// ===== SEASONALITY =====
+new Chart(document.getElementById('seasonDistChart'), {
+  type: 'bar',
+  data: {
+    labels: DATA.seasonality.map(s => s.month),
+    datasets: [{
+      data: DATA.seasonality.map(s => s.avgDist),
+      backgroundColor: DATA.seasonality.map(s => {
+        const m = DATA.seasonality.indexOf(s);
+        return m >= 5 && m <= 8 ? C.red : m >= 2 && m <= 4 ? C.green : C.accent;
+      }),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.raw.toFixed(1) + ' mi avg (' + DATA.seasonality[ctx.dataIndex].count + ' runs)' } }
+    },
+    scales: { y: { title: { display: true, text: 'Avg Miles' } } }
+  }
+});
+
+new Chart(document.getElementById('seasonPaceChart'), {
+  type: 'line',
+  data: {
+    labels: DATA.seasonality.map(s => s.month),
+    datasets: [{
+      data: DATA.seasonality.map(s => s.avgPace),
+      borderColor: C.red,
+      backgroundColor: 'rgba(248,81,73,0.1)',
+      fill: true,
+      tension: 0.3,
+      pointRadius: 5,
+      pointBackgroundColor: DATA.seasonality.map(s => s.avgPace === Math.min(...DATA.seasonality.map(x=>x.avgPace)) ? C.green : s.avgPace === Math.max(...DATA.seasonality.map(x=>x.avgPace)) ? C.red : C.accent),
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => fmtPace(ctx.raw) + '/mi' } }
+    },
+    scales: { y: { ticks: { callback: v => fmtPace(v) }, title: { display: true, text: 'Avg Pace' } } }
+  }
+});
+
+// ===== FRESH LEGS =====
+new Chart(document.getElementById('freshChart'), {
+  type: 'bar',
+  data: {
+    labels: DATA.freshLegs.map(f => f.restDays === 0 ? 'Back-to-back' : f.restDays + ' day' + (f.restDays > 1 ? 's' : '') + ' off'),
+    datasets: [{
+      data: DATA.freshLegs.map(f => f.avgPace),
+      backgroundColor: DATA.freshLegs.map(f => f.avgPace === Math.min(...DATA.freshLegs.map(x=>x.avgPace)) ? C.green : C.accent),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => fmtPace(ctx.raw) + '/mi (' + DATA.freshLegs[ctx.dataIndex].count + ' runs)' } }
+    },
+    scales: { y: { ticks: { callback: v => fmtPace(v) }, min: Math.min(...DATA.freshLegs.map(f=>f.avgPace)) - 20 } }
+  }
+});
+
+// ===== DOUBLES =====
+document.getElementById('dblTotal').textContent = DATA.doubles.totalDays;
+document.getElementById('dblMax').textContent = DATA.doubles.maxRuns;
+document.getElementById('dblMaxMi').textContent = DATA.doubles.maxMiles;
+document.getElementById('dblAvg').textContent = DATA.doubles.avgMiles;
+
+new Chart(document.getElementById('dblChart'), {
+  type: 'bar',
+  data: {
+    labels: DATA.doubles.dist.map(d => d.runs + ' runs'),
+    datasets: [{
+      data: DATA.doubles.dist.map(d => d.days),
+      backgroundColor: [C.accent, C.green, C.yellow, C.orange, C.red, C.purple],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.raw + ' days' } }
+    },
+    scales: { y: { title: { display: true, text: 'Days' } } }
+  }
+});
+
+// ===== HR DRIFT =====
+new Chart(document.getElementById('hrChart'), {
+  type: 'line',
+  data: {
+    labels: DATA.hrByDist.map(h => h.dist + '-' + (h.dist + 5) + 'mi'),
+    datasets: [{
+      data: DATA.hrByDist.map(h => h.avgHR),
+      borderColor: C.red,
+      backgroundColor: 'rgba(248,81,73,0.15)',
+      fill: true,
+      tension: 0.3,
+      pointRadius: 5,
+      pointBackgroundColor: DATA.hrByDist.map(h => h.avgHR > 155 ? C.red : h.avgHR > 148 ? C.yellow : C.green),
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.raw + ' bpm (' + DATA.hrByDist[ctx.dataIndex].count + ' runs)' } }
+    },
+    scales: { y: { title: { display: true, text: 'Avg Heart Rate (bpm)' }, min: 135 } }
+  }
+});
+
+// ===== ELEVATION vs PACE =====
+const ep = DATA.elevPace.filter((_, i) => i % 3 === 0);  // subsample more for perf
+new Chart(document.getElementById('elevPaceChart'), {
+  type: 'scatter',
+  data: {
+    datasets: [{
+      data: ep.map(d => ({x: d.vert, y: d.pace})),
+      backgroundColor: ep.map(d => d.vert < 50 ? 'rgba(88,166,255,0.25)' : d.vert < 100 ? 'rgba(63,185,80,0.25)' : d.vert < 200 ? 'rgba(210,153,34,0.25)' : 'rgba(248,81,73,0.25)'),
+      pointRadius: 3,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.raw.x + ' ft/mi → ' + fmtPace(ctx.raw.y) + '/mi' } }
+    },
+    scales: {
+      x: { title: { display: true, text: 'Elevation Gain per Mile (ft)' }, max: 400 },
+      y: { title: { display: true, text: 'Pace' }, ticks: { callback: v => fmtPace(v) }, min: 300, max: 1000 }
+    }
+  }
+});
+
+// ===== TAPER =====
+// Calculate average taper pattern
+const validTapers = DATA.taper.filter(t => t.w4 > 20);
+const avgW4 = validTapers.reduce((s,t) => s + t.w4, 0) / validTapers.length;
+const avgW3 = validTapers.reduce((s,t) => s + t.w3, 0) / validTapers.length;
+const avgW2 = validTapers.reduce((s,t) => s + t.w2, 0) / validTapers.length;
+const avgW1 = validTapers.reduce((s,t) => s + t.w1, 0) / validTapers.length;
+const taperPct = Math.round((1 - avgW1/avgW4) * 100);
+
+new Chart(document.getElementById('taperChart'), {
+  type: 'bar',
+  data: {
+    labels: ['W-4 (base)', 'W-3', 'W-2', 'W-1 (race week)'],
+    datasets: [{
+      label: 'Avg Weekly Miles',
+      data: [Math.round(avgW4), Math.round(avgW3), Math.round(avgW2), Math.round(avgW1)],
+      backgroundColor: [C.accent, C.accent, C.yellow, C.green],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: { y: { title: { display: true, text: 'Miles' } } }
+  }
+});
+
+document.getElementById('taperFinding').innerHTML = '<strong>Average taper: ' + taperPct + '% volume reduction</strong> from base week (W-4) to race week (W-1). ' +
+  'Base week averages ' + Math.round(avgW4) + ' miles, dropping to ' + Math.round(avgW1) + ' miles race week. ' +
+  'Based on ' + validTapers.length + ' races of 26+ miles.';
+
+// ===== COMEBACK =====
+new Chart(document.getElementById('comebackChart'), {
+  type: 'bar',
+  data: {
+    labels: DATA.comeback.map(c => c.gap + ' days'),
+    datasets: [{
+      data: DATA.comeback.map(c => c.avgDiff),
+      backgroundColor: DATA.comeback.map(c => c.avgDiff < 0 ? C.green : C.red),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => {
+        const v = ctx.raw;
+        return (v < 0 ? v : '+' + v) + ' sec/mi (' + DATA.comeback[ctx.dataIndex].count + ' instances)';
+      }}}
+    },
+    scales: {
+      y: { title: { display: true, text: 'Pace Change (sec/mi)' },
+        ticks: { callback: v => (v < 0 ? '' : '+') + v + 's' } }
     }
   }
 });
