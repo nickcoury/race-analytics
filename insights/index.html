@@ -82,6 +82,10 @@
 <a href="#elev-efficiency">Elevation vs Pace</a>
 <a href="#taper">Taper Patterns</a>
 <a href="#comeback">Comeback Curve</a>
+<a href="#economy">Running Economy</a>
+<a href="#uv">UV Index</a>
+<a href="#daylight">Daylight</a>
+<a href="#big-weeks">Biggest Weeks</a>
 </div>
 
 <!-- ===== MOON PHASE ===== -->
@@ -456,6 +460,76 @@ Steep mountain runs (200+ ft/mi) push past 11:00/mi. The relationship is remarka
 <strong>Short breaks make you faster.</strong> After 3-5 days off, the first run back is 14 seconds/mi faster than before.
 After 6-7 days: 25 seconds faster. The body genuinely supercompensates.
 The crossover happens around 2 weeks — after 8-14 days off, you're 12 seconds slower. Detraining kicks in fast.
+</div>
+</div>
+
+<!-- ===== RUNNING ECONOMY ===== -->
+<div class="section section-anchor" id="economy">
+<h2>Running Economy Over Time <span class="tag" style="background:#3fb95033;color:var(--green)">Fitness</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Same effort, different speed. How fast can Nick run at heart rate 140-150 bpm? Only 5-15 mile runs included.</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>Pace at HR 140-150 by Year</h3>
+<div class="subtitle">Lower = more economical (faster at the same heart rate). The purest measure of running fitness.</div>
+<canvas id="economyChart" style="max-height:300px"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>Peak economy: 2018 at 8:21/mi</strong> at HR 140-150 — the year of Tushars 70k and Stagecoach 55k.
+The 2022-2023 decline (9:18-11:15/mi at the same HR) maps to injury and recovery.
+The 2025-2026 bounceback to 8:35/mi shows economy has nearly returned to peak levels.
+</div>
+</div>
+
+<!-- ===== UV INDEX ===== -->
+<div class="section section-anchor" id="uv">
+<h2>UV Index vs Pace <span class="tag" style="background:#d2992233;color:var(--yellow)">Sun</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Does sun intensity affect running speed? 1,575 runs with UV data.</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>Pace by UV Index</h3>
+<div class="subtitle">UV 0 = night/heavy cloud. UV 8+ = extreme sun exposure.</div>
+<canvas id="uvChart" style="max-height:280px"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>UV 0 (night/overcast) runs are a full minute faster</strong> than UV 6+ runs: 8:39 vs 9:39/mi.
+This is stronger than the temperature effect — UV captures sun intensity that temperature alone misses.
+Night runs and overcast days produce the best performances. Arizona runners: chase the clouds.
+</div>
+</div>
+
+<!-- ===== DAYLIGHT ===== -->
+<div class="section section-anchor" id="daylight">
+<h2>Running by Daylight <span class="tag" style="background:#db6d2833;color:var(--orange)">Light</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Pace compared to sunrise/sunset times. When is the best time to run?</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>Pace by Time of Day (relative to sun)</h3>
+<div class="subtitle">Pre-dawn = before sunrise. Dusk = 2hrs before sunset. Night = after sunset.</div>
+<canvas id="daylightChart" style="max-height:280px"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>Daytime runs are fastest at 8:44/mi.</strong> Pre-dawn is slowest at 9:39/mi — but that's skewed by ultra race starts where early miles are deliberately slow.
+Night runs (9:23) are surprisingly not much slower than daytime, suggesting many are tempo/speed sessions done in cooler conditions.
+</div>
+</div>
+
+<!-- ===== BIGGEST WEEKS ===== -->
+<div class="section section-anchor" id="big-weeks">
+<h2>The Biggest Weeks <span class="tag" style="background:#f8514933;color:var(--red)">Volume</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">The 20 highest-mileage weeks in 14 years of running.</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>Top 20 Mileage Weeks</h3>
+<div class="subtitle">Bar length = weekly miles. Most include a race.</div>
+<div id="bigWeekBars"></div>
+</div>
+</div>
+<div class="finding">
+<strong>197 miles in one week</strong> (Dec 6, 2021) — the American Record at Desert Solstice, where 173 miles came in a single 24-hour run.
+The top 5 weeks all include either Desert Solstice or Dome 24hr races. The highest non-race week would be pure training volume.
 </div>
 </div>
 
@@ -1005,6 +1079,85 @@ new Chart(document.getElementById('comebackChart'), {
     }
   }
 });
+
+// ===== RUNNING ECONOMY =====
+if (DATA.economy && DATA.economy.length) {
+  new Chart(document.getElementById('economyChart'), {
+    type: 'line',
+    data: {
+      labels: DATA.economy.map(e => e.year),
+      datasets: [{
+        data: DATA.economy.map(e => e.pace),
+        borderColor: C.green,
+        backgroundColor: 'rgba(63,185,80,0.1)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 6,
+        pointBackgroundColor: DATA.economy.map(e => e.pace === Math.min(...DATA.economy.map(x=>x.pace)) ? C.green : e.pace > 600 ? C.red : C.accent),
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: ctx => fmtPace(ctx.raw) + '/mi at HR 140-150 (' + DATA.economy[ctx.dataIndex].count + ' runs)' } }
+      },
+      scales: { y: { ticks: { callback: v => fmtPace(v) }, title: { display: true, text: 'Pace at HR 140-150' } } }
+    }
+  });
+}
+
+// ===== UV INDEX =====
+if (DATA.uvPace && DATA.uvPace.length) {
+  new Chart(document.getElementById('uvChart'), {
+    type: 'bar',
+    data: {
+      labels: DATA.uvPace.map(u => 'UV ' + u.uv),
+      datasets: [{
+        data: DATA.uvPace.map(u => u.pace),
+        backgroundColor: DATA.uvPace.map(u => u.uv === 0 ? C.accent : u.uv <= 3 ? C.green : u.uv <= 6 ? C.yellow : C.red),
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: ctx => fmtPace(ctx.raw) + '/mi (' + DATA.uvPace[ctx.dataIndex].count + ' runs)' } }
+      },
+      scales: { y: { ticks: { callback: v => fmtPace(v) }, min: Math.min(...DATA.uvPace.map(u=>u.pace)) - 20 } }
+    }
+  });
+}
+
+// ===== DAYLIGHT =====
+if (DATA.daylight && DATA.daylight.length) {
+  const dlEmojis = {'Pre-Dawn': '🌙', 'Dawn': '🌅', 'Daytime': '☀️', 'Dusk': '🌇', 'Night': '🌃'};
+  new Chart(document.getElementById('daylightChart'), {
+    type: 'bar',
+    data: {
+      labels: DATA.daylight.map(d => (dlEmojis[d.period]||'') + ' ' + d.period),
+      datasets: [{
+        data: DATA.daylight.map(d => d.pace),
+        backgroundColor: DATA.daylight.map(d => d.period === 'Daytime' ? C.green : d.period === 'Pre-Dawn' ? C.purple : d.period === 'Night' ? '#1f6feb' : C.yellow),
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: ctx => fmtPace(ctx.raw) + '/mi (' + DATA.daylight[ctx.dataIndex].count + ' runs)' } }
+      },
+      scales: { y: { ticks: { callback: v => fmtPace(v) }, min: Math.min(...DATA.daylight.map(d=>d.pace)) - 20 } }
+    }
+  });
+}
+
+// ===== BIGGEST WEEKS =====
+if (DATA.bigWeeks && DATA.bigWeeks.length) {
+  const bwDiv = document.getElementById('bigWeekBars');
+  const maxWeek = Math.max(...DATA.bigWeeks.map(w => w.miles));
+  DATA.bigWeeks.forEach((w, i) => {
+    const pct = (w.miles / maxWeek) * 100;
+    const color = i === 0 ? C.green : i < 3 ? C.accent : i < 10 ? C.yellow : C.text;
+    bwDiv.innerHTML += '<div class="streak-bar"><span class="value">' + w.miles + 'mi</span><span class="bar" style="width:' + pct + '%;background:' + color + '"></span><span class="label">' + w.date + '</span></div>';
+  });
+}
 </script>
 </body>
 </html>
