@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Insights — Race Analytics</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+.insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+@media (max-width: 800px) { .insight-grid { grid-template-columns: 1fr; } }
+.insight-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+.insight-card h3 { font-size: 15px; margin-bottom: 4px; }
+.insight-card .subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
+.insight-card canvas { max-height: 280px; }
+.finding { background: var(--accent-subtle); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 14px; line-height: 1.7; }
+.finding strong { color: var(--accent); }
+.shoe-table { font-size: 13px; }
+.shoe-table td, .shoe-table th { padding: 5px 8px; white-space: nowrap; }
+.shoe-table .bar { display: inline-block; height: 6px; background: var(--accent); border-radius: 3px; vertical-align: middle; }
+.streak-bar { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.streak-bar .bar { height: 16px; border-radius: 3px; min-width: 4px; }
+.streak-bar .label { min-width: 200px; color: var(--text-muted); }
+.streak-bar .value { font-weight: 600; min-width: 50px; text-align: right; }
+.moon-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.moon-row .emoji { font-size: 24px; width: 36px; text-align: center; }
+.moon-row .name { min-width: 140px; }
+.moon-row .pace { font-weight: 600; min-width: 60px; }
+.moon-row .bar { height: 10px; background: var(--accent); border-radius: 5px; }
+.full-width { grid-column: 1 / -1; }
+.milestone-row { display: flex; align-items: center; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.milestone-row .miles { font-size: 20px; font-weight: 700; color: var(--accent); min-width: 80px; text-align: right; }
+.milestone-row .date { min-width: 80px; }
+.milestone-row .time { color: var(--text-muted); }
+.milestone-row .bar { height: 12px; background: linear-gradient(90deg, var(--green), var(--accent)); border-radius: 6px; }
+.section-anchor { scroll-margin-top: 80px; }
+.toc { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 0; }
+.toc a { background: var(--surface); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 13px; color: var(--text-muted); }
+.toc a:hover { border-color: var(--accent); color: var(--text); text-decoration: none; }
+</style>
+</head>
+<body>
+<header>
+<div class="container">
+<h1><a href="../index.html" style="color:inherit">Race Analytics</a></h1>
+<nav>
+<a href="../index.html#fixed-time">Fixed Time</a>
+<a href="../index.html#repeat-races">Repeat Races</a>
+<a href="../training/index.html">Training</a>
+<a href="../patterns/index.html">Patterns</a>
+<a href="../records/index.html">Records</a>
+<a href="../insights/index.html" class="active">Insights</a>
+</nav>
+</div>
+</header>
+<main class="container">
+<div class="breadcrumb"><a href="../index.html">Home</a> / Insights</div>
+
+<div class="hero">
+<h2>Deep Insights</h2>
+<p>Creative analyses from 14 years of running data — finding hidden patterns in shoes, weather, lunar cycles, wind, elevation, and more.</p>
+</div>
+
+<div class="toc">
+<a href="#moon">Lunar Cycles</a>
+<a href="#temperature">Temperature</a>
+<a href="#wind">Wind</a>
+<a href="#humidity">Humidity</a>
+<a href="#shoes">Shoe Lab</a>
+<a href="#streaks">Streaks</a>
+<a href="#milestones">Milestones</a>
+<a href="#elevation">Elevation</a>
+<a href="#speed-over-time">Speed Over Time</a>
+<a href="#distance-distribution">Distance Distribution</a>
+<a href="#training-load">Training Load</a>
+<a href="#rhythm">Running Rhythm</a>
+<a href="#cumulative">Cumulative Growth</a>
+</div>
+
+<!-- ===== MOON PHASE ===== -->
+<div class="section section-anchor" id="moon">
+<h2>Does the Moon Affect Pace? <span class="tag" style="background:#d2992233;color:var(--yellow)">Lunar</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">1,597 runs with moon phase data. Pace bucketed by 8 lunar phases.</p>
+<div class="insight-grid">
+<div class="insight-card">
+<h3>Pace by Moon Phase</h3>
+<div class="subtitle">Average pace across all runs with moon data</div>
+<canvas id="moonChart"></canvas>
+</div>
+<div class="insight-card">
+<h3>Moon Phase Breakdown</h3>
+<div class="subtitle">Fastest to slowest</div>
+<div id="moonBars"></div>
+<div class="finding">
+<strong>Last Quarter moon runs are 20 seconds/mile faster</strong> than new moon runs (8:44 vs 9:04).
+Full moon is close behind at 8:46/mi. Ultra races often start at night — moonlit trails may genuinely help.
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== TEMPERATURE ===== -->
+<div class="section section-anchor" id="temperature">
+<h2>Temperature vs Performance <span class="tag" style="background:#f8514933;color:var(--red)">Heat</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">1,594 runs with weather data. Each dot is a single run.</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>Every Run by Temperature</h3>
+<div class="subtitle">Blue = cold (&lt;40°F), Green = ideal (40-60°F), Yellow = warm (60-80°F), Red = hot (80°F+)</div>
+<canvas id="tempChart" style="max-height:360px"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>The sweet spot is 40-45°F</strong> with an average pace of 8:41/mi. But the remarkable thing is how flat the curve stays — only 33 seconds separate the fastest and slowest temperature buckets across a 75°F range. Arizona heat adaptation is real: 100°F runs are only 30 seconds slower than 45°F runs.
+</div>
+</div>
+
+<!-- ===== WIND ===== -->
+<div class="section section-anchor" id="wind">
+<h2>Wind Resistance <span class="tag" style="background:#58a6ff22;color:var(--accent)">Aero</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">1,587 runs with wind speed data. How much does wind actually slow you down?</p>
+<div class="insight-grid">
+<div class="insight-card">
+<h3>Wind Speed vs Pace</h3>
+<div class="subtitle">Average pace by wind speed bucket (mph)</div>
+<canvas id="windChart"></canvas>
+</div>
+<div class="insight-card">
+<h3>Humidity vs Pace</h3>
+<div class="subtitle">Average pace by humidity range</div>
+<canvas id="humidityChart"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>Wind matters more than temperature.</strong> Calm conditions (0-3 mph) average 8:46/mi, while 12-15 mph winds slow to 9:23/mi — a 37-second penalty. Humidity has almost no effect: the flattest curve of all conditions.
+</div>
+</div>
+
+<!-- ===== SHOE LAB ===== -->
+<div class="section section-anchor" id="shoes">
+<h2>The Shoe Lab <span class="tag" style="background:#3fb95033;color:var(--green)">Gear</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">36 shoes tracked with 50+ miles each. Green = trail shoe (50+ ft/mi vert). Red = racing flat (&lt;8:20 avg pace).</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>Shoe Speed vs Durability</h3>
+<div class="subtitle">Bubble size = total miles. X = miles logged, Y = average pace. Lower is faster.</div>
+<canvas id="shoeChart" style="max-height:400px"></canvas>
+</div>
+<div class="insight-card full-width">
+<h3>Top 20 Shoes</h3>
+<div class="subtitle">Sorted by total mileage. ± shows pace variability across different runs.</div>
+<div class="table-wrapper">
+<table class="shoe-table">
+<thead><tr><th>Shoe</th><th>Miles</th><th>Runs</th><th>Mi/Run</th><th>Avg Pace</th><th>Avg HR</th><th>Vert/Mi</th><th>Pace Range</th></tr></thead>
+<tbody id="shoeTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="finding">
+<strong>The Adidas Adios Pro 3 is the fastest shoe at 8:02/mi</strong> across 816 miles — and the highest avg HR (152 bpm), confirming it's the race-day weapon.
+The PUMA Deviate Elite 3 Trail Proto leads trail shoes: 600 miles, 55 ft/mi of vert.
+The Saucony Kinvara 13 is the workhorse: 509 miles across 89 runs at 5.7 mi/run — the daily trainer.
+The Nike VaporFly 3 Trail% averages a wild 60 mi/run across just 4 outings — pure ultra racing.
+</div>
+</div>
+
+<!-- ===== STREAKS ===== -->
+<div class="section section-anchor" id="streaks">
+<h2>Running Streaks <span class="tag" style="background:#58a6ff22;color:var(--accent)">Consistency</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Consecutive days with at least one run. 15 streaks of 20+ days.</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>Longest Streaks</h3>
+<div class="subtitle">Bar length = streak duration. Shows total miles and daily average during each streak.</div>
+<div id="streakBars"></div>
+</div>
+</div>
+<div class="finding">
+<strong>118-day streak from Aug 25 to Dec 20, 2025</strong> — nearly 4 months without a rest day, covering 1,452 miles (12.3 mi/day avg).
+The highest-intensity streak was 89 days in fall 2020: 1,564 miles at 17.6 mi/day — that's the Desert Solstice 2020 buildup that produced 155 miles in 24 hours.
+</div>
+</div>
+
+<!-- ===== MILESTONES ===== -->
+<div class="section section-anchor" id="milestones">
+<h2>Career Milestones <span class="tag" style="background:#d2992233;color:var(--yellow)">Journey</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">When each 5,000-mile milestone was reached, starting from September 2012.</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>The Road to 40,000 Miles</h3>
+<div class="subtitle">Time from first recorded run to each milestone</div>
+<div id="milestoneBars"></div>
+<div class="finding">
+<strong>The acceleration is real.</strong> First 5,000 miles took 4.3 years. The next 5,000 took only 1.8 years.
+Peak velocity: 5,000 miles in just 337 days between miles 20,000 and 25,000 (Sep 2020–Sep 2021) — the American Record buildup year.
+Post-injury slowdown: 30,000 to 35,000 took 479 days (the 2023 injury year).
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== ELEVATION ===== -->
+<div class="section section-anchor" id="elevation">
+<h2>Elevation Profile <span class="tag" style="background:#3fb95033;color:var(--green)">Vert</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">How vertical gain per mile has evolved over 14 years of running.</p>
+<div class="insight-grid">
+<div class="insight-card">
+<h3>Yearly Vertical Gain</h3>
+<div class="subtitle">Total elevation gain (feet) by year</div>
+<canvas id="elevChart"></canvas>
+</div>
+<div class="insight-card">
+<h3>Vertical Intensity (ft/mile)</h3>
+<div class="subtitle">How mountainous the running is each year</div>
+<canvas id="vertPerMileChart"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>2024 was the most vertical year ever</strong> at 465,000+ feet of climbing — that's 88 vertical miles, or 16 Everests.
+Vertical intensity peaked in 2014 at 131 ft/mi (mountain-heavy with fewer total miles), then settled around 75-100 ft/mi as mileage increased.
+</div>
+</div>
+
+<!-- ===== SPEED OVER TIME ===== -->
+<div class="section section-anchor" id="speed-over-time">
+<h2>Speed Over the Years <span class="tag" style="background:#f8514933;color:var(--red)">Trend</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Average pace for "normal" runs (5-15 miles) by year — removing ultras and short shakeouts to normalize.</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>Normalized Pace Trend</h3>
+<div class="subtitle">Only medium-distance runs (5-15 mi) included. Lower = faster.</div>
+<canvas id="yearPaceChart" style="max-height:300px"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>Fastest year: 2015 at 7:52/mi</strong> for medium runs — the peak road speed era.
+Pace has gradually slowed as the focus shifted to ultras (2018+), settling around 8:30-9:00/mi for daily training.
+The 2023 uptick to 9:30 marks the injury recovery year.
+</div>
+</div>
+
+<!-- ===== DISTANCE DISTRIBUTION ===== -->
+<div class="section section-anchor" id="distance-distribution">
+<h2>The Distance Fingerprint <span class="tag" style="background:#58a6ff22;color:var(--accent)">Pattern</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">How many times each distance has been run. What's the "default" run?</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>Run Distance Distribution</h3>
+<div class="subtitle">Count of runs at each whole-mile distance. Everyone has a signature distance.</div>
+<canvas id="distChart" style="max-height:300px"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>10 miles is the signature distance</strong> — run 600+ times. There's a clear "daily run" cluster at 8-12 miles, a Saturday long run mode at 15-20 miles, and a long tail of ultras stretching past 100.
+The gap between 25 and 30 miles is notable: very few "medium-long" runs. It's either a standard long run (15-20) or full race mode (30+).
+</div>
+</div>
+
+<!-- ===== TRAINING LOAD ===== -->
+<div class="section section-anchor" id="training-load">
+<h2>Training Load vs Race Day <span class="tag" style="background:#db6d2833;color:var(--orange)">Prep</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Does more training volume lead to faster races? Green = short races, Yellow = medium, Red = ultras (60+ mi).</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>8-Week Training Load vs Race Pace</h3>
+<div class="subtitle">Bubble size = race distance. X = miles in 8 weeks before race. Y = race pace.</div>
+<canvas id="trainingChart" style="max-height:400px"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>The relationship is messy — and that's the insight.</strong> Short races cluster fast regardless of training load.
+100-milers need 500+ miles of 8-week base, but pace is governed by terrain, not volume.
+The sweet spot for peak performance appears around 400-600 miles of 8-week training load.
+</div>
+</div>
+
+<!-- ===== RHYTHM ===== -->
+<div class="section section-anchor" id="rhythm">
+<h2>Running Rhythm <span class="tag" style="background:#58a6ff22;color:var(--accent)">When</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">When does Nick run? 4,213 runs across 14 years.</p>
+<div class="insight-grid">
+<div class="insight-card">
+<h3>Day of Week</h3>
+<div class="subtitle">Average distance and long run count by day</div>
+<canvas id="dowChart"></canvas>
+</div>
+<div class="insight-card">
+<h3>Hour of Day</h3>
+<div class="subtitle">Run count by start hour</div>
+<canvas id="hourChart"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>Saturday is king:</strong> 14.5 mi average, 766 runs, 187 long runs (20+ mi) — 53% of all long runs happen on Saturday.
+Monday is recovery day at 8.5 mi average. Peak start time: 3-4 PM (afternoon runner), with a secondary 5-6 AM peak for race mornings.
+</div>
+</div>
+
+<!-- ===== CUMULATIVE GROWTH ===== -->
+<div class="section section-anchor" id="cumulative">
+<h2>The Growth Curve <span class="tag" style="background:#3fb95033;color:var(--green)">Career</span></h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Cumulative miles over 14 years. Every mile adds up.</p>
+<div class="insight-grid">
+<div class="insight-card full-width">
+<h3>Cumulative Career Miles</h3>
+<div class="subtitle">Monthly cumulative total from Sep 2012 to Mar 2026</div>
+<canvas id="cumulativeChart" style="max-height:350px"></canvas>
+</div>
+</div>
+<div class="finding">
+<strong>The curve inflects around 2015</strong> when mileage jumped from ~50 mi/month to 300+.
+The steepest climb is 2020-2021 (the American Record year). A visible plateau in 2023 marks the injury.
+At current pace, 50,000 career miles will arrive around early 2028.
+</div>
+</div>
+
+</main>
+
+<footer>
+<div class="container">
+Race Analytics — Built from Strava data (2012–2026) — <a href="https://github.com/nickcoury/race-analytics">Source</a>
+</div>
+</footer>
+
+<script>
+const DATA = {"shoes":[{"name":"Adidas Adios Pro 3","miles":816,"count":75,"avgPace":482,"medPace":488,"avgHR":152,"avgVert":38,"paceStd":65,"miPerRun":10.9,"firstDate":"2022-12-10","lastDate":"2025-06-28"},{"name":"PUMA Deviate Elite 3 Trail Proto","miles":600,"count":50,"avgPace":503,"medPace":526,"avgHR":139,"avgVert":55,"paceStd":94,"miPerRun":12.0,"firstDate":"2024-06-20","lastDate":"2025-11-11"},{"name":"Saucony Kinvara 13 Blue","miles":509,"count":89,"avgPace":544,"medPace":546,"avgHR":141,"avgVert":42,"paceStd":66,"miPerRun":5.7,"firstDate":"2023-10-25","lastDate":"2025-10-06"},{"name":"Saucony Triumph 20 White","miles":454,"count":41,"avgPace":530,"medPace":530,"avgHR":166,"avgVert":62,"paceStd":40,"miPerRun":11.1,"firstDate":"2024-01-10","lastDate":"2024-04-28"},{"name":"Saucony Speed 3 Black","miles":417,"count":50,"avgPace":517,"medPace":527,"avgHR":134,"avgVert":47,"paceStd":60,"miPerRun":8.3,"firstDate":"2025-03-11","lastDate":"2026-03-11"},{"name":"Saucony Triumph 20 Blue","miles":390,"count":41,"avgPace":535,"medPace":543,"avgHR":149,"avgVert":74,"paceStd":52,"miPerRun":9.5,"firstDate":"2024-05-04","lastDate":"2025-06-02"},{"name":"Reebok Floatride Energy 5 Red","miles":370,"count":57,"avgPace":586,"medPace":576,"avgHR":131,"avgVert":78,"paceStd":69,"miPerRun":6.5,"firstDate":"2024-08-09","lastDate":"2025-12-29"},{"name":"Saucony Tempus Grey","miles":359,"count":38,"avgPace":609,"medPace":582,"avgHR":139,"avgVert":133,"paceStd":120,"miPerRun":9.5,"firstDate":"2024-07-11","lastDate":"2025-01-24"},{"name":"Adidas Adios Pro 3 Blue","miles":350,"count":36,"avgPace":464,"medPace":447,"avgHR":147,"avgVert":30,"paceStd":73,"miPerRun":9.7,"firstDate":"2025-08-08","lastDate":"2025-12-23"},{"name":"PUMA Deviate Elite","miles":336,"count":21,"avgPace":525,"medPace":523,"avgHR":0,"avgVert":62,"paceStd":60,"miPerRun":16.0,"firstDate":"2024-02-06","lastDate":"2024-06-17"},{"name":"Saucony Pro 3 Trail Pink","miles":324,"count":38,"avgPace":629,"medPace":607,"avgHR":0,"avgVert":128,"paceStd":106,"miPerRun":8.5,"firstDate":"2024-05-01","lastDate":"2024-09-10"},{"name":"PUMA Deviate Elite 2 Trail Black and White","miles":308,"count":25,"avgPace":595,"medPace":607,"avgHR":138,"avgVert":127,"paceStd":109,"miPerRun":12.3,"firstDate":"2024-04-26","lastDate":"2025-10-04"},{"name":"Saucony Tempus Pink","miles":306,"count":20,"avgPace":556,"medPace":559,"avgHR":0,"avgVert":84,"paceStd":76,"miPerRun":15.3,"firstDate":"2024-02-10","lastDate":"2024-06-20"},{"name":"Topo Specter","miles":294,"count":32,"avgPace":534,"medPace":533,"avgHR":144,"avgVert":53,"paceStd":41,"miPerRun":9.2,"firstDate":"2024-01-17","lastDate":"2025-02-21"},{"name":"Adidas Adizero Adios 3 Athlete Pack","miles":255,"count":20,"avgPace":464,"medPace":450,"avgHR":150,"avgVert":23,"paceStd":66,"miPerRun":12.8,"firstDate":"2025-03-20","lastDate":"2026-03-19"},{"name":"Nike VaporFly 3 Trail% Red Stripe","miles":240,"count":4,"avgPace":548,"medPace":555,"avgHR":0,"avgVert":106,"paceStd":59,"miPerRun":60.0,"firstDate":"2023-12-01","lastDate":"2024-05-27"},{"name":"PUMA Velocity 4 White","miles":219,"count":31,"avgPace":543,"medPace":538,"avgHR":123,"avgVert":48,"paceStd":44,"miPerRun":7.1,"firstDate":"2025-12-09","lastDate":"2026-03-06"},{"name":"PUMA Deviate Elite 2 Green","miles":210,"count":14,"avgPace":663,"medPace":597,"avgHR":0,"avgVert":137,"paceStd":203,"miPerRun":15.0,"firstDate":"2024-07-09","lastDate":"2024-10-08"},{"name":"Saucony Convergence","miles":172,"count":20,"avgPace":562,"medPace":559,"avgHR":127,"avgVert":58,"paceStd":31,"miPerRun":8.6,"firstDate":"2025-07-09","lastDate":"2026-03-17"},{"name":"Adidas Adios Pro 1","miles":162,"count":12,"avgPace":464,"medPace":469,"avgHR":158,"avgVert":29,"paceStd":57,"miPerRun":13.5,"firstDate":"2025-01-03","lastDate":"2025-05-04"},{"name":"Saucony Edge Blue","miles":158,"count":14,"avgPace":654,"medPace":637,"avgHR":132,"avgVert":193,"paceStd":120,"miPerRun":11.3,"firstDate":"2025-07-15","lastDate":"2026-03-15"},{"name":"Adidas Takumi Sen 8","miles":131,"count":15,"avgPace":509,"medPace":481,"avgHR":147,"avgVert":63,"paceStd":98,"miPerRun":8.7,"firstDate":"2025-02-18","lastDate":"2025-10-25"},{"name":"Adidas Adios 7 (2)","miles":130,"count":7,"avgPace":569,"medPace":578,"avgHR":0,"avgVert":90,"paceStd":42,"miPerRun":18.5,"firstDate":"2024-02-03","lastDate":"2024-04-05"},{"name":"Mount To Coast R1","miles":126,"count":15,"avgPace":541,"medPace":548,"avgHR":146,"avgVert":42,"paceStd":49,"miPerRun":8.4,"firstDate":"2024-11-16","lastDate":"2025-04-28"},{"name":"PUMA Deviate Elite Trail","miles":122,"count":8,"avgPace":595,"medPace":588,"avgHR":137,"avgVert":186,"paceStd":120,"miPerRun":15.3,"firstDate":"2025-07-22","lastDate":"2025-09-13"},{"name":"Adidas Prime X Strung","miles":121,"count":6,"avgPace":479,"medPace":469,"avgHR":174,"avgVert":40,"paceStd":31,"miPerRun":20.1,"firstDate":"2023-03-12","lastDate":"2024-12-19"},{"name":"Altra Vanish Tempo","miles":119,"count":12,"avgPace":522,"medPace":528,"avgHR":137,"avgVert":52,"paceStd":49,"miPerRun":9.9,"firstDate":"2025-06-04","lastDate":"2025-11-05"},{"name":"Skechers Razor Elite (1)","miles":112,"count":13,"avgPace":512,"medPace":511,"avgHR":150,"avgVert":66,"paceStd":49,"miPerRun":8.6,"firstDate":"2024-11-09","lastDate":"2025-03-14"},{"name":"Adidas Adizero LT DC","miles":104,"count":11,"avgPace":595,"medPace":586,"avgHR":117,"avgVert":119,"paceStd":63,"miPerRun":9.5,"firstDate":"2025-07-06","lastDate":"2026-01-12"},{"name":"Adidas Adizero SL","miles":104,"count":9,"avgPace":607,"medPace":609,"avgHR":130,"avgVert":144,"paceStd":36,"miPerRun":11.6,"firstDate":"2025-01-18","lastDate":"2025-09-11"},{"name":"Brooks Catamount 2","miles":97,"count":8,"avgPace":729,"medPace":724,"avgHR":132,"avgVert":231,"paceStd":161,"miPerRun":12.2,"firstDate":"2024-08-20","lastDate":"2025-01-17"},{"name":"Nike VaporFly 3 Trail% Silver","miles":82,"count":3,"avgPace":500,"medPace":508,"avgHR":0,"avgVert":96,"paceStd":88,"miPerRun":27.4,"firstDate":"2024-06-01","lastDate":"2024-11-01"},{"name":"Skechers Excess 2","miles":67,"count":4,"avgPace":538,"medPace":537,"avgHR":0,"avgVert":92,"paceStd":22,"miPerRun":16.7,"firstDate":"2024-03-05","lastDate":"2024-03-29"},{"name":"PUMA Liberate Black","miles":66,"count":9,"avgPace":589,"medPace":561,"avgHR":158,"avgVert":81,"paceStd":111,"miPerRun":7.3,"firstDate":"2024-08-04","lastDate":"2025-01-06"},{"name":"Adidas Adizero Adios Pro Evo 1","miles":59,"count":6,"avgPace":340,"medPace":321,"avgHR":173,"avgVert":22,"paceStd":35,"miPerRun":9.8,"firstDate":"2025-02-07","lastDate":"2025-11-27"},{"name":"ASICS Metaspeed Sky OG Green","miles":55,"count":7,"avgPace":511,"medPace":541,"avgHR":135,"avgVert":38,"paceStd":59,"miPerRun":7.8,"firstDate":"2025-10-15","lastDate":"2025-11-30"}],"tempPace":[{"t":67.8,"p":513,"d":4.1},{"t":55.9,"p":468,"d":10.9},{"t":42.3,"p":543,"d":12.2},{"t":42.4,"p":436,"d":9.0},{"t":39.4,"p":550,"d":5.1},{"t":59.4,"p":563,"d":14.8},{"t":57.6,"p":514,"d":5.8},{"t":45.1,"p":485,"d":6.6},{"t":68.5,"p":568,"d":9.5},{"t":39.9,"p":513,"d":11.9},{"t":66.7,"p":527,"d":8.1},{"t":39.7,"p":457,"d":16.0},{"t":46.6,"p":482,"d":9.6},{"t":56.3,"p":554,"d":7.9},{"t":39.4,"p":425,"d":10.1},{"t":42.4,"p":484,"d":10.2},{"t":48.4,"p":459,"d":5.5},{"t":44.1,"p":421,"d":31.9},{"t":66.6,"p":517,"d":4.3},{"t":58.5,"p":579,"d":12.7},{"t":54.3,"p":519,"d":11.1},{"t":59.5,"p":520,"d":7.1},{"t":54.9,"p":526,"d":10.5},{"t":53.2,"p":480,"d":5.8},{"t":54.0,"p":546,"d":25.0},{"t":48.4,"p":466,"d":10.3},{"t":44.4,"p":454,"d":11.1},{"t":40.5,"p":454,"d":11.4},{"t":45.1,"p":504,"d":10.8},{"t":47.1,"p":443,"d":11.6},{"t":53.6,"p":567,"d":19.5},{"t":43.5,"p":529,"d":5.1},{"t":41.5,"p":492,"d":22.5},{"t":54.7,"p":477,"d":10.2},{"t":58.8,"p":504,"d":12.2},{"t":60.1,"p":422,"d":10.8},{"t":55.8,"p":429,"d":11.3},{"t":44.2,"p":552,"d":8.0},{"t":42.3,"p":449,"d":18.9},{"t":57.2,"p":531,"d":15.0},{"t":59.4,"p":498,"d":10.2},{"t":45.3,"p":459,"d":10.5},{"t":51.1,"p":467,"d":6.1},{"t":47.7,"p":510,"d":4.0},{"t":39.2,"p":484,"d":61.5},{"t":49.1,"p":604,"d":5.7},{"t":47.8,"p":597,"d":10.1},{"t":50.0,"p":562,"d":15.2},{"t":46.4,"p":534,"d":18.4},{"t":44.2,"p":517,"d":16.2},{"t":43.3,"p":526,"d":10.6},{"t":46.4,"p":494,"d":27.0},{"t":47.5,"p":538,"d":6.6},{"t":46.0,"p":539,"d":15.0},{"t":49.1,"p":511,"d":12.3},{"t":47.3,"p":420,"d":14.4},{"t":54.7,"p":556,"d":15.2},{"t":42.4,"p":529,"d":9.7},{"t":42.6,"p":391,"d":26.3},{"t":49.3,"p":698,"d":14.9},{"t":42.8,"p":496,"d":10.8},{"t":50.5,"p":454,"d":10.8},{"t":74.1,"p":543,"d":5.4},{"t":50.0,"p":528,"d":17.6},{"t":52.5,"p":463,"d":15.0},{"t":53.4,"p":470,"d":10.0},{"t":63.1,"p":413,"d":30.9},{"t":57.2,"p":518,"d":15.1},{"t":65.7,"p":518,"d":10.1},{"t":65.3,"p":517,"d":10.1},{"t":61.2,"p":521,"d":8.2},{"t":62.2,"p":467,"d":5.0},{"t":55.4,"p":550,"d":3.9},{"t":47.1,"p":413,"d":50.0},{"t":71.6,"p":594,"d":10.1},{"t":45.5,"p":630,"d":11.0},{"t":83.5,"p":556,"d":4.0},{"t":54.9,"p":532,"d":20.5},{"t":56.5,"p":424,"d":31.1},{"t":51.1,"p":483,"d":15.9},{"t":50.7,"p":499,"d":21.1},{"t":47.5,"p":499,"d":16.2},{"t":67.8,"p":558,"d":11.0},{"t":60.6,"p":564,"d":14.7},{"t":48.4,"p":497,"d":30.2},{"t":71.2,"p":510,"d":18.1},{"t":57.4,"p":550,"d":15.2},{"t":57.0,"p":514,"d":16.2},{"t":77.2,"p":579,"d":20.6},{"t":65.8,"p":541,"d":15.6},{"t":77.2,"p":525,"d":15.4},{"t":90.9,"p":503,"d":25.4},{"t":72.0,"p":545,"d":25.0},{"t":65.5,"p":536,"d":15.0},{"t":64.9,"p":527,"d":20.0},{"t":58.8,"p":462,"d":21.1},{"t":63.1,"p":538,"d":20.7},{"t":63.3,"p":520,"d":15.2},{"t":61.0,"p":486,"d":25.1},{"t":64.2,"p":448,"d":24.7},{"t":66.4,"p":549,"d":10.8},{"t":61.3,"p":559,"d":20.6},{"t":61.5,"p":496,"d":20.2},{"t":60.4,"p":525,"d":15.2},{"t":64.9,"p":491,"d":13.1},{"t":40.5,"p":508,"d":57.2},{"t":70.2,"p":550,"d":13.0},{"t":81.9,"p":518,"d":12.6},{"t":86.2,"p":593,"d":5.4},{"t":59.0,"p":470,"d":20.0},{"t":66.9,"p":533,"d":19.3},{"t":68.2,"p":556,"d":15.0},{"t":69.6,"p":528,"d":10.0},{"t":72.7,"p":538,"d":30.1},{"t":79.5,"p":591,"d":10.0},{"t":71.8,"p":568,"d":8.1},{"t":58.5,"p":510,"d":5.0},{"t":81.1,"p":437,"d":3.0},{"t":49.1,"p":572,"d":148.5},{"t":69.4,"p":685,"d":5.0},{"t":66.0,"p":620,"d":8.3},{"t":69.6,"p":581,"d":10.8},{"t":70.5,"p":572,"d":5.4},{"t":68.9,"p":513,"d":10.2},{"t":66.4,"p":652,"d":20.3},{"t":65.7,"p":519,"d":10.1},{"t":69.4,"p":597,"d":10.2},{"t":69.4,"p":495,"d":10.0},{"t":76.8,"p":562,"d":12.1},{"t":78.3,"p":568,"d":10.0},{"t":79.2,"p":634,"d":20.3},{"t":76.3,"p":526,"d":15.1},{"t":76.1,"p":464,"d":10.3},{"t":69.6,"p":551,"d":11.1},{"t":70.7,"p":498,"d":15.2},{"t":72.3,"p":567,"d":10.1},{"t":63.7,"p":523,"d":5.3},{"t":59.9,"p":514,"d":10.2},{"t":64.9,"p":605,"d":20.4},{"t":65.8,"p":543,"d":10.2},{"t":76.3,"p":536,"d":10.5},{"t":83.8,"p":517,"d":15.2},{"t":67.8,"p":631,"d":22.0},{"t":94.1,"p":538,"d":10.1},{"t":78.8,"p":489,"d":17.2},{"t":76.5,"p":543,"d":11.0},{"t":76.6,"p":466,"d":11.7},{"t":82.4,"p":530,"d":11.1},{"t":71.1,"p":508,"d":10.1},{"t":84.4,"p":461,"d":10.9},{"t":101.7,"p":512,"d":6.0},{"t":87.3,"p":545,"d":25.0},{"t":89.1,"p":540,"d":9.1},{"t":71.6,"p":543,"d":15.1},{"t":75.9,"p":453,"d":11.3},{"t":76.1,"p":560,"d":20.1},{"t":72.5,"p":519,"d":20.4},{"t":75.4,"p":511,"d":5.4},{"t":73.4,"p":554,"d":20.0},{"t":75.6,"p":535,"d":3.0},{"t":75.6,"p":313,"d":3.1},{"t":81.5,"p":579,"d":3.0},{"t":111.6,"p":576,"d":8.3},{"t":88.2,"p":530,"d":5.4},{"t":66.9,"p":585,"d":4.0},{"t":95.7,"p":604,"d":8.2},{"t":82.4,"p":521,"d":10.2},{"t":57.4,"p":534,"d":15.7},{"t":59.7,"p":497,"d":10.1},{"t":51.1,"p":562,"d":33.5},{"t":59.7,"p":563,"d":10.1},{"t":86.7,"p":523,"d":10.4},{"t":84.6,"p":494,"d":15.1},{"t":88.7,"p":464,"d":15.1},{"t":81.3,"p":592,"d":15.3},{"t":84.6,"p":496,"d":20.0},{"t":81.3,"p":612,"d":25.3},{"t":102.7,"p":549,"d":10.2},{"t":90.9,"p":534,"d":16.0},{"t":86.2,"p":487,"d":15.0},{"t":88.2,"p":568,"d":12.9},{"t":89.6,"p":634,"d":16.1},{"t":90.7,"p":547,"d":15.2},{"t":43.3,"p":551,"d":5.0},{"t":49.6,"p":666,"d":12.4},{"t":50.2,"p":808,"d":14.5},{"t":52.2,"p":522,"d":16.7},{"t":49.3,"p":648,"d":8.6},{"t":55.8,"p":619,"d":5.2},{"t":86.2,"p":517,"d":10.2},{"t":86.5,"p":574,"d":15.0},{"t":86.9,"p":579,"d":15.1},{"t":82.8,"p":490,"d":18.8},{"t":75.9,"p":532,"d":13.1},{"t":50.9,"p":777,"d":25.8},{"t":50.0,"p":615,"d":24.7},{"t":61.0,"p":554,"d":15.0},{"t":73.6,"p":500,"d":13.3},{"t":68.0,"p":497,"d":15.0},{"t":73.6,"p":567,"d":19.7},{"t":80.2,"p":546,"d":25.0},{"t":82.2,"p":544,"d":22.1},{"t":86.9,"p":563,"d":10.3},{"t":86.0,"p":477,"d":15.2},{"t":86.9,"p":538,"d":10.8},{"t":85.6,"p":441,"d":16.7},{"t":89.6,"p":504,"d":5.1},{"t":73.8,"p":595,"d":30.2},{"t":87.6,"p":521,"d":5.2},{"t":83.5,"p":515,"d":15.1},{"t":78.8,"p":522,"d":15.1},{"t":81.1,"p":471,"d":17.1},{"t":77.2,"p":507,"d":5.0},{"t":79.3,"p":531,"d":19.9},{"t":77.9,"p":624,"d":21.6},{"t":64.0,"p":640,"d":20.0},{"t":65.3,"p":593,"d":5.1},{"t":61.0,"p":640,"d":8.1},{"t":44.4,"p":718,"d":13.5},{"t":50.4,"p":508,"d":14.0},{"t":74.1,"p":518,"d":12.0},{"t":77.5,"p":527,"d":10.5},{"t":76.1,"p":556,"d":15.3},{"t":68.5,"p":545,"d":27.0},{"t":101.1,"p":555,"d":5.3},{"t":77.7,"p":526,"d":15.0},{"t":80.1,"p":562,"d":13.1},{"t":82.4,"p":553,"d":10.1},{"t":83.3,"p":558,"d":8.0},{"t":90.5,"p":445,"d":48.2},{"t":83.8,"p":539,"d":5.1},{"t":82.0,"p":501,"d":10.4},{"t":74.3,"p":458,"d":12.2},{"t":74.3,"p":520,"d":15.4},{"t":80.4,"p":558,"d":10.0},{"t":79.0,"p":539,"d":5.1},{"t":55.2,"p":590,"d":31.8},{"t":49.8,"p":704,"d":13.2},{"t":44.8,"p":690,"d":16.7},{"t":38.1,"p":544,"d":13.2},{"t":42.3,"p":541,"d":10.4},{"t":55.8,"p":547,"d":5.0},{"t":57.9,"p":623,"d":14.9},{"t":67.6,"p":539,"d":6.1},{"t":55.4,"p":552,"d":8.7},{"t":41.5,"p":532,"d":4.3},{"t":69.6,"p":642,"d":102.8},{"t":48.9,"p":655,"d":3.0},{"t":87.6,"p":529,"d":5.3},{"t":73.9,"p":559,"d":6.4},{"t":77.0,"p":521,"d":10.5},{"t":72.5,"p":554,"d":8.0},{"t":70.2,"p":447,"d":10.0},{"t":70.5,"p":448,"d":15.0},{"t":72.1,"p":567,"d":11.9},{"t":65.3,"p":508,"d":10.1},{"t":85.6,"p":481,"d":31.8},{"t":77.7,"p":514,"d":11.3},{"t":72.5,"p":568,"d":15.0},{"t":70.0,"p":466,"d":11.0},{"t":66.0,"p":549,"d":8.1},{"t":66.9,"p":519,"d":5.1},{"t":50.5,"p":510,"d":48.5},{"t":68.7,"p":534,"d":7.2},{"t":57.9,"p":562,"d":10.0},{"t":55.9,"p":596,"d":10.4},{"t":49.6,"p":544,"d":15.2},{"t":51.6,"p":433,"d":15.0},{"t":59.2,"p":487,"d":10.1},{"t":72.1,"p":668,"d":27.0},{"t":73.6,"p":547,"d":25.1},{"t":58.8,"p":481,"d":15.8},{"t":58.8,"p":467,"d":20.5},{"t":59.0,"p":449,"d":14.9},{"t":48.7,"p":611,"d":11.5},{"t":45.0,"p":491,"d":35.3},{"t":45.9,"p":605,"d":18.2},{"t":61.7,"p":478,"d":20.4},{"t":63.9,"p":534,"d":20.7},{"t":53.8,"p":450,"d":20.0},{"t":55.6,"p":485,"d":22.3},{"t":62.4,"p":500,"d":20.4},{"t":74.7,"p":644,"d":30.0},{"t":67.3,"p":458,"d":25.0},{"t":61.5,"p":506,"d":15.0},{"t":59.0,"p":570,"d":16.8},{"t":57.4,"p":450,"d":15.3},{"t":58.8,"p":484,"d":10.8},{"t":49.1,"p":535,"d":5.2},{"t":74.8,"p":484,"d":3.0},{"t":63.1,"p":411,"d":62.2},{"t":47.8,"p":537,"d":10.0},{"t":39.6,"p":559,"d":12.9},{"t":30.7,"p":558,"d":15.1},{"t":68.7,"p":571,"d":3.0},{"t":56.7,"p":446,"d":19.7},{"t":60.8,"p":550,"d":49.9},{"t":58.6,"p":541,"d":10.2},{"t":56.8,"p":597,"d":13.1},{"t":54.9,"p":486,"d":17.6},{"t":52.3,"p":588,"d":13.1},{"t":57.9,"p":467,"d":13.1},{"t":54.3,"p":524,"d":20.9},{"t":59.4,"p":448,"d":19.5},{"t":61.5,"p":614,"d":12.1},{"t":64.0,"p":487,"d":15.0},{"t":58.6,"p":564,"d":12.1},{"t":55.2,"p":506,"d":3.2},{"t":55.9,"p":326,"d":10.0},{"t":60.6,"p":619,"d":3.0},{"t":62.2,"p":482,"d":30.1},{"t":57.0,"p":599,"d":12.1},{"t":53.8,"p":543,"d":10.1},{"t":52.3,"p":576,"d":9.0},{"t":54.9,"p":416,"d":10.4},{"t":56.1,"p":545,"d":8.4},{"t":52.0,"p":486,"d":20.0},{"t":49.6,"p":538,"d":3.0},{"t":48.9,"p":539,"d":7.0},{"t":48.7,"p":574,"d":8.1},{"t":55.9,"p":537,"d":5.1},{"t":45.7,"p":481,"d":178.7},{"t":51.3,"p":594,"d":3.2},{"t":38.8,"p":577,"d":4.3},{"t":62.4,"p":570,"d":4.1},{"t":49.5,"p":581,"d":4.1},{"t":52.7,"p":578,"d":3.0},{"t":48.6,"p":539,"d":5.1},{"t":50.5,"p":533,"d":3.9},{"t":48.4,"p":639,"d":3.9},{"t":70.5,"p":579,"d":4.3},{"t":55.9,"p":529,"d":5.7},{"t":46.9,"p":580,"d":7.9},{"t":51.1,"p":540,"d":3.9},{"t":59.9,"p":515,"d":8.0},{"t":47.1,"p":535,"d":3.9},{"t":44.4,"p":562,"d":8.0},{"t":53.2,"p":539,"d":11.8},{"t":58.6,"p":545,"d":4.9},{"t":42.8,"p":570,"d":11.9},{"t":41.4,"p":548,"d":11.8},{"t":43.5,"p":519,"d":8.2},{"t":65.7,"p":567,"d":11.9},{"t":67.5,"p":586,"d":5.2},{"t":61.7,"p":563,"d":11.9},{"t":44.2,"p":514,"d":10.1},{"t":48.6,"p":545,"d":12.7},{"t":45.9,"p":609,"d":13.0},{"t":57.2,"p":522,"d":5.6},{"t":46.8,"p":530,"d":6.5},{"t":67.1,"p":554,"d":5.3},{"t":64.8,"p":494,"d":8.1},{"t":45.7,"p":481,"d":10.8},{"t":56.5,"p":555,"d":8.0},{"t":54.3,"p":532,"d":9.1},{"t":59.9,"p":490,"d":3.9},{"t":57.6,"p":531,"d":8.8},{"t":49.6,"p":516,"d":9.7},{"t":48.7,"p":544,"d":11.9},{"t":52.3,"p":540,"d":11.9},{"t":43.7,"p":465,"d":12.0},{"t":41.2,"p":523,"d":12.1},{"t":68.5,"p":525,"d":3.3},{"t":73.8,"p":555,"d":3.2},{"t":47.5,"p":687,"d":18.7},{"t":62.6,"p":554,"d":11.9},{"t":48.4,"p":554,"d":14.5},{"t":49.1,"p":507,"d":3.9},{"t":45.0,"p":560,"d":7.1},{"t":44.1,"p":506,"d":5.4},{"t":36.9,"p":471,"d":30.0},{"t":56.1,"p":522,"d":9.3},{"t":46.2,"p":576,"d":19.1},{"t":42.6,"p":557,"d":3.9},{"t":47.7,"p":538,"d":6.8},{"t":44.6,"p":522,"d":16.5},{"t":65.1,"p":540,"d":4.1},{"t":59.9,"p":540,"d":8.2},{"t":50.5,"p":484,"d":10.6},{"t":53.4,"p":539,"d":8.1},{"t":78.3,"p":511,"d":6.9},{"t":79.5,"p":515,"d":3.9},{"t":63.3,"p":582,"d":13.4},{"t":60.8,"p":560,"d":13.7},{"t":50.4,"p":543,"d":8.3},{"t":51.6,"p":521,"d":7.0},{"t":57.6,"p":516,"d":5.2},{"t":79.9,"p":538,"d":3.9},{"t":80.6,"p":457,"d":15.3},{"t":55.4,"p":475,"d":8.2},{"t":55.2,"p":527,"d":5.6},{"t":57.6,"p":459,"d":10.2},{"t":63.0,"p":496,"d":6.3},{"t":64.8,"p":497,"d":18.1},{"t":74.8,"p":549,"d":8.1},{"t":78.3,"p":565,"d":6.0},{"t":68.9,"p":524,"d":10.2},{"t":88.0,"p":508,"d":5.1},{"t":55.4,"p":588,"d":19.3},{"t":54.3,"p":593,"d":5.6},{"t":79.3,"p":538,"d":10.1},{"t":60.4,"p":524,"d":9.7},{"t":59.2,"p":524,"d":9.0},{"t":46.6,"p":420,"d":8.4},{"t":36.9,"p":417,"d":12.3},{"t":44.6,"p":501,"d":6.3},{"t":48.2,"p":494,"d":4.0},{"t":43.7,"p":509,"d":30.4},{"t":90.3,"p":488,"d":6.5},{"t":66.4,"p":520,"d":8.2},{"t":72.5,"p":539,"d":10.3},{"t":64.8,"p":506,"d":8.1},{"t":63.9,"p":467,"d":5.4},{"t":64.9,"p":585,"d":15.5},{"t":77.7,"p":529,"d":8.0},{"t":72.1,"p":514,"d":7.9},{"t":68.2,"p":507,"d":10.7},{"t":62.8,"p":534,"d":8.0},{"t":65.3,"p":522,"d":11.9},{"t":88.0,"p":505,"d":5.5},{"t":67.8,"p":541,"d":20.8},{"t":46.2,"p":597,"d":9.9},{"t":36.9,"p":508,"d":8.4},{"t":41.5,"p":604,"d":10.1},{"t":39.6,"p":578,"d":8.8},{"t":50.7,"p":544,"d":6.4},{"t":50.4,"p":506,"d":54.0},{"t":71.6,"p":561,"d":3.1},{"t":65.7,"p":537,"d":4.1},{"t":55.6,"p":694,"d":4.0},{"t":73.8,"p":526,"d":4.4},{"t":58.3,"p":543,"d":5.1},{"t":51.6,"p":553,"d":3.2},{"t":51.4,"p":461,"d":5.1},{"t":53.2,"p":506,"d":5.1},{"t":58.5,"p":577,"d":4.0},{"t":55.9,"p":789,"d":11.5},{"t":48.0,"p":697,"d":7.2},{"t":47.7,"p":554,"d":5.3},{"t":66.9,"p":617,"d":6.7},{"t":64.8,"p":660,"d":5.0},{"t":72.3,"p":609,"d":8.4},{"t":64.2,"p":592,"d":5.6},{"t":50.4,"p":795,"d":8.9},{"t":49.6,"p":599,"d":5.8},{"t":51.1,"p":531,"d":7.8},{"t":49.6,"p":778,"d":12.0},{"t":48.9,"p":770,"d":14.3},{"t":55.8,"p":563,"d":4.0},{"t":49.3,"p":517,"d":6.6},{"t":45.1,"p":787,"d":17.9},{"t":58.3,"p":556,"d":8.3},{"t":47.7,"p":629,"d":12.6},{"t":54.1,"p":516,"d":6.3},{"t":53.2,"p":572,"d":16.4},{"t":64.9,"p":633,"d":4.3},{"t":62.4,"p":593,"d":11.0},{"t":56.3,"p":613,"d":8.5},{"t":55.0,"p":481,"d":20.2},{"t":54.3,"p":527,"d":16.4},{"t":54.3,"p":508,"d":5.2},{"t":71.2,"p":560,"d":5.6},{"t":50.2,"p":474,"d":10.1},{"t":50.2,"p":535,"d":11.1},{"t":61.2,"p":541,"d":8.4},{"t":53.8,"p":495,"d":13.2},{"t":52.5,"p":609,"d":32.4},{"t":59.4,"p":530,"d":6.5},{"t":48.0,"p":740,"d":9.7},{"t":50.9,"p":431,"d":16.2},{"t":48.2,"p":511,"d":15.5},{"t":45.1,"p":623,"d":17.0},{"t":68.9,"p":663,"d":7.5},{"t":52.5,"p":486,"d":10.6},{"t":49.3,"p":497,"d":50.0},{"t":52.3,"p":715,"d":8.5},{"t":48.6,"p":585,"d":14.8},{"t":46.8,"p":580,"d":12.1},{"t":95.5,"p":498,"d":15.5},{"t":80.6,"p":481,"d":8.1},{"t":79.7,"p":582,"d":12.8},{"t":76.8,"p":590,"d":11.5},{"t":63.9,"p":614,"d":10.6},{"t":52.7,"p":552,"d":6.0},{"t":71.4,"p":723,"d":5.4},{"t":75.2,"p":583,"d":9.0},{"t":68.9,"p":381,"d":13.1},{"t":61.5,"p":736,"d":18.7},{"t":65.3,"p":652,"d":17.4},{"t":73.9,"p":521,"d":5.3},{"t":73.2,"p":506,"d":9.1},{"t":91.0,"p":515,"d":5.0},{"t":71.8,"p":578,"d":11.1},{"t":60.8,"p":606,"d":12.5},{"t":63.9,"p":676,"d":6.5},{"t":79.2,"p":537,"d":7.1},{"t":90.0,"p":568,"d":15.4},{"t":76.1,"p":325,"d":3.1},{"t":75.0,"p":530,"d":5.1},{"t":94.3,"p":529,"d":8.0},{"t":93.7,"p":491,"d":6.5},{"t":95.9,"p":459,"d":45.4},{"t":90.9,"p":536,"d":8.8},{"t":75.4,"p":538,"d":8.5},{"t":80.2,"p":516,"d":10.0},{"t":77.5,"p":497,"d":12.0},{"t":76.8,"p":501,"d":15.2},{"t":76.5,"p":479,"d":16.2},{"t":78.3,"p":643,"d":24.9},{"t":79.5,"p":446,"d":15.9},{"t":78.1,"p":506,"d":16.0},{"t":81.0,"p":474,"d":16.2},{"t":80.2,"p":526,"d":16.1},{"t":72.9,"p":494,"d":10.0},{"t":74.7,"p":523,"d":50.5},{"t":82.2,"p":498,"d":10.1},{"t":76.6,"p":562,"d":16.4},{"t":69.4,"p":444,"d":14.3},{"t":69.8,"p":553,"d":15.1},{"t":71.6,"p":561,"d":15.2},{"t":72.9,"p":386,"d":26.2},{"t":69.6,"p":559,"d":24.3},{"t":68.7,"p":532,"d":12.2},{"t":67.3,"p":427,"d":15.6},{"t":71.8,"p":557,"d":6.1},{"t":84.7,"p":591,"d":8.1},{"t":68.7,"p":459,"d":15.5},{"t":68.0,"p":520,"d":10.0},{"t":68.9,"p":601,"d":29.3},{"t":67.6,"p":532,"d":5.1},{"t":65.1,"p":451,"d":13.9},{"t":64.9,"p":564,"d":9.9},{"t":68.7,"p":437,"d":15.2},{"t":64.9,"p":580,"d":10.0},{"t":71.8,"p":528,"d":5.1},{"t":48.2,"p":624,"d":16.5},{"t":77.5,"p":825,"d":5.9},{"t":79.0,"p":686,"d":4.2},{"t":67.5,"p":561,"d":6.0},{"t":53.4,"p":502,"d":99.1},{"t":57.9,"p":692,"d":5.1},{"t":62.4,"p":538,"d":6.5},{"t":67.1,"p":561,"d":9.8},{"t":62.4,"p":570,"d":12.6},{"t":60.8,"p":520,"d":8.2},{"t":52.3,"p":550,"d":10.0},{"t":57.7,"p":481,"d":10.2},{"t":48.0,"p":512,"d":9.4},{"t":64.0,"p":591,"d":18.2},{"t":57.4,"p":559,"d":9.9},{"t":41.5,"p":512,"d":10.0},{"t":44.8,"p":472,"d":10.0},{"t":46.4,"p":531,"d":10.0},{"t":46.8,"p":555,"d":13.7},{"t":46.0,"p":472,"d":6.1},{"t":46.6,"p":484,"d":4.3},{"t":44.2,"p":322,"d":3.1},{"t":43.7,"p":569,"d":3.8},{"t":50.5,"p":581,"d":22.5},{"t":48.7,"p":499,"d":13.1},{"t":54.0,"p":543,"d":8.6},{"t":48.4,"p":520,"d":10.3},{"t":51.4,"p":542,"d":3.4},{"t":52.7,"p":336,"d":10.0},{"t":63.3,"p":588,"d":13.5},{"t":43.7,"p":564,"d":25.3},{"t":63.5,"p":504,"d":8.0},{"t":46.2,"p":530,"d":8.1},{"t":44.6,"p":545,"d":10.0},{"t":65.1,"p":465,"d":10.2},{"t":44.1,"p":487,"d":10.2},{"t":50.5,"p":525,"d":5.4},{"t":50.9,"p":532,"d":3.1},{"t":51.1,"p":422,"d":31.0},{"t":58.6,"p":533,"d":10.1},{"t":57.6,"p":545,"d":15.2},{"t":54.9,"p":550,"d":15.1},{"t":61.5,"p":486,"d":12.5},{"t":43.5,"p":545,"d":10.0},{"t":42.4,"p":464,"d":6.4},{"t":37.0,"p":361,"d":26.4},{"t":45.1,"p":645,"d":9.4},{"t":44.2,"p":541,"d":15.0},{"t":36.9,"p":506,"d":12.1},{"t":37.0,"p":521,"d":13.4},{"t":38.8,"p":563,"d":13.7},{"t":53.2,"p":494,"d":5.1},{"t":35.1,"p":470,"d":31.0},{"t":47.1,"p":531,"d":15.1},{"t":59.4,"p":510,"d":10.0},{"t":54.9,"p":480,"d":19.0},{"t":50.4,"p":558,"d":10.1},{"t":40.3,"p":516,"d":5.0},{"t":37.2,"p":505,"d":5.5},{"t":39.4,"p":552,"d":5.1},{"t":40.6,"p":445,"d":15.8},{"t":36.1,"p":600,"d":7.5},{"t":38.1,"p":546,"d":9.4},{"t":39.0,"p":617,"d":4.2},{"t":38.7,"p":461,"d":9.9},{"t":36.5,"p":602,"d":7.0},{"t":46.2,"p":508,"d":4.3},{"t":47.5,"p":467,"d":8.1},{"t":63.7,"p":540,"d":6.5},{"t":46.6,"p":506,"d":3.9},{"t":60.4,"p":518,"d":7.2},{"t":43.9,"p":470,"d":5.1},{"t":66.6,"p":601,"d":14.1},{"t":47.8,"p":455,"d":15.0},{"t":50.7,"p":517,"d":30.0},{"t":50.2,"p":503,"d":5.1},{"t":48.0,"p":490,"d":12.0},{"t":43.9,"p":467,"d":15.7},{"t":38.3,"p":494,"d":10.6},{"t":44.1,"p":552,"d":9.6},{"t":34.7,"p":524,"d":51.5},{"t":54.5,"p":531,"d":10.8},{"t":60.1,"p":512,"d":12.5},{"t":62.4,"p":506,"d":15.9},{"t":58.8,"p":573,"d":11.3},{"t":36.9,"p":527,"d":12.8},{"t":37.9,"p":508,"d":31.3},{"t":44.2,"p":545,"d":14.1},{"t":43.0,"p":429,"d":15.2},{"t":57.2,"p":558,"d":14.1},{"t":42.3,"p":467,"d":10.0},{"t":69.6,"p":561,"d":10.4},{"t":45.3,"p":479,"d":24.4},{"t":50.5,"p":341,"d":3.1},{"t":45.9,"p":544,"d":4.0},{"t":44.8,"p":337,"d":6.3},{"t":44.4,"p":527,"d":9.3},{"t":43.2,"p":470,"d":7.8},{"t":43.2,"p":446,"d":10.9},{"t":41.7,"p":531,"d":8.0},{"t":50.2,"p":458,"d":8.1},{"t":51.1,"p":516,"d":4.1},{"t":52.5,"p":520,"d":16.2},{"t":61.9,"p":560,"d":7.9},{"t":45.7,"p":522,"d":8.0},{"t":43.7,"p":478,"d":6.3},{"t":34.9,"p":536,"d":61.1},{"t":60.6,"p":558,"d":3.2},{"t":68.4,"p":539,"d":12.7},{"t":54.3,"p":503,"d":6.7},{"t":50.9,"p":507,"d":8.1},{"t":41.5,"p":458,"d":10.1},{"t":40.3,"p":496,"d":10.1},{"t":50.5,"p":558,"d":20.1},{"t":41.5,"p":491,"d":22.7},{"t":39.9,"p":478,"d":13.5},{"t":41.4,"p":454,"d":12.0},{"t":59.9,"p":450,"d":11.3},{"t":38.1,"p":484,"d":13.5},{"t":60.8,"p":708,"d":11.8},{"t":49.1,"p":604,"d":21.8},{"t":45.7,"p":435,"d":20.4},{"t":49.3,"p":455,"d":14.1},{"t":42.1,"p":478,"d":15.1},{"t":54.9,"p":445,"d":16.1},{"t":43.9,"p":494,"d":9.2},{"t":50.9,"p":493,"d":12.3},{"t":60.6,"p":617,"d":22.6},{"t":63.0,"p":455,"d":31.1},{"t":53.4,"p":605,"d":11.8},{"t":52.2,"p":462,"d":15.0},{"t":62.2,"p":490,"d":15.1},{"t":47.7,"p":517,"d":14.1},{"t":49.5,"p":511,"d":14.0},{"t":49.8,"p":619,"d":26.3},{"t":54.9,"p":456,"d":31.1},{"t":55.4,"p":509,"d":10.5},{"t":58.8,"p":424,"d":16.1},{"t":54.1,"p":474,"d":15.8},{"t":44.4,"p":495,"d":15.0},{"t":46.8,"p":533,"d":10.5},{"t":44.1,"p":500,"d":30.9},{"t":52.7,"p":529,"d":25.1},{"t":51.3,"p":550,"d":10.0},{"t":49.6,"p":502,"d":15.0},{"t":51.3,"p":509,"d":12.0},{"t":33.8,"p":525,"d":5.0},{"t":61.5,"p":556,"d":4.1},{"t":53.2,"p":525,"d":5.0},{"t":54.3,"p":513,"d":6.5},{"t":50.4,"p":550,"d":3.0},{"t":52.0,"p":816,"d":4.9},{"t":55.2,"p":768,"d":4.5},{"t":56.7,"p":808,"d":4.7},{"t":47.3,"p":593,"d":3.0},{"t":56.5,"p":607,"d":5.5},{"t":64.6,"p":701,"d":6.7},{"t":55.9,"p":594,"d":10.3},{"t":49.1,"p":487,"d":6.4},{"t":45.5,"p":745,"d":6.9},{"t":42.4,"p":799,"d":7.9},{"t":49.1,"p":747,"d":13.5},{"t":58.6,"p":556,"d":3.6},{"t":61.0,"p":771,"d":5.5},{"t":63.9,"p":692,"d":7.0},{"t":48.4,"p":499,"d":7.1},{"t":53.2,"p":674,"d":18.1},{"t":54.0,"p":526,"d":3.1},{"t":64.4,"p":706,"d":5.8},{"t":59.7,"p":660,"d":9.0},{"t":54.0,"p":681,"d":9.1},{"t":46.2,"p":475,"d":13.1},{"t":44.4,"p":540,"d":4.1},{"t":57.7,"p":553,"d":7.7},{"t":54.7,"p":804,"d":7.2},{"t":30.2,"p":684,"d":5.4},{"t":59.4,"p":590,"d":9.2},{"t":49.3,"p":605,"d":6.8},{"t":59.0,"p":704,"d":3.5},{"t":63.1,"p":575,"d":10.4},{"t":56.8,"p":489,"d":3.6},{"t":76.1,"p":511,"d":10.8},{"t":106.7,"p":565,"d":7.1},{"t":87.3,"p":518,"d":18.3},{"t":83.3,"p":549,"d":5.0},{"t":53.1,"p":520,"d":5.5},{"t":45.1,"p":634,"d":10.5},{"t":43.2,"p":398,"d":3.1},{"t":41.0,"p":519,"d":7.0},{"t":44.2,"p":575,"d":8.1},{"t":36.7,"p":819,"d":6.2},{"t":46.8,"p":601,"d":22.9},{"t":55.9,"p":650,"d":11.0},{"t":42.4,"p":526,"d":10.1},{"t":40.6,"p":488,"d":8.3},{"t":36.0,"p":690,"d":14.9},{"t":37.9,"p":497,"d":8.0},{"t":55.9,"p":469,"d":6.0},{"t":47.1,"p":499,"d":24.6},{"t":60.1,"p":651,"d":8.3},{"t":56.1,"p":606,"d":9.1},{"t":60.4,"p":514,"d":10.0},{"t":39.7,"p":825,"d":10.6},{"t":51.1,"p":549,"d":6.0},{"t":58.1,"p":552,"d":13.1},{"t":48.2,"p":572,"d":3.6},{"t":43.5,"p":527,"d":13.1},{"t":27.9,"p":462,"d":12.1},{"t":43.9,"p":741,"d":4.7},{"t":30.0,"p":536,"d":9.1},{"t":35.2,"p":525,"d":10.1},{"t":55.0,"p":573,"d":5.1},{"t":46.4,"p":507,"d":31.7},{"t":54.0,"p":803,"d":5.7},{"t":55.8,"p":567,"d":15.1},{"t":44.8,"p":544,"d":10.0},{"t":47.7,"p":687,"d":6.1},{"t":35.4,"p":500,"d":11.5},{"t":34.0,"p":634,"d":10.1},{"t":30.6,"p":535,"d":5.0},{"t":30.6,"p":520,"d":40.0},{"t":38.3,"p":689,"d":9.2},{"t":87.6,"p":549,"d":3.0},{"t":72.9,"p":511,"d":10.1},{"t":77.0,"p":432,"d":15.5},{"t":95.0,"p":580,"d":3.2},{"t":68.7,"p":529,"d":11.2},{"t":95.4,"p":557,"d":3.0},{"t":68.9,"p":459,"d":10.1},{"t":70.0,"p":558,"d":3.4},{"t":71.1,"p":408,"d":26.2},{"t":67.5,"p":631,"d":27.7},{"t":66.4,"p":586,"d":8.0},{"t":79.3,"p":611,"d":3.1},{"t":62.6,"p":493,"d":9.8},{"t":60.4,"p":519,"d":7.8},{"t":78.6,"p":587,"d":3.4},{"t":61.0,"p":564,"d":5.3},{"t":61.0,"p":459,"d":50.0},{"t":63.5,"p":521,"d":9.5},{"t":67.8,"p":531,"d":20.2},{"t":53.2,"p":523,"d":10.0},{"t":56.3,"p":573,"d":13.2},{"t":57.0,"p":502,"d":15.9},{"t":57.6,"p":561,"d":11.3},{"t":57.4,"p":476,"d":26.2},{"t":62.2,"p":473,"d":26.2},{"t":63.7,"p":563,"d":10.1},{"t":59.4,"p":471,"d":18.1},{"t":57.6,"p":542,"d":10.0},{"t":51.1,"p":468,"d":13.0},{"t":74.3,"p":510,"d":3.0},{"t":72.5,"p":592,"d":3.2},{"t":51.1,"p":588,"d":11.0},{"t":72.5,"p":593,"d":3.4},{"t":62.4,"p":450,"d":31.1},{"t":58.6,"p":601,"d":25.0},{"t":61.0,"p":581,"d":6.7},{"t":63.0,"p":419,"d":18.6},{"t":64.6,"p":573,"d":7.6},{"t":75.9,"p":662,"d":8.6},{"t":64.4,"p":532,"d":31.2},{"t":60.1,"p":561,"d":7.0},{"t":59.5,"p":502,"d":10.1},{"t":50.4,"p":333,"d":10.0},{"t":54.1,"p":574,"d":10.1},{"t":73.8,"p":644,"d":5.0},{"t":62.8,"p":600,"d":124.1},{"t":66.2,"p":580,"d":4.2},{"t":48.4,"p":514,"d":8.0},{"t":50.9,"p":537,"d":6.5},{"t":51.1,"p":531,"d":10.7},{"t":47.5,"p":491,"d":5.4},{"t":70.3,"p":509,"d":12.4},{"t":55.0,"p":499,"d":3.9},{"t":63.7,"p":511,"d":14.4},{"t":54.5,"p":542,"d":8.2},{"t":59.2,"p":525,"d":5.1},{"t":56.5,"p":517,"d":9.6},{"t":52.7,"p":524,"d":10.1},{"t":70.9,"p":533,"d":4.4},{"t":59.0,"p":518,"d":10.0},{"t":47.5,"p":566,"d":3.9},{"t":50.9,"p":535,"d":5.5},{"t":58.5,"p":537,"d":11.0},{"t":45.1,"p":554,"d":9.0},{"t":60.1,"p":560,"d":7.2},{"t":60.4,"p":590,"d":11.5},{"t":57.4,"p":581,"d":12.9},{"t":57.0,"p":565,"d":8.0},{"t":62.8,"p":539,"d":8.2},{"t":42.6,"p":528,"d":10.0},{"t":39.7,"p":518,"d":7.1},{"t":53.6,"p":534,"d":8.0},{"t":54.1,"p":539,"d":4.1},{"t":51.1,"p":582,"d":15.3},{"t":41.5,"p":533,"d":21.6},{"t":30.6,"p":527,"d":15.1},{"t":52.2,"p":464,"d":8.2},{"t":33.8,"p":447,"d":11.4},{"t":54.9,"p":519,"d":5.5},{"t":55.6,"p":553,"d":14.3},{"t":31.6,"p":491,"d":10.4},{"t":46.6,"p":482,"d":31.2},{"t":43.9,"p":574,"d":17.2},{"t":62.4,"p":502,"d":3.9},{"t":42.6,"p":484,"d":10.3},{"t":64.2,"p":544,"d":8.9},{"t":42.1,"p":497,"d":9.0},{"t":46.8,"p":524,"d":15.0},{"t":49.5,"p":475,"d":10.1},{"t":47.3,"p":469,"d":36.3},{"t":54.7,"p":530,"d":12.0},{"t":53.6,"p":531,"d":15.0},{"t":47.5,"p":516,"d":17.6},{"t":45.7,"p":495,"d":8.0},{"t":46.2,"p":522,"d":6.1},{"t":60.1,"p":513,"d":4.6},{"t":43.7,"p":506,"d":12.1},{"t":51.6,"p":538,"d":34.5},{"t":67.3,"p":555,"d":12.4},{"t":57.4,"p":471,"d":8.3},{"t":79.3,"p":555,"d":10.3},{"t":64.4,"p":518,"d":8.0},{"t":72.7,"p":566,"d":12.0},{"t":50.5,"p":505,"d":8.1},{"t":41.0,"p":606,"d":49.5},{"t":59.7,"p":584,"d":4.3},{"t":50.5,"p":509,"d":9.5},{"t":59.2,"p":409,"d":8.5},{"t":55.6,"p":539,"d":12.1},{"t":48.7,"p":422,"d":11.9},{"t":47.8,"p":528,"d":4.7},{"t":36.9,"p":484,"d":10.5},{"t":42.1,"p":396,"d":26.2},{"t":50.4,"p":624,"d":10.6},{"t":63.3,"p":554,"d":15.1},{"t":67.8,"p":560,"d":15.2},{"t":43.3,"p":444,"d":13.9},{"t":44.2,"p":580,"d":14.8},{"t":58.3,"p":529,"d":5.5},{"t":47.1,"p":500,"d":42.6},{"t":48.4,"p":502,"d":13.3},{"t":71.8,"p":534,"d":14.9},{"t":56.5,"p":474,"d":10.1},{"t":53.4,"p":443,"d":13.3},{"t":55.6,"p":515,"d":6.9},{"t":48.9,"p":462,"d":12.7},{"t":54.3,"p":454,"d":50.2},{"t":46.9,"p":488,"d":15.1},{"t":57.7,"p":549,"d":9.1},{"t":58.5,"p":510,"d":15.2},{"t":44.2,"p":542,"d":15.1},{"t":40.1,"p":523,"d":15.0},{"t":48.4,"p":501,"d":12.1},{"t":52.3,"p":530,"d":10.1},{"t":52.9,"p":585,"d":35.2},{"t":49.8,"p":485,"d":10.1},{"t":52.0,"p":350,"d":9.4},{"t":50.4,"p":465,"d":15.0},{"t":46.4,"p":518,"d":10.8},{"t":53.8,"p":514,"d":20.0},{"t":48.7,"p":517,"d":7.5},{"t":51.6,"p":502,"d":7.6},{"t":57.0,"p":554,"d":12.2},{"t":47.5,"p":561,"d":49.6},{"t":28.2,"p":545,"d":11.6},{"t":33.6,"p":574,"d":15.1},{"t":30.9,"p":638,"d":11.9},{"t":34.2,"p":595,"d":3.2},{"t":17.6,"p":642,"d":14.4},{"t":14.0,"p":584,"d":10.9},{"t":35.2,"p":555,"d":9.7},{"t":21.2,"p":601,"d":5.4},{"t":43.3,"p":496,"d":27.1},{"t":48.4,"p":569,"d":10.8},{"t":50.0,"p":501,"d":16.0},{"t":50.2,"p":417,"d":15.3},{"t":51.6,"p":507,"d":13.1},{"t":61.7,"p":509,"d":3.2},{"t":59.9,"p":507,"d":10.1},{"t":55.8,"p":512,"d":62.0},{"t":53.1,"p":573,"d":12.7},{"t":46.4,"p":525,"d":16.0},{"t":67.6,"p":593,"d":3.9},{"t":49.6,"p":429,"d":15.3},{"t":48.0,"p":530,"d":14.0},{"t":60.3,"p":479,"d":3.9},{"t":51.4,"p":410,"d":17.0},{"t":73.9,"p":554,"d":3.8},{"t":52.5,"p":485,"d":16.0},{"t":56.1,"p":449,"d":27.0},{"t":48.7,"p":550,"d":25.4},{"t":61.0,"p":553,"d":12.3},{"t":50.9,"p":576,"d":16.0},{"t":51.8,"p":432,"d":20.2},{"t":82.4,"p":553,"d":16.0},{"t":59.4,"p":499,"d":12.0},{"t":51.1,"p":523,"d":31.6},{"t":43.3,"p":427,"d":24.6},{"t":55.2,"p":526,"d":7.1},{"t":81.0,"p":547,"d":10.1},{"t":82.0,"p":569,"d":6.4},{"t":73.2,"p":477,"d":5.1},{"t":73.6,"p":531,"d":3.9},{"t":43.7,"p":484,"d":57.0},{"t":64.4,"p":544,"d":7.0},{"t":56.7,"p":544,"d":3.7},{"t":48.7,"p":560,"d":10.3},{"t":46.9,"p":513,"d":10.2},{"t":52.9,"p":456,"d":15.3},{"t":51.4,"p":521,"d":13.6},{"t":51.1,"p":484,"d":21.1},{"t":57.7,"p":528,"d":5.1},{"t":49.8,"p":601,"d":25.0},{"t":63.7,"p":523,"d":4.2},{"t":66.7,"p":539,"d":11.1},{"t":95.4,"p":599,"d":15.6},{"t":69.1,"p":481,"d":14.4},{"t":91.4,"p":543,"d":4.5},{"t":65.3,"p":419,"d":16.2},{"t":59.0,"p":531,"d":16.8},{"t":57.7,"p":516,"d":7.1},{"t":33.4,"p":607,"d":49.0},{"t":61.3,"p":576,"d":10.0},{"t":88.5,"p":591,"d":15.0},{"t":65.1,"p":461,"d":15.0},{"t":88.5,"p":533,"d":4.4},{"t":66.9,"p":419,"d":14.2},{"t":89.6,"p":534,"d":15.1},{"t":83.1,"p":510,"d":15.9},{"t":66.2,"p":543,"d":31.1},{"t":79.7,"p":598,"d":23.3},{"t":67.6,"p":493,"d":10.3},{"t":62.4,"p":437,"d":17.8},{"t":66.4,"p":541,"d":13.2},{"t":59.7,"p":542,"d":13.1},{"t":61.9,"p":607,"d":40.0},{"t":72.7,"p":632,"d":10.6},{"t":66.6,"p":626,"d":14.8},{"t":69.8,"p":626,"d":7.7},{"t":63.0,"p":694,"d":20.6},{"t":55.9,"p":479,"d":16.0},{"t":61.9,"p":562,"d":17.0},{"t":68.4,"p":594,"d":4.9},{"t":64.0,"p":628,"d":31.1},{"t":65.5,"p":580,"d":12.1},{"t":70.0,"p":633,"d":16.6},{"t":59.4,"p":484,"d":20.1},{"t":64.9,"p":489,"d":15.1},{"t":63.3,"p":490,"d":16.1},{"t":64.8,"p":558,"d":10.3},{"t":42.1,"p":597,"d":30.9},{"t":57.7,"p":539,"d":19.4},{"t":62.8,"p":513,"d":28.0},{"t":74.5,"p":529,"d":8.1},{"t":75.6,"p":433,"d":13.0},{"t":98.2,"p":552,"d":10.1},{"t":93.0,"p":568,"d":6.4},{"t":71.8,"p":408,"d":53.0},{"t":83.7,"p":592,"d":10.1},{"t":74.7,"p":560,"d":9.5},{"t":97.9,"p":591,"d":6.3},{"t":71.8,"p":488,"d":8.2},{"t":75.6,"p":454,"d":11.6},{"t":108.5,"p":649,"d":13.6},{"t":83.1,"p":457,"d":15.0},{"t":93.7,"p":657,"d":11.2},{"t":84.9,"p":583,"d":26.3},{"t":81.7,"p":569,"d":8.3},{"t":79.5,"p":492,"d":12.7},{"t":81.1,"p":599,"d":10.1},{"t":66.6,"p":418,"d":14.0},{"t":77.9,"p":649,"d":10.1},{"t":73.8,"p":705,"d":19.2},{"t":72.7,"p":574,"d":6.4},{"t":73.6,"p":476,"d":8.2},{"t":77.0,"p":438,"d":8.8},{"t":107.1,"p":539,"d":5.1},{"t":104.2,"p":606,"d":7.1},{"t":90.0,"p":607,"d":4.1},{"t":103.1,"p":542,"d":4.1},{"t":102.7,"p":582,"d":4.5},{"t":103.6,"p":563,"d":5.4},{"t":48.2,"p":753,"d":96.1},{"t":54.0,"p":582,"d":3.0},{"t":58.3,"p":616,"d":3.0},{"t":68.7,"p":765,"d":4.1},{"t":45.3,"p":837,"d":13.4},{"t":46.0,"p":689,"d":12.4},{"t":56.3,"p":775,"d":16.1},{"t":55.8,"p":632,"d":11.1},{"t":41.9,"p":673,"d":12.1},{"t":45.1,"p":636,"d":10.7},{"t":68.5,"p":706,"d":7.5},{"t":54.3,"p":685,"d":5.6},{"t":63.3,"p":607,"d":3.5},{"t":44.1,"p":785,"d":24.0},{"t":58.1,"p":558,"d":4.5},{"t":67.3,"p":590,"d":3.6},{"t":65.3,"p":751,"d":6.0},{"t":52.3,"p":726,"d":11.6},{"t":58.8,"p":707,"d":21.0},{"t":63.9,"p":459,"d":6.6},{"t":49.3,"p":681,"d":16.7},{"t":62.8,"p":796,"d":5.8},{"t":62.1,"p":535,"d":3.2},{"t":55.0,"p":565,"d":4.1},{"t":61.0,"p":327,"d":3.1},{"t":47.8,"p":659,"d":7.2},{"t":63.1,"p":644,"d":5.6},{"t":45.7,"p":792,"d":7.9},{"t":46.2,"p":551,"d":3.6},{"t":48.9,"p":800,"d":16.5},{"t":57.0,"p":505,"d":8.1},{"t":54.3,"p":586,"d":5.6},{"t":43.5,"p":596,"d":4.0},{"t":66.0,"p":605,"d":6.7},{"t":62.1,"p":563,"d":3.8},{"t":66.7,"p":637,"d":5.0},{"t":58.3,"p":560,"d":6.1},{"t":48.0,"p":641,"d":5.4},{"t":44.6,"p":801,"d":39.0},{"t":52.3,"p":673,"d":4.0},{"t":72.1,"p":480,"d":12.0},{"t":56.8,"p":673,"d":3.1},{"t":57.4,"p":522,"d":6.6},{"t":61.0,"p":763,"d":4.5},{"t":45.9,"p":562,"d":4.3},{"t":62.4,"p":592,"d":9.4},{"t":57.2,"p":827,"d":14.1},{"t":58.8,"p":740,"d":4.7},{"t":59.0,"p":543,"d":8.3},{"t":43.3,"p":661,"d":6.2},{"t":54.1,"p":773,"d":6.5},{"t":58.1,"p":609,"d":8.5},{"t":43.3,"p":355,"d":3.1},{"t":43.3,"p":561,"d":4.5},{"t":39.9,"p":497,"d":3.4},{"t":54.1,"p":802,"d":9.5},{"t":49.8,"p":712,"d":6.0},{"t":52.3,"p":596,"d":3.4},{"t":44.1,"p":587,"d":19.0},{"t":37.2,"p":561,"d":5.0},{"t":36.7,"p":663,"d":21.8},{"t":42.4,"p":575,"d":3.1},{"t":38.8,"p":517,"d":9.6},{"t":55.9,"p":471,"d":10.2},{"t":65.1,"p":327,"d":3.1},{"t":57.2,"p":515,"d":5.9},{"t":54.5,"p":502,"d":6.0},{"t":49.3,"p":530,"d":7.4},{"t":58.5,"p":577,"d":13.1},{"t":59.2,"p":625,"d":8.9},{"t":44.6,"p":540,"d":16.3},{"t":59.2,"p":834,"d":4.3},{"t":59.9,"p":573,"d":8.7},{"t":58.3,"p":556,"d":8.2},{"t":51.4,"p":511,"d":32.5},{"t":66.9,"p":607,"d":11.1},{"t":37.2,"p":563,"d":3.5},{"t":39.2,"p":707,"d":10.7},{"t":39.0,"p":674,"d":11.5},{"t":56.3,"p":554,"d":8.1},{"t":38.8,"p":534,"d":17.3},{"t":59.0,"p":593,"d":7.4},{"t":46.2,"p":468,"d":5.6},{"t":70.9,"p":488,"d":9.0},{"t":71.8,"p":499,"d":31.4},{"t":70.7,"p":482,"d":20.4},{"t":61.2,"p":439,"d":15.3},{"t":55.4,"p":618,"d":10.0},{"t":53.4,"p":606,"d":18.4},{"t":64.0,"p":472,"d":14.5},{"t":70.7,"p":546,"d":8.4},{"t":66.6,"p":595,"d":4.1},{"t":85.3,"p":478,"d":7.4},{"t":85.5,"p":540,"d":6.6},{"t":63.0,"p":441,"d":8.8},{"t":65.1,"p":533,"d":10.6},{"t":63.7,"p":435,"d":24.4},{"t":71.1,"p":448,"d":17.8},{"t":60.8,"p":530,"d":8.3},{"t":57.2,"p":503,"d":12.0},{"t":48.6,"p":409,"d":14.4},{"t":46.4,"p":520,"d":4.7},{"t":48.4,"p":506,"d":10.1},{"t":50.4,"p":477,"d":10.7},{"t":59.2,"p":318,"d":3.1},{"t":53.1,"p":509,"d":8.4},{"t":59.2,"p":523,"d":9.0},{"t":50.9,"p":561,"d":16.0},{"t":44.8,"p":503,"d":12.0},{"t":48.7,"p":513,"d":10.9},{"t":46.8,"p":480,"d":15.0},{"t":64.0,"p":538,"d":4.1},{"t":46.0,"p":522,"d":5.4},{"t":40.1,"p":503,"d":9.2},{"t":53.1,"p":562,"d":8.2},{"t":46.4,"p":328,"d":13.2},{"t":48.9,"p":559,"d":5.8},{"t":62.2,"p":637,"d":11.1},{"t":54.3,"p":573,"d":3.9},{"t":57.6,"p":458,"d":5.4},{"t":52.2,"p":454,"d":10.7},{"t":72.3,"p":554,"d":3.1},{"t":49.1,"p":475,"d":10.6},{"t":49.8,"p":504,"d":19.4},{"t":39.6,"p":456,"d":17.3},{"t":51.6,"p":452,"d":8.0},{"t":50.7,"p":507,"d":6.0},{"t":47.1,"p":482,"d":10.7},{"t":52.7,"p":410,"d":26.3},{"t":55.6,"p":520,"d":8.0},{"t":71.8,"p":517,"d":6.5},{"t":53.4,"p":487,"d":21.5},{"t":66.7,"p":584,"d":5.6},{"t":49.1,"p":340,"d":10.0},{"t":50.7,"p":485,"d":9.9},{"t":53.6,"p":545,"d":21.8},{"t":52.2,"p":515,"d":20.1},{"t":50.2,"p":486,"d":8.1},{"t":64.6,"p":529,"d":5.8},{"t":72.3,"p":554,"d":3.9},{"t":56.7,"p":494,"d":5.3},{"t":54.3,"p":492,"d":5.4},{"t":49.3,"p":570,"d":4.6},{"t":48.0,"p":430,"d":31.1},{"t":69.1,"p":564,"d":10.1},{"t":54.1,"p":644,"d":15.0},{"t":45.1,"p":553,"d":7.2},{"t":61.0,"p":535,"d":9.7},{"t":53.2,"p":446,"d":11.3},{"t":49.8,"p":543,"d":8.0},{"t":46.9,"p":505,"d":7.9},{"t":47.7,"p":505,"d":3.6},{"t":45.0,"p":486,"d":14.2},{"t":43.2,"p":344,"d":26.3},{"t":59.7,"p":530,"d":8.3},{"t":44.8,"p":550,"d":3.9},{"t":50.2,"p":532,"d":16.3},{"t":52.0,"p":536,"d":8.0},{"t":57.9,"p":478,"d":25.2},{"t":50.4,"p":524,"d":9.7},{"t":39.0,"p":510,"d":20.0},{"t":43.0,"p":678,"d":8.2},{"t":73.0,"p":527,"d":5.7},{"t":46.4,"p":493,"d":18.5},{"t":51.1,"p":556,"d":4.3},{"t":44.8,"p":468,"d":10.5},{"t":45.1,"p":598,"d":4.1},{"t":47.3,"p":549,"d":3.9},{"t":41.4,"p":466,"d":39.5},{"t":44.6,"p":512,"d":7.7},{"t":56.1,"p":551,"d":13.3},{"t":48.9,"p":508,"d":8.6},{"t":61.3,"p":554,"d":10.8},{"t":46.8,"p":542,"d":11.2},{"t":54.0,"p":480,"d":21.4},{"t":47.7,"p":525,"d":8.4},{"t":38.5,"p":410,"d":16.5},{"t":42.4,"p":517,"d":4.0},{"t":41.9,"p":476,"d":8.3},{"t":62.8,"p":554,"d":6.4},{"t":43.3,"p":500,"d":3.9},{"t":38.8,"p":518,"d":10.0},{"t":15.3,"p":502,"d":9.9},{"t":14.7,"p":677,"d":8.2},{"t":31.5,"p":664,"d":4.2},{"t":35.1,"p":479,"d":12.4},{"t":15.1,"p":647,"d":10.4},{"t":23.9,"p":644,"d":27.5},{"t":13.1,"p":609,"d":8.4},{"t":24.6,"p":598,"d":10.6},{"t":25.7,"p":720,"d":9.1},{"t":12.0,"p":589,"d":11.8},{"t":17.4,"p":583,"d":16.9},{"t":64.9,"p":486,"d":3.2},{"t":41.7,"p":540,"d":4.3},{"t":42.4,"p":346,"d":13.1},{"t":42.3,"p":537,"d":8.0},{"t":46.8,"p":518,"d":3.9},{"t":42.4,"p":478,"d":28.4},{"t":40.5,"p":545,"d":20.6},{"t":38.8,"p":490,"d":10.7},{"t":40.6,"p":425,"d":20.1},{"t":61.7,"p":524,"d":14.0},{"t":54.3,"p":577,"d":6.1},{"t":52.9,"p":485,"d":11.6},{"t":60.4,"p":549,"d":3.7},{"t":52.5,"p":348,"d":26.3},{"t":63.5,"p":544,"d":5.2},{"t":66.9,"p":553,"d":7.9},{"t":50.5,"p":515,"d":8.1},{"t":55.8,"p":549,"d":3.9},{"t":47.5,"p":601,"d":4.0},{"t":55.2,"p":488,"d":10.7},{"t":52.3,"p":563,"d":15.5},{"t":58.1,"p":581,"d":16.3},{"t":51.1,"p":582,"d":3.2},{"t":54.0,"p":548,"d":5.0},{"t":70.0,"p":477,"d":3.9},{"t":51.1,"p":468,"d":9.5},{"t":56.5,"p":455,"d":11.6},{"t":50.2,"p":568,"d":7.8},{"t":45.0,"p":494,"d":10.7},{"t":63.3,"p":503,"d":26.6},{"t":59.4,"p":556,"d":21.9},{"t":57.0,"p":503,"d":9.6},{"t":50.5,"p":459,"d":8.8},{"t":45.1,"p":515,"d":4.2},{"t":51.4,"p":505,"d":3.0},{"t":71.6,"p":551,"d":11.1},{"t":49.3,"p":488,"d":4.5},{"t":52.3,"p":343,"d":9.4},{"t":46.9,"p":535,"d":9.3},{"t":58.8,"p":487,"d":6.8},{"t":46.4,"p":479,"d":15.0},{"t":48.4,"p":511,"d":8.3},{"t":55.8,"p":463,"d":6.1},{"t":40.6,"p":620,"d":9.2},{"t":41.9,"p":599,"d":16.2},{"t":37.6,"p":557,"d":15.1},{"t":57.4,"p":433,"d":6.0},{"t":46.4,"p":476,"d":6.1},{"t":34.9,"p":446,"d":7.5},{"t":34.9,"p":480,"d":13.3},{"t":43.7,"p":486,"d":10.7},{"t":51.6,"p":542,"d":19.1},{"t":56.1,"p":507,"d":19.1},{"t":56.8,"p":548,"d":3.9},{"t":75.2,"p":508,"d":5.8},{"t":59.0,"p":481,"d":21.8},{"t":70.3,"p":559,"d":8.3},{"t":53.6,"p":441,"d":31.2},{"t":48.9,"p":486,"d":10.7},{"t":56.3,"p":508,"d":30.6},{"t":59.2,"p":636,"d":14.2},{"t":71.8,"p":532,"d":6.5},{"t":63.3,"p":554,"d":5.1},{"t":64.4,"p":481,"d":10.7},{"t":43.5,"p":363,"d":26.3},{"t":44.1,"p":553,"d":5.7},{"t":50.7,"p":527,"d":6.0},{"t":72.3,"p":560,"d":6.1},{"t":50.7,"p":540,"d":8.7},{"t":46.4,"p":521,"d":10.8},{"t":41.4,"p":578,"d":8.6},{"t":52.5,"p":477,"d":8.2},{"t":89.8,"p":530,"d":6.1},{"t":70.9,"p":604,"d":4.1},{"t":62.4,"p":485,"d":10.6},{"t":70.7,"p":615,"d":8.2},{"t":74.1,"p":475,"d":9.2},{"t":65.7,"p":474,"d":25.1},{"t":64.6,"p":407,"d":8.5},{"t":57.9,"p":616,"d":4.1},{"t":59.7,"p":479,"d":32.3},{"t":49.5,"p":555,"d":3.1},{"t":61.5,"p":622,"d":24.1},{"t":64.8,"p":550,"d":4.0},{"t":63.1,"p":529,"d":4.1},{"t":61.0,"p":490,"d":8.7},{"t":44.6,"p":614,"d":49.7},{"t":61.2,"p":527,"d":5.3},{"t":60.6,"p":459,"d":10.0},{"t":66.4,"p":556,"d":8.2},{"t":64.4,"p":472,"d":10.7},{"t":72.0,"p":548,"d":11.0},{"t":68.0,"p":439,"d":12.1},{"t":55.9,"p":614,"d":3.9},{"t":56.8,"p":452,"d":3.9},{"t":59.5,"p":417,"d":9.2},{"t":63.3,"p":643,"d":4.1},{"t":69.3,"p":484,"d":10.7},{"t":75.9,"p":401,"d":14.0},{"t":76.1,"p":434,"d":10.1},{"t":84.4,"p":453,"d":6.5},{"t":64.8,"p":482,"d":6.2},{"t":50.5,"p":410,"d":6.1},{"t":50.9,"p":487,"d":8.2},{"t":64.0,"p":320,"d":3.1},{"t":55.6,"p":435,"d":11.4},{"t":51.4,"p":482,"d":4.8},{"t":85.1,"p":577,"d":8.3},{"t":78.4,"p":475,"d":10.0},{"t":77.2,"p":545,"d":10.4},{"t":79.3,"p":489,"d":6.4},{"t":73.8,"p":642,"d":4.1},{"t":78.4,"p":534,"d":7.8},{"t":80.6,"p":510,"d":5.1},{"t":77.9,"p":443,"d":14.7},{"t":66.2,"p":554,"d":7.1},{"t":70.9,"p":490,"d":22.1},{"t":70.3,"p":547,"d":8.9},{"t":72.5,"p":656,"d":4.1},{"t":75.0,"p":491,"d":10.2},{"t":85.3,"p":498,"d":11.5},{"t":73.8,"p":429,"d":20.1},{"t":101.8,"p":506,"d":7.4},{"t":75.7,"p":439,"d":10.2},{"t":77.5,"p":440,"d":10.7},{"t":79.5,"p":553,"d":6.5},{"t":76.3,"p":452,"d":11.8},{"t":82.9,"p":527,"d":11.9},{"t":78.1,"p":427,"d":20.6},{"t":87.8,"p":531,"d":9.2},{"t":82.4,"p":458,"d":20.1},{"t":80.8,"p":442,"d":11.8},{"t":84.2,"p":546,"d":13.8},{"t":91.9,"p":515,"d":5.4},{"t":76.6,"p":561,"d":3.9},{"t":81.5,"p":548,"d":6.6},{"t":84.0,"p":572,"d":3.9},{"t":75.6,"p":454,"d":10.6},{"t":86.0,"p":469,"d":9.7},{"t":86.5,"p":432,"d":6.5},{"t":88.3,"p":457,"d":8.2},{"t":73.4,"p":564,"d":7.8},{"t":76.1,"p":320,"d":4.0},{"t":89.8,"p":586,"d":10.1},{"t":87.8,"p":553,"d":6.4},{"t":88.2,"p":428,"d":10.0},{"t":64.4,"p":538,"d":5.0},{"t":67.8,"p":576,"d":7.5},{"t":54.9,"p":330,"d":3.1},{"t":60.6,"p":465,"d":4.6},{"t":59.9,"p":666,"d":10.0},{"t":64.4,"p":380,"d":13.1},{"t":68.0,"p":561,"d":10.2},{"t":46.9,"p":493,"d":22.6},{"t":58.8,"p":645,"d":9.1},{"t":56.7,"p":560,"d":8.6},{"t":59.2,"p":426,"d":13.2},{"t":62.1,"p":579,"d":16.6},{"t":57.0,"p":463,"d":5.4},{"t":53.8,"p":590,"d":10.5},{"t":57.9,"p":608,"d":22.4},{"t":61.5,"p":508,"d":7.8},{"t":59.4,"p":541,"d":8.4},{"t":44.8,"p":610,"d":18.8},{"t":68.2,"p":573,"d":13.9},{"t":64.4,"p":626,"d":19.8},{"t":48.6,"p":648,"d":11.8},{"t":66.6,"p":466,"d":13.3},{"t":55.6,"p":618,"d":5.2},{"t":65.3,"p":648,"d":7.4},{"t":58.3,"p":638,"d":18.7},{"t":59.5,"p":530,"d":16.1},{"t":66.2,"p":508,"d":3.4},{"t":68.2,"p":624,"d":6.0},{"t":64.0,"p":733,"d":12.8},{"t":66.0,"p":446,"d":18.7},{"t":66.4,"p":553,"d":23.4},{"t":59.4,"p":649,"d":7.7},{"t":60.3,"p":692,"d":10.7},{"t":62.6,"p":593,"d":3.6},{"t":49.6,"p":819,"d":73.2},{"t":61.9,"p":664,"d":3.8},{"t":62.4,"p":637,"d":6.0},{"t":71.6,"p":712,"d":5.9},{"t":71.2,"p":578,"d":7.2},{"t":66.7,"p":666,"d":8.2},{"t":55.4,"p":599,"d":8.3},{"t":62.2,"p":558,"d":13.3},{"t":58.8,"p":561,"d":8.5},{"t":57.6,"p":554,"d":8.1},{"t":51.6,"p":565,"d":8.2},{"t":52.3,"p":602,"d":7.2},{"t":49.5,"p":555,"d":8.6},{"t":47.7,"p":464,"d":14.2},{"t":63.5,"p":568,"d":8.8},{"t":54.3,"p":444,"d":11.8},{"t":61.7,"p":648,"d":9.1},{"t":41.0,"p":514,"d":10.1},{"t":49.1,"p":627,"d":18.7},{"t":61.0,"p":562,"d":10.1},{"t":42.6,"p":464,"d":13.9},{"t":60.3,"p":543,"d":10.6},{"t":55.8,"p":636,"d":12.2},{"t":46.9,"p":544,"d":10.1},{"t":39.7,"p":338,"d":3.1},{"t":34.3,"p":651,"d":14.0},{"t":59.2,"p":618,"d":10.1},{"t":40.5,"p":508,"d":10.2},{"t":38.8,"p":429,"d":12.0},{"t":34.0,"p":505,"d":10.1},{"t":39.4,"p":726,"d":18.1},{"t":47.7,"p":645,"d":10.0},{"t":40.6,"p":562,"d":10.0},{"t":34.2,"p":444,"d":11.2},{"t":33.3,"p":579,"d":8.0},{"t":35.1,"p":590,"d":12.0},{"t":38.8,"p":537,"d":8.4},{"t":54.7,"p":514,"d":13.3},{"t":51.8,"p":836,"d":9.9},{"t":50.0,"p":551,"d":10.4},{"t":48.9,"p":590,"d":8.0},{"t":49.1,"p":640,"d":5.5},{"t":36.0,"p":471,"d":10.1},{"t":61.0,"p":561,"d":10.7},{"t":39.2,"p":809,"d":14.6},{"t":38.7,"p":495,"d":8.7},{"t":59.5,"p":388,"d":16.1},{"t":63.5,"p":478,"d":10.1},{"t":69.3,"p":540,"d":11.2},{"t":68.9,"p":387,"d":10.2},{"t":82.0,"p":529,"d":10.9},{"t":75.7,"p":566,"d":11.1},{"t":70.0,"p":454,"d":20.7},{"t":69.8,"p":423,"d":10.6},{"t":68.2,"p":528,"d":11.9},{"t":65.7,"p":529,"d":9.6},{"t":60.1,"p":417,"d":12.0},{"t":56.7,"p":559,"d":10.1},{"t":56.5,"p":547,"d":10.0},{"t":56.7,"p":817,"d":14.1},{"t":57.7,"p":370,"d":18.0},{"t":63.3,"p":551,"d":12.1},{"t":63.0,"p":560,"d":6.6},{"t":72.5,"p":541,"d":14.0},{"t":63.3,"p":470,"d":10.0},{"t":59.9,"p":404,"d":20.5},{"t":60.8,"p":526,"d":3.4},{"t":83.1,"p":562,"d":11.8},{"t":57.4,"p":434,"d":16.1},{"t":63.1,"p":519,"d":13.1},{"t":61.0,"p":375,"d":12.0},{"t":67.3,"p":543,"d":12.0},{"t":65.1,"p":497,"d":16.3},{"t":79.0,"p":511,"d":12.0},{"t":55.6,"p":402,"d":18.1},{"t":65.7,"p":527,"d":12.1},{"t":62.4,"p":586,"d":12.0},{"t":61.3,"p":541,"d":12.2},{"t":59.5,"p":560,"d":12.9},{"t":57.4,"p":555,"d":11.8},{"t":60.8,"p":551,"d":12.2},{"t":67.5,"p":518,"d":8.7},{"t":58.8,"p":321,"d":13.2},{"t":63.5,"p":544,"d":10.3},{"t":61.7,"p":511,"d":12.0},{"t":62.6,"p":547,"d":11.7},{"t":60.4,"p":402,"d":12.2},{"t":61.3,"p":547,"d":11.5},{"t":65.7,"p":537,"d":13.0},{"t":66.2,"p":375,"d":23.2},{"t":53.6,"p":552,"d":12.1},{"t":56.8,"p":534,"d":13.0},{"t":56.5,"p":512,"d":12.0},{"t":51.8,"p":417,"d":12.2},{"t":61.7,"p":583,"d":12.4},{"t":56.5,"p":523,"d":12.1},{"t":53.8,"p":396,"d":18.8},{"t":48.7,"p":486,"d":12.0},{"t":61.5,"p":605,"d":10.1},{"t":51.6,"p":540,"d":10.0},{"t":49.6,"p":321,"d":10.0},{"t":48.7,"p":424,"d":10.6},{"t":57.0,"p":564,"d":13.0},{"t":47.5,"p":454,"d":16.0},{"t":44.8,"p":535,"d":12.1},{"t":49.1,"p":474,"d":11.9},{"t":46.8,"p":428,"d":8.6},{"t":48.0,"p":605,"d":10.0},{"t":44.4,"p":523,"d":11.7},{"t":54.5,"p":552,"d":12.0},{"t":46.0,"p":418,"d":17.5},{"t":69.3,"p":592,"d":10.0},{"t":55.2,"p":488,"d":10.0},{"t":45.5,"p":403,"d":11.3},{"t":52.5,"p":476,"d":8.0},{"t":53.8,"p":556,"d":9.9},{"t":48.9,"p":384,"d":13.1},{"t":55.0,"p":581,"d":8.1},{"t":57.4,"p":532,"d":8.3},{"t":49.1,"p":420,"d":8.8},{"t":51.6,"p":521,"d":8.2},{"t":47.1,"p":533,"d":6.0},{"t":46.0,"p":344,"d":26.4},{"t":62.6,"p":607,"d":6.0},{"t":51.6,"p":449,"d":8.2},{"t":63.1,"p":620,"d":8.0},{"t":64.2,"p":756,"d":5.2},{"t":55.8,"p":564,"d":10.0},{"t":60.6,"p":629,"d":15.8},{"t":52.9,"p":577,"d":5.1},{"t":58.8,"p":623,"d":9.4},{"t":61.2,"p":576,"d":10.2},{"t":60.6,"p":430,"d":6.7},{"t":60.1,"p":567,"d":3.6},{"t":60.8,"p":693,"d":12.2},{"t":50.9,"p":576,"d":10.0},{"t":49.1,"p":568,"d":8.8},{"t":52.3,"p":441,"d":11.1},{"t":51.4,"p":555,"d":10.0},{"t":39.9,"p":501,"d":10.1},{"t":38.1,"p":570,"d":3.8},{"t":51.3,"p":547,"d":11.4},{"t":40.3,"p":415,"d":18.3},{"t":49.6,"p":559,"d":10.1},{"t":50.0,"p":572,"d":8.0},{"t":44.6,"p":439,"d":8.7},{"t":56.1,"p":538,"d":8.0},{"t":49.6,"p":622,"d":3.2},{"t":47.5,"p":538,"d":5.0},{"t":28.6,"p":624,"d":3.0},{"t":28.8,"p":327,"d":13.3},{"t":35.6,"p":606,"d":10.6},{"t":50.9,"p":550,"d":6.1},{"t":45.7,"p":555,"d":4.0},{"t":57.9,"p":519,"d":5.5},{"t":48.0,"p":576,"d":4.2},{"t":58.1,"p":552,"d":10.1},{"t":54.9,"p":565,"d":10.0},{"t":45.0,"p":397,"d":18.4},{"t":38.8,"p":572,"d":8.3},{"t":46.8,"p":519,"d":8.3},{"t":63.5,"p":552,"d":12.2},{"t":49.6,"p":531,"d":6.4},{"t":42.8,"p":476,"d":10.1},{"t":52.2,"p":386,"d":14.9},{"t":57.4,"p":518,"d":8.1},{"t":57.7,"p":537,"d":8.2},{"t":51.6,"p":538,"d":8.5},{"t":56.1,"p":488,"d":13.6},{"t":66.7,"p":497,"d":15.4},{"t":52.9,"p":432,"d":8.2},{"t":54.0,"p":553,"d":8.3},{"t":59.2,"p":480,"d":9.1},{"t":60.1,"p":576,"d":7.8},{"t":49.6,"p":350,"d":13.2},{"t":43.9,"p":523,"d":8.1},{"t":37.4,"p":510,"d":8.6},{"t":34.0,"p":566,"d":15.4},{"t":38.5,"p":496,"d":6.5},{"t":67.3,"p":589,"d":6.5},{"t":58.3,"p":564,"d":8.0},{"t":62.2,"p":549,"d":8.2},{"t":61.7,"p":508,"d":8.3},{"t":61.9,"p":478,"d":10.1},{"t":60.8,"p":427,"d":14.7},{"t":52.9,"p":522,"d":10.2},{"t":51.6,"p":502,"d":8.0},{"t":52.2,"p":455,"d":10.1},{"t":53.2,"p":489,"d":10.1},{"t":59.2,"p":522,"d":8.0},{"t":59.9,"p":413,"d":18.0},{"t":27.9,"p":512,"d":8.2},{"t":26.4,"p":561,"d":10.3},{"t":40.8,"p":727,"d":5.1},{"t":24.1,"p":480,"d":8.6},{"t":34.9,"p":553,"d":18.3},{"t":38.3,"p":520,"d":6.2},{"t":89.2,"p":526,"d":6.2},{"t":69.6,"p":562,"d":12.0},{"t":74.5,"p":601,"d":10.4},{"t":65.3,"p":473,"d":10.5},{"t":76.1,"p":521,"d":8.0}],"streaks":[{"start":"2025-08-25","end":"2025-12-20","days":118,"miles":1452},{"start":"2020-09-11","end":"2020-12-08","days":89,"miles":1564},{"start":"2024-04-11","end":"2024-06-22","days":73,"miles":1214},{"start":"2024-01-22","end":"2024-03-31","days":70,"miles":1271},{"start":"2023-09-30","end":"2023-11-16","days":48,"miles":756},{"start":"2024-12-04","end":"2025-01-19","days":47,"miles":601},{"start":"2025-12-22","end":"2026-02-04","days":45,"miles":433},{"start":"2021-03-19","end":"2021-04-27","days":40,"miles":750},{"start":"2023-02-18","end":"2023-03-29","days":40,"miles":673},{"start":"2022-07-20","end":"2022-08-23","days":35,"miles":500},{"start":"2021-01-09","end":"2021-02-11","days":34,"miles":422},{"start":"2025-07-11","end":"2025-08-12","days":33,"miles":434},{"start":"2021-07-27","end":"2021-08-27","days":32,"miles":475},{"start":"2021-05-15","end":"2021-06-14","days":31,"miles":414},{"start":"2021-02-13","end":"2021-03-12","days":28,"miles":434}],"dayOfWeek":[{"day":"Mon","count":436,"miles":3688,"avg":8.5,"long":8,"pace":542},{"day":"Tue","count":608,"miles":5422,"avg":8.9,"long":23,"pace":532},{"day":"Wed","count":629,"miles":5432,"avg":8.6,"long":19,"pace":521},{"day":"Thu","count":579,"miles":4983,"avg":8.6,"long":17,"pace":528},{"day":"Fri","count":555,"miles":5170,"avg":9.3,"long":21,"pace":538},{"day":"Sat","count":766,"miles":11112,"avg":14.5,"long":187,"pace":545},{"day":"Sun","count":640,"miles":6730,"avg":10.5,"long":79,"pace":540}],"hourOfDay":[{"hour":0,"count":310,"miles":2309},{"hour":1,"count":203,"miles":1461},{"hour":2,"count":70,"miles":603},{"hour":3,"count":41,"miles":279},{"hour":4,"count":14,"miles":102},{"hour":5,"count":9,"miles":104},{"hour":6,"count":9,"miles":75},{"hour":7,"count":5,"miles":42},{"hour":8,"count":12,"miles":244},{"hour":9,"count":2,"miles":33},{"hour":10,"count":30,"miles":630},{"hour":11,"count":152,"miles":1766},{"hour":12,"count":390,"miles":5332},{"hour":13,"count":507,"miles":5785},{"hour":14,"count":644,"miles":6702},{"hour":15,"count":469,"miles":4827},{"hour":16,"count":314,"miles":3131},{"hour":17,"count":237,"miles":2400},{"hour":18,"count":172,"miles":1722},{"hour":19,"count":120,"miles":1046},{"hour":20,"count":109,"miles":817},{"hour":21,"count":86,"miles":692},{"hour":22,"count":104,"miles":869},{"hour":23,"count":204,"miles":1568}],"trainingRace":[{"name":"Crown King Scramble 50k","date":"2014-04-05","dist":31.3,"pace":565,"load4w":49,"load8w":138},{"name":"Cave Creek Running","date":"2015-03-29","dist":10.1,"pace":658,"load4w":172,"load8w":275},{"name":"Crown King Running","date":"2015-03-08","dist":6.0,"pace":604,"load4w":106,"load8w":339},{"name":"Xterra Black Canyon Race","date":"2012-03-25","dist":13.3,"pace":411,"load4w":0,"load8w":0},{"name":"Hardrock 100","date":"2016-07-15","dist":100.0,"pace":1179,"load4w":162,"load8w":265},{"name":"Mountain to Fountain 15k","date":"2018-03-04","dist":9.3,"pace":335,"load4w":307,"load8w":532},{"name":"Pacing James at Hardrock","date":"2018-07-21","dist":27.0,"pace":1247,"load4w":224,"load8w":388},{"name":"Tushars 70k - 1st Place","date":"2018-08-04","dist":41.7,"pace":780,"load4w":256,"load8w":444},{"name":"Peoria Thanksgiving 10 Mile - 3rd Place","date":"2018-11-22","dist":10.0,"pace":332,"load4w":446,"load8w":750},{"name":"Desert Solstice 24 Hour","date":"2018-12-08","dist":155.0,"pace":557,"load4w":413,"load8w":731},{"name":"Xterra McDowell Mountain - 2nd Place","date":"2019-02-03","dist":15.0,"pace":389,"load4w":344,"load8w":582},{"name":"Black Canyon 100k","date":"2019-02-16","dist":61.2,"pace":542,"load4w":357,"load8w":585},{"name":"Crown King Scramble 50k","date":"2019-03-30","dist":31.0,"pace":558,"load4w":283,"load8w":563},{"name":"Javelina Jangover 50k - 1st Place\u2601\ufe0f","date":"2019-09-29","dist":30.4,"pace":475,"load4w":415,"load8w":860},{"name":"Cave Creek Thriller - 1st Place","date":"2019-10-12","dist":31.3,"pace":483,"load4w":371,"load8w":836},{"name":"Thanksgiving 10 Mile","date":"2019-11-28","dist":9.9,"pace":345,"load4w":114,"load8w":482},{"name":"Aravaipa Crown King Virtual Run","date":"2020-03-28","dist":32.0,"pace":544,"load4w":422,"load8w":728},{"name":"Tushars 70k - 4th Place","date":"2020-08-01","dist":41.4,"pace":857,"load4w":195,"load8w":373},{"name":"Javelina Jundred - 2nd Place","date":"2020-10-31","dist":97.8,"pace":519,"load4w":524,"load8w":1002},{"name":"Desert Solstice 24 Hour - 1st Place","date":"2020-12-12","dist":155.4,"pace":538,"load4w":437,"load8w":981},{"name":"Black Canyon 100k - 3rd Place","date":"2021-02-13","dist":61.5,"pace":484,"load4w":349,"load8w":517},{"name":"Crown King Scramble - 3rd Place","date":"2021-03-27","dist":30.2,"pace":497,"load4w":388,"load8w":775},{"name":"Pacing Jamil at Hardrock","date":"2021-07-17","dist":58.4,"pace":1049,"load4w":416,"load8w":786},{"name":"Thanksgiving Day Classic 10 Mile - 2nd P","date":"2021-11-25","dist":10.0,"pace":326,"load4w":508,"load8w":924},{"name":"24 Hour American Record - 173.015 Miles ","date":"2021-12-11","dist":178.7,"pace":481,"load4w":384,"load8w":903},{"name":"Hardrock 100 - 7th Place","date":"2022-07-15","dist":100.3,"pace":1013,"load4w":99,"load8w":124},{"name":"Javelina Jundred - 5th Place","date":"2022-10-29","dist":99.1,"pace":502,"load4w":411,"load8w":806},{"name":"Thanksgiving Classic 10 Mile - 2nd Place","date":"2022-11-24","dist":10.0,"pace":336,"load4w":305,"load8w":716},{"name":"McDowell Mountain Frenzy 50k - 2nd Place","date":"2022-12-03","dist":31.0,"pace":422,"load4w":286,"load8w":691},{"name":"Tucson Marathon - 3rd Place","date":"2022-12-10","dist":26.4,"pace":361,"load4w":338,"load8w":667},{"name":"Cave Creek Thriller 50k - 2nd Place","date":"2022-12-17","dist":31.0,"pace":470,"load4w":370,"load8w":664},{"name":"Black Canyon 100k","date":"2023-02-18","dist":61.1,"pace":536,"load4w":384,"load8w":596},{"name":"Crown King Scramble 50k - 2nd Place","date":"2023-03-25","dist":30.9,"pace":500,"load4w":443,"load8w":801},{"name":"Deep Creek Half Marathon - 2nd Place","date":"2023-09-30","dist":13.1,"pace":552,"load4w":247,"load8w":402},{"name":"Hanging Flume 50k - 1st Place","date":"2023-10-07","dist":31.7,"pace":507,"load4w":270,"load8w":433},{"name":"Thanksgiving Day Classic 10 Mile - 1st P","date":"2023-11-23","dist":10.0,"pace":333,"load4w":455,"load8w":837},{"name":"Mountain to Fountain 15k - 8th Place","date":"2024-03-03","dist":9.4,"pace":350,"load4w":474,"load8w":900},{"name":"Crown King 100k","date":"2024-03-23","dist":62.0,"pace":512,"load4w":506,"load8w":970},{"name":"Hardrock 100 - 10th Place 7th Finish","date":"2024-07-12","dist":102.5,"pace":1074,"load4w":255,"load8w":752},{"name":"Blisters and Brews 5k - 1st Place","date":"2024-09-14","dist":3.1,"pace":355,"load4w":139,"load8w":416},{"name":"Deep Creek Half","date":"2024-09-28","dist":13.1,"pace":577,"load4w":199,"load8w":436},{"name":"Hanging Flume 50k - 1st Place","date":"2024-10-05","dist":32.5,"pace":511,"load4w":251,"load8w":437},{"name":"Cave Creek Thriller 50k - 1st Place","date":"2024-10-12","dist":31.4,"pace":499,"load4w":299,"load8w":438},{"name":"Thanksgiving Classic 10 Mile - 1st Place","date":"2024-11-28","dist":10.0,"pace":340,"load4w":330,"load8w":699},{"name":"McDowell Mountain Frenzy 50k - 2nd Place","date":"2024-12-07","dist":31.1,"pace":430,"load4w":329,"load8w":707},{"name":"Tucson Marathon - 5th Place","date":"2024-12-15","dist":26.3,"pace":344,"load4w":319,"load8w":671},{"name":"Mountain to Fountain 15k","date":"2025-03-02","dist":9.4,"pace":343,"load4w":343,"load8w":659},{"name":"Blisters and Brews 5k - 1st Place","date":"2025-09-13","dist":3.1,"pace":338,"load4w":282,"load8w":669},{"name":"Deep Creek Half - 2nd Place","date":"2025-09-27","dist":13.3,"pace":514,"load4w":302,"load8w":636},{"name":"Thanksgiving Classic 10 Mile - 1st Place","date":"2025-11-27","dist":10.0,"pace":321,"load4w":395,"load8w":761}],"moonPhase":[{"phase":"New Moon","value":0.0,"pace":544,"count":83},{"phase":"Waxing Crescent","value":0.125,"pace":546,"count":290},{"phase":"First Quarter","value":0.25,"pace":546,"count":116},{"phase":"Waxing Gibbous","value":0.375,"pace":535,"count":269},{"phase":"Full Moon","value":0.5,"pace":526,"count":113},{"phase":"Waning Gibbous","value":0.625,"pace":537,"count":275},{"phase":"Last Quarter","value":0.75,"pace":524,"count":123},{"phase":"Waning Crescent","value":0.875,"pace":533,"count":281},{"phase":"New Moon","value":1.0,"pace":543,"count":47}],"milestones":[{"miles":1000,"date":"Oct 2013","days":559,"years":1.5},{"miles":2500,"date":"Apr 2015","days":1123,"years":3.1},{"miles":5000,"date":"Jul 2016","days":1559,"years":4.3},{"miles":7500,"date":"May 2017","days":1878,"years":5.1},{"miles":10000,"date":"Apr 2018","days":2213,"years":6.1},{"miles":15000,"date":"Jul 2019","days":2674,"years":7.3},{"miles":20000,"date":"Oct 2020","days":3121,"years":8.5},{"miles":25000,"date":"Sep 2021","days":3458,"years":9.5},{"miles":30000,"date":"Jan 2023","days":3947,"years":10.8},{"miles":35000,"date":"May 2024","days":4426,"years":12.1},{"miles":40000,"date":"Jul 2025","days":4874,"years":13.3}],"weather":[{"condition":"Clear","pace":531,"count":970},{"condition":"Cloudy","pace":550,"count":315},{"condition":"Partly Cloudy","pace":541,"count":266}],"wind":[{"wind":"0-3","windMid":1.5,"pace":526,"count":224},{"wind":"3-6","windMid":4.5,"pace":535,"count":813},{"wind":"6-9","windMid":7.5,"pace":541,"count":384},{"wind":"9-12","windMid":10.5,"pace":537,"count":112},{"wind":"12-15","windMid":13.5,"pace":563,"count":44},{"wind":"15-18","windMid":16.5,"pace":559,"count":10}],"elevation":[{"year":2012,"totalVert":61351,"vertPerMile":114,"miles":540},{"year":2013,"totalVert":71550,"vertPerMile":112,"miles":639},{"year":2014,"totalVert":70969,"vertPerMile":131,"miles":540},{"year":2015,"totalVert":276987,"vertPerMile":115,"miles":2415},{"year":2016,"totalVert":161828,"vertPerMile":73,"miles":2205},{"year":2017,"totalVert":287234,"vertPerMile":107,"miles":2677},{"year":2018,"totalVert":309003,"vertPerMile":82,"miles":3764},{"year":2019,"totalVert":186198,"vertPerMile":48,"miles":3862},{"year":2020,"totalVert":350574,"vertPerMile":76,"miles":4613},{"year":2021,"totalVert":383840,"vertPerMile":74,"miles":5210},{"year":2022,"totalVert":368810,"vertPerMile":107,"miles":3458},{"year":2023,"totalVert":216263,"vertPerMile":76,"miles":2844},{"year":2024,"totalVert":466279,"vertPerMile":93,"miles":5003},{"year":2025,"totalVert":287694,"vertPerMile":71,"miles":4069},{"year":2026,"totalVert":34892,"vertPerMile":51,"miles":690}],"timeline":[{"month":"2012-03","cumMiles":28,"monthMiles":28},{"month":"2012-05","cumMiles":106,"monthMiles":78},{"month":"2012-06","cumMiles":200,"monthMiles":94},{"month":"2012-07","cumMiles":231,"monthMiles":32},{"month":"2012-08","cumMiles":300,"monthMiles":69},{"month":"2012-09","cumMiles":443,"monthMiles":143},{"month":"2012-10","cumMiles":467,"monthMiles":24},{"month":"2012-11","cumMiles":541,"monthMiles":74},{"month":"2013-01","cumMiles":585,"monthMiles":44},{"month":"2013-02","cumMiles":607,"monthMiles":22},{"month":"2013-03","cumMiles":665,"monthMiles":58},{"month":"2013-04","cumMiles":750,"monthMiles":84},{"month":"2013-05","cumMiles":828,"monthMiles":78},{"month":"2013-06","cumMiles":884,"monthMiles":56},{"month":"2013-09","cumMiles":961,"monthMiles":77},{"month":"2013-10","cumMiles":1046,"monthMiles":85},{"month":"2013-11","cumMiles":1169,"monthMiles":123},{"month":"2013-12","cumMiles":1180,"monthMiles":11},{"month":"2014-01","cumMiles":1185,"monthMiles":5},{"month":"2014-02","cumMiles":1233,"monthMiles":49},{"month":"2014-03","cumMiles":1329,"monthMiles":95},{"month":"2014-04","cumMiles":1501,"monthMiles":173},{"month":"2014-05","cumMiles":1596,"monthMiles":94},{"month":"2014-06","cumMiles":1713,"monthMiles":117},{"month":"2014-09","cumMiles":1720,"monthMiles":7},{"month":"2015-01","cumMiles":1943,"monthMiles":223},{"month":"2015-02","cumMiles":2062,"monthMiles":119},{"month":"2015-03","cumMiles":2281,"monthMiles":219},{"month":"2015-04","cumMiles":2584,"monthMiles":303},{"month":"2015-05","cumMiles":2831,"monthMiles":247},{"month":"2015-06","cumMiles":3101,"monthMiles":270},{"month":"2015-07","cumMiles":3192,"monthMiles":91},{"month":"2015-08","cumMiles":3286,"monthMiles":94},{"month":"2015-09","cumMiles":3432,"monthMiles":146},{"month":"2015-10","cumMiles":3647,"monthMiles":215},{"month":"2015-11","cumMiles":3877,"monthMiles":230},{"month":"2015-12","cumMiles":4136,"monthMiles":259},{"month":"2016-01","cumMiles":4444,"monthMiles":308},{"month":"2016-02","cumMiles":4589,"monthMiles":145},{"month":"2016-03","cumMiles":4802,"monthMiles":213},{"month":"2016-04","cumMiles":4805,"monthMiles":3},{"month":"2016-05","cumMiles":4851,"monthMiles":46},{"month":"2016-06","cumMiles":4999,"monthMiles":148},{"month":"2016-07","cumMiles":5231,"monthMiles":232},{"month":"2016-08","cumMiles":5460,"monthMiles":230},{"month":"2016-09","cumMiles":5705,"monthMiles":244},{"month":"2016-10","cumMiles":5829,"monthMiles":124},{"month":"2016-11","cumMiles":6041,"monthMiles":212},{"month":"2016-12","cumMiles":6341,"monthMiles":300},{"month":"2017-01","cumMiles":6522,"monthMiles":182},{"month":"2017-02","cumMiles":6720,"monthMiles":198},{"month":"2017-03","cumMiles":6986,"monthMiles":266},{"month":"2017-04","cumMiles":7325,"monthMiles":339},{"month":"2017-05","cumMiles":7606,"monthMiles":281},{"month":"2017-06","cumMiles":8038,"monthMiles":433},{"month":"2017-07","cumMiles":8171,"monthMiles":133},{"month":"2017-08","cumMiles":8317,"monthMiles":146},{"month":"2017-09","cumMiles":8519,"monthMiles":202},{"month":"2017-10","cumMiles":8661,"monthMiles":141},{"month":"2017-11","cumMiles":8849,"monthMiles":189},{"month":"2017-12","cumMiles":9019,"monthMiles":170},{"month":"2018-01","cumMiles":9268,"monthMiles":249},{"month":"2018-02","cumMiles":9578,"monthMiles":309},{"month":"2018-03","cumMiles":9895,"monthMiles":318},{"month":"2018-04","cumMiles":10126,"monthMiles":230},{"month":"2018-05","cumMiles":10373,"monthMiles":247},{"month":"2018-06","cumMiles":10571,"monthMiles":198},{"month":"2018-07","cumMiles":10839,"monthMiles":268},{"month":"2018-08","cumMiles":11257,"monthMiles":418},{"month":"2018-09","cumMiles":11701,"monthMiles":445},{"month":"2018-10","cumMiles":12039,"monthMiles":337},{"month":"2018-11","cumMiles":12523,"monthMiles":484},{"month":"2018-12","cumMiles":12783,"monthMiles":261},{"month":"2019-01","cumMiles":13160,"monthMiles":377},{"month":"2019-02","cumMiles":13421,"monthMiles":261},{"month":"2019-03","cumMiles":13752,"monthMiles":330},{"month":"2019-04","cumMiles":14002,"monthMiles":250},{"month":"2019-05","cumMiles":14419,"monthMiles":417},{"month":"2019-06","cumMiles":14821,"monthMiles":401},{"month":"2019-07","cumMiles":15217,"monthMiles":396},{"month":"2019-08","cumMiles":15676,"monthMiles":459},{"month":"2019-09","cumMiles":16116,"monthMiles":440},{"month":"2019-10","cumMiles":16482,"monthMiles":366},{"month":"2019-11","cumMiles":16623,"monthMiles":141},{"month":"2019-12","cumMiles":16645,"monthMiles":22},{"month":"2020-01","cumMiles":16828,"monthMiles":182},{"month":"2020-02","cumMiles":17190,"monthMiles":362},{"month":"2020-03","cumMiles":17652,"monthMiles":463},{"month":"2020-04","cumMiles":18078,"monthMiles":426},{"month":"2020-05","cumMiles":18465,"monthMiles":387},{"month":"2020-06","cumMiles":18647,"monthMiles":182},{"month":"2020-07","cumMiles":18851,"monthMiles":204},{"month":"2020-08","cumMiles":19324,"monthMiles":473},{"month":"2020-09","cumMiles":19829,"monthMiles":505},{"month":"2020-10","cumMiles":20461,"monthMiles":633},{"month":"2020-11","cumMiles":20905,"monthMiles":444},{"month":"2020-12","cumMiles":21258,"monthMiles":353},{"month":"2021-01","cumMiles":21610,"monthMiles":352},{"month":"2021-02","cumMiles":22013,"monthMiles":403},{"month":"2021-03","cumMiles":22476,"monthMiles":463},{"month":"2021-04","cumMiles":22991,"monthMiles":515},{"month":"2021-05","cumMiles":23485,"monthMiles":494},{"month":"2021-06","cumMiles":23911,"monthMiles":426},{"month":"2021-07","cumMiles":24411,"monthMiles":500},{"month":"2021-08","cumMiles":24863,"monthMiles":452},{"month":"2021-09","cumMiles":25208,"monthMiles":344},{"month":"2021-10","cumMiles":25748,"monthMiles":540},{"month":"2021-11","cumMiles":26212,"monthMiles":464},{"month":"2021-12","cumMiles":26468,"monthMiles":257},{"month":"2022-01","cumMiles":26659,"monthMiles":190},{"month":"2022-02","cumMiles":26921,"monthMiles":262},{"month":"2022-03","cumMiles":27117,"monthMiles":196},{"month":"2022-04","cumMiles":27343,"monthMiles":226},{"month":"2022-05","cumMiles":27520,"monthMiles":177},{"month":"2022-06","cumMiles":27563,"monthMiles":42},{"month":"2022-07","cumMiles":27863,"monthMiles":300},{"month":"2022-08","cumMiles":28371,"monthMiles":508},{"month":"2022-09","cumMiles":28776,"monthMiles":405},{"month":"2022-10","cumMiles":29244,"monthMiles":467},{"month":"2022-11","cumMiles":29556,"monthMiles":312},{"month":"2022-12","cumMiles":29929,"monthMiles":373},{"month":"2023-01","cumMiles":30269,"monthMiles":341},{"month":"2023-02","cumMiles":30613,"monthMiles":343},{"month":"2023-03","cumMiles":31104,"monthMiles":491},{"month":"2023-04","cumMiles":31140,"monthMiles":36},{"month":"2023-07","cumMiles":31179,"monthMiles":39},{"month":"2023-08","cumMiles":31369,"monthMiles":190},{"month":"2023-09","cumMiles":31635,"monthMiles":266},{"month":"2023-10","cumMiles":32091,"monthMiles":456},{"month":"2023-11","cumMiles":32463,"monthMiles":372},{"month":"2023-12","cumMiles":32774,"monthMiles":311},{"month":"2024-01","cumMiles":33231,"monthMiles":457},{"month":"2024-02","cumMiles":33731,"monthMiles":500},{"month":"2024-03","cumMiles":34340,"monthMiles":609},{"month":"2024-04","cumMiles":34871,"monthMiles":531},{"month":"2024-05","cumMiles":35421,"monthMiles":551},{"month":"2024-06","cumMiles":35827,"monthMiles":406},{"month":"2024-07","cumMiles":36091,"monthMiles":264},{"month":"2024-08","cumMiles":36330,"monthMiles":239},{"month":"2024-09","cumMiles":36593,"monthMiles":263},{"month":"2024-10","cumMiles":37004,"monthMiles":411},{"month":"2024-11","cumMiles":37362,"monthMiles":359},{"month":"2024-12","cumMiles":37777,"monthMiles":415},{"month":"2025-01","cumMiles":38150,"monthMiles":373},{"month":"2025-02","cumMiles":38441,"monthMiles":291},{"month":"2025-03","cumMiles":38819,"monthMiles":378},{"month":"2025-04","cumMiles":39107,"monthMiles":287},{"month":"2025-05","cumMiles":39321,"monthMiles":215},{"month":"2025-06","cumMiles":39653,"monthMiles":332},{"month":"2025-07","cumMiles":40045,"monthMiles":392},{"month":"2025-08","cumMiles":40384,"monthMiles":339},{"month":"2025-09","cumMiles":40718,"monthMiles":333},{"month":"2025-10","cumMiles":41137,"monthMiles":419},{"month":"2025-11","cumMiles":41551,"monthMiles":413},{"month":"2025-12","cumMiles":41848,"monthMiles":297},{"month":"2026-01","cumMiles":42167,"monthMiles":320},{"month":"2026-02","cumMiles":42355,"monthMiles":188},{"month":"2026-03","cumMiles":42538,"monthMiles":183}],"humidity":[{"humidity":"0-10%","humMid":5,"pace":531,"count":35},{"humidity":"10-20%","humMid":15,"pace":551,"count":128},{"humidity":"20-30%","humMid":25,"pace":535,"count":252},{"humidity":"30-40%","humMid":35,"pace":531,"count":259},{"humidity":"40-50%","humMid":45,"pace":544,"count":231},{"humidity":"50-60%","humMid":55,"pace":539,"count":219},{"humidity":"60-70%","humMid":65,"pace":531,"count":164},{"humidity":"70-80%","humMid":75,"pace":517,"count":135},{"humidity":"80-90%","humMid":85,"pace":550,"count":115},{"humidity":"90-100%","humMid":95,"pace":534,"count":51}],"distDist":[{"miles":0,"count":37},{"miles":1,"count":215},{"miles":2,"count":290},{"miles":3,"count":292},{"miles":4,"count":247},{"miles":5,"count":305},{"miles":6,"count":262},{"miles":7,"count":238},{"miles":8,"count":414},{"miles":9,"count":202},{"miles":10,"count":398},{"miles":11,"count":161},{"miles":12,"count":177},{"miles":13,"count":106},{"miles":14,"count":87},{"miles":15,"count":189},{"miles":16,"count":96},{"miles":17,"count":27},{"miles":18,"count":50},{"miles":19,"count":38},{"miles":20,"count":90},{"miles":21,"count":19},{"miles":22,"count":19},{"miles":23,"count":5},{"miles":24,"count":17},{"miles":25,"count":29},{"miles":26,"count":28},{"miles":27,"count":12},{"miles":28,"count":5},{"miles":29,"count":5},{"miles":30,"count":17},{"miles":31,"count":26},{"miles":32,"count":7},{"miles":33,"count":2},{"miles":34,"count":3},{"miles":35,"count":5},{"miles":36,"count":1},{"miles":39,"count":2},{"miles":40,"count":2},{"miles":41,"count":2},{"miles":42,"count":1},{"miles":44,"count":1},{"miles":45,"count":3},{"miles":46,"count":2},{"miles":47,"count":1},{"miles":48,"count":3},{"miles":49,"count":7},{"miles":50,"count":10}],"yearPace":[{"year":2012,"pace":477,"count":31},{"year":2013,"pace":529,"count":33},{"year":2014,"pace":539,"count":28},{"year":2015,"pace":533,"count":175},{"year":2016,"pace":520,"count":158},{"year":2017,"pace":518,"count":198},{"year":2018,"pace":502,"count":234},{"year":2019,"pace":519,"count":229},{"year":2020,"pace":526,"count":210},{"year":2021,"pace":535,"count":167},{"year":2022,"pace":546,"count":188},{"year":2023,"pace":555,"count":141},{"year":2024,"pace":544,"count":208},{"year":2025,"pace":527,"count":261},{"year":2026,"pace":522,"count":59}]};
+
+function fmtPace(totalSec) {
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return m + ':' + String(s).padStart(2, '0');
+}
+
+const C = {
+  accent: '#58a6ff', green: '#3fb950', yellow: '#d29922', red: '#f85149',
+  orange: '#db6d28', surface: '#161b22', border: '#30363d', text: '#8b949e',
+  bright: '#e6edf3', purple: '#6e40c9'
+};
+
+Chart.defaults.color = C.text;
+Chart.defaults.borderColor = C.border;
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
+
+// ===== MOON =====
+const moonEmojis = {'New Moon':'🌑','Waxing Crescent':'🌒','First Quarter':'🌓','Waxing Gibbous':'🌔','Full Moon':'🌕','Waning Gibbous':'🌖','Last Quarter':'🌗','Waning Crescent':'🌘'};
+const moonData = DATA.moonPhase.filter(m => m.value < 1);
+const moonPaces = moonData.map(m => m.pace);
+const fastestMoon = Math.min(...moonPaces);
+const slowestMoon = Math.max(...moonPaces);
+
+new Chart(document.getElementById('moonChart'), {
+  type: 'bar',
+  data: {
+    labels: moonData.map(m => (moonEmojis[m.phase]||'') + ' ' + m.phase),
+    datasets: [{
+      data: moonPaces,
+      backgroundColor: moonPaces.map(p => p === fastestMoon ? C.green : p === slowestMoon ? C.red : C.accent),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => fmtPace(ctx.raw) + '/mi (' + moonData[ctx.dataIndex].count + ' runs)' } }
+    },
+    scales: {
+      x: { min: Math.min(...moonPaces) - 10,
+        ticks: { callback: v => fmtPace(v) }
+      },
+      y: { grid: { display: false } }
+    }
+  }
+});
+
+const moonBarsDiv = document.getElementById('moonBars');
+const sortedMoon = [...moonData].sort((a,b) => a.pace - b.pace);
+const moonRange = slowestMoon - fastestMoon;
+sortedMoon.forEach(m => {
+  const barPct = 100 - ((m.pace - fastestMoon) / moonRange) * 100;
+  moonBarsDiv.innerHTML += '<div class="moon-row">' +
+    '<span class="emoji">' + (moonEmojis[m.phase]||'') + '</span>' +
+    '<span class="name">' + m.phase + '</span>' +
+    '<span class="pace">' + fmtPace(m.pace) + '</span>' +
+    '<span class="bar" style="width:' + Math.max(barPct, 5) + '%"></span>' +
+    '<span style="color:var(--text-muted);font-size:12px">' + m.count + ' runs</span></div>';
+});
+
+// ===== TEMPERATURE =====
+const tempSampled = DATA.tempPace.filter((_, i) => i % 2 === 0);
+new Chart(document.getElementById('tempChart'), {
+  type: 'scatter',
+  data: {
+    datasets: [{
+      data: tempSampled.map(d => ({x: d.t, y: d.p})),
+      backgroundColor: tempSampled.map(d => d.t < 40 ? 'rgba(88,166,255,0.3)' : d.t < 60 ? 'rgba(63,185,80,0.3)' : d.t < 80 ? 'rgba(210,153,34,0.3)' : 'rgba(248,81,73,0.3)'),
+      pointRadius: 3,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.raw.x.toFixed(0) + '°F — ' + fmtPace(ctx.raw.y) + '/mi' } }
+    },
+    scales: {
+      x: { title: { display: true, text: 'Temperature (°F)' }, min: 20, max: 110 },
+      y: { title: { display: true, text: 'Pace (per mile)' },
+        ticks: { callback: v => fmtPace(v) }, min: 300, max: 900 }
+    }
+  }
+});
+
+// ===== WIND =====
+new Chart(document.getElementById('windChart'), {
+  type: 'bar',
+  data: {
+    labels: DATA.wind.map(w => w.wind + ' mph'),
+    datasets: [{
+      data: DATA.wind.map(w => w.pace),
+      backgroundColor: DATA.wind.map(w => w.windMid < 6 ? C.green : w.windMid < 12 ? C.yellow : C.red),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => fmtPace(ctx.raw) + '/mi (' + DATA.wind[ctx.dataIndex].count + ' runs)' } }
+    },
+    scales: {
+      y: { ticks: { callback: v => fmtPace(v) }, min: Math.min(...DATA.wind.map(w=>w.pace)) - 15 }
+    }
+  }
+});
+
+// ===== HUMIDITY =====
+new Chart(document.getElementById('humidityChart'), {
+  type: 'bar',
+  data: {
+    labels: DATA.humidity.map(h => h.humidity),
+    datasets: [{
+      data: DATA.humidity.map(h => h.pace),
+      backgroundColor: DATA.humidity.map(h => h.humMid < 30 ? C.yellow : h.humMid < 60 ? C.green : C.accent),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => fmtPace(ctx.raw) + '/mi (' + DATA.humidity[ctx.dataIndex].count + ' runs)' } }
+    },
+    scales: {
+      y: { ticks: { callback: v => fmtPace(v) }, min: Math.min(...DATA.humidity.map(h=>h.pace)) - 15 }
+    }
+  }
+});
+
+// ===== SHOES =====
+const shoeTop = DATA.shoes.slice(0, 25);
+new Chart(document.getElementById('shoeChart'), {
+  type: 'bubble',
+  data: {
+    datasets: shoeTop.map(s => ({
+      label: s.name,
+      data: [{ x: s.miles, y: s.avgPace, r: Math.max(Math.sqrt(s.miles) / 2, 4) }],
+      backgroundColor: s.avgVert > 50 ? 'rgba(63,185,80,0.5)' : s.avgPace < 500 ? 'rgba(248,81,73,0.4)' : 'rgba(88,166,255,0.4)',
+      borderColor: s.avgVert > 50 ? C.green : s.avgPace < 500 ? C.red : C.accent,
+      borderWidth: 1,
+    }))
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.raw.x + ' mi, ' + fmtPace(ctx.raw.y) + '/mi' } }
+    },
+    scales: {
+      x: { title: { display: true, text: 'Total Miles' } },
+      y: { title: { display: true, text: 'Average Pace' }, ticks: { callback: v => fmtPace(v) }, min: 400, max: 700 }
+    }
+  }
+});
+
+const tbody = document.getElementById('shoeTableBody');
+DATA.shoes.slice(0, 20).forEach(s => {
+  const barW = Math.min(s.paceStd / 120 * 100, 100);
+  tbody.innerHTML += '<tr><td style="font-weight:500">' + s.name + '</td><td>' + s.miles + '</td><td>' + s.count + '</td><td>' + s.miPerRun + '</td><td style="font-weight:600">' + fmtPace(s.avgPace) + '</td><td>' + (s.avgHR || '—') + '</td><td>' + s.avgVert + ' ft</td><td><span class="bar" style="width:' + barW + 'px;background:' + (s.paceStd > 80 ? C.yellow : C.accent) + '"></span> ±' + fmtPace(s.paceStd) + '</td></tr>';
+});
+
+// ===== STREAKS =====
+const streakDiv = document.getElementById('streakBars');
+const maxStreak = Math.max(...DATA.streaks.map(s => s.days));
+DATA.streaks.forEach(s => {
+  const pct = (s.days / maxStreak) * 100;
+  const avg = (s.miles / s.days).toFixed(1);
+  const color = s.days >= 70 ? C.green : s.days >= 40 ? C.accent : C.text;
+  streakDiv.innerHTML += '<div class="streak-bar"><span class="value">' + s.days + 'd</span><span class="bar" style="width:' + pct + '%;background:' + color + '"></span><span class="label">' + s.start + ' → ' + s.end + ' &nbsp; ' + s.miles + ' mi (' + avg + '/day)</span></div>';
+});
+
+// ===== MILESTONES =====
+const msDiv = document.getElementById('milestoneBars');
+DATA.milestones.forEach((m, i) => {
+  const pct = (m.days / DATA.milestones[DATA.milestones.length-1].days) * 100;
+  const gap = i > 0 ? m.days - DATA.milestones[i-1].days : m.days;
+  const gapYears = (gap / 365.25).toFixed(1);
+  msDiv.innerHTML += '<div class="milestone-row"><span class="miles">' + m.miles.toLocaleString() + '</span><span class="bar" style="width:' + pct + '%"></span><span class="date">' + m.date + '</span><span class="time">' + m.years + ' yrs in &nbsp;(+' + gapYears + 'y)</span></div>';
+});
+
+// ===== ELEVATION =====
+new Chart(document.getElementById('elevChart'), {
+  type: 'bar',
+  data: {
+    labels: DATA.elevation.map(e => e.year),
+    datasets: [{
+      data: DATA.elevation.map(e => e.totalVert),
+      backgroundColor: DATA.elevation.map(e => e.totalVert > 400000 ? C.green : e.totalVert > 200000 ? C.accent : C.text),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => (ctx.raw/1000).toFixed(0) + 'k ft (' + DATA.elevation[ctx.dataIndex].miles + ' mi)' } }
+    },
+    scales: { y: { ticks: { callback: v => (v/1000) + 'k' } } }
+  }
+});
+
+new Chart(document.getElementById('vertPerMileChart'), {
+  type: 'line',
+  data: {
+    labels: DATA.elevation.map(e => e.year),
+    datasets: [{
+      data: DATA.elevation.map(e => e.vertPerMile),
+      borderColor: C.green,
+      backgroundColor: 'rgba(63,185,80,0.1)',
+      fill: true,
+      tension: 0.3,
+      pointRadius: 4,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.raw + ' ft/mi' } }
+    },
+    scales: { y: { title: { display: true, text: 'ft per mile' } } }
+  }
+});
+
+// ===== SPEED OVER TIME =====
+new Chart(document.getElementById('yearPaceChart'), {
+  type: 'line',
+  data: {
+    labels: DATA.yearPace.map(y => y.year),
+    datasets: [{
+      data: DATA.yearPace.map(y => y.pace),
+      borderColor: C.accent,
+      backgroundColor: 'rgba(88,166,255,0.1)',
+      fill: true,
+      tension: 0.3,
+      pointRadius: 5,
+      pointBackgroundColor: DATA.yearPace.map(y => y.pace === Math.min(...DATA.yearPace.map(p=>p.pace)) ? C.green : C.accent),
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => fmtPace(ctx.raw) + '/mi (' + DATA.yearPace[ctx.dataIndex].count + ' runs)' } }
+    },
+    scales: {
+      y: { reverse: false, ticks: { callback: v => fmtPace(v) },
+        title: { display: true, text: 'Average Pace (5-15mi runs)' } }
+    }
+  }
+});
+
+// ===== DISTANCE DISTRIBUTION =====
+const distData = DATA.distDist.filter(d => d.miles <= 40);
+new Chart(document.getElementById('distChart'), {
+  type: 'bar',
+  data: {
+    labels: distData.map(d => d.miles),
+    datasets: [{
+      data: distData.map(d => d.count),
+      backgroundColor: distData.map(d => d.miles <= 6 ? C.text : d.miles <= 15 ? C.accent : d.miles <= 26 ? C.yellow : C.red),
+      borderRadius: 2,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.raw + ' runs at ' + distData[ctx.dataIndex].miles + ' mi' } }
+    },
+    scales: { x: { title: { display: true, text: 'Distance (miles)' } }, y: { title: { display: true, text: 'Count' } } }
+  }
+});
+
+// ===== TRAINING LOAD =====
+const races = DATA.trainingRace.filter(r => r.load8w > 50 && r.pace > 300 && r.pace < 1200);
+new Chart(document.getElementById('trainingChart'), {
+  type: 'bubble',
+  data: {
+    datasets: races.map(r => ({
+      label: r.name,
+      data: [{ x: r.load8w, y: r.pace, r: Math.max(Math.sqrt(r.dist) * 1.5, 4) }],
+      backgroundColor: r.dist > 60 ? 'rgba(248,81,73,0.4)' : r.dist > 20 ? 'rgba(210,153,34,0.4)' : 'rgba(63,185,80,0.4)',
+      borderColor: r.dist > 60 ? C.red : r.dist > 20 ? C.yellow : C.green,
+      borderWidth: 1,
+    }))
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmtPace(ctx.raw.y) + '/mi, ' + ctx.raw.x + 'mi in 8wk' } }
+    },
+    scales: {
+      x: { title: { display: true, text: '8-Week Training Load (miles)' } },
+      y: { title: { display: true, text: 'Race Pace' }, ticks: { callback: v => fmtPace(v) } }
+    }
+  }
+});
+
+// ===== DAY OF WEEK =====
+new Chart(document.getElementById('dowChart'), {
+  type: 'bar',
+  data: {
+    labels: DATA.dayOfWeek.map(d => d.day),
+    datasets: [
+      { label: 'Avg Miles', data: DATA.dayOfWeek.map(d => d.avg), backgroundColor: C.accent, borderRadius: 4, yAxisID: 'y' },
+      { label: 'Long Runs (20+mi)', data: DATA.dayOfWeek.map(d => d.long), backgroundColor: C.green, borderRadius: 4, yAxisID: 'y1' },
+    ]
+  },
+  options: {
+    plugins: { legend: { position: 'bottom' } },
+    scales: {
+      y: { title: { display: true, text: 'Avg Miles' }, position: 'left' },
+      y1: { title: { display: true, text: 'Long Runs' }, position: 'right', grid: { drawOnChartArea: false } },
+    }
+  }
+});
+
+// ===== HOUR OF DAY =====
+new Chart(document.getElementById('hourChart'), {
+  type: 'bar',
+  data: {
+    labels: DATA.hourOfDay.map(h => h.hour === 0 ? '12a' : h.hour < 12 ? h.hour + 'a' : h.hour === 12 ? '12p' : (h.hour-12) + 'p'),
+    datasets: [{
+      data: DATA.hourOfDay.map(h => h.count),
+      backgroundColor: DATA.hourOfDay.map(h => h.hour < 6 ? C.yellow : h.hour < 12 ? C.orange : h.hour < 18 ? C.accent : C.purple),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: { y: { title: { display: true, text: 'Run Count' } } }
+  }
+});
+
+// ===== CUMULATIVE =====
+const tl = DATA.timeline;
+const tlLabels = tl.map(t => t.month);
+const showLabel = (_, i) => i % 12 === 0 ? tlLabels[i].split('-')[0] : '';
+new Chart(document.getElementById('cumulativeChart'), {
+  type: 'line',
+  data: {
+    labels: tlLabels,
+    datasets: [{
+      data: tl.map(t => t.cumMiles),
+      borderColor: C.green,
+      backgroundColor: 'rgba(63,185,80,0.1)',
+      fill: true,
+      tension: 0.2,
+      pointRadius: 0,
+      borderWidth: 2,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.raw.toLocaleString() + ' miles (' + tl[ctx.dataIndex].month + ')' } }
+    },
+    scales: {
+      x: { ticks: { callback: showLabel, maxRotation: 0 } },
+      y: { ticks: { callback: v => (v/1000) + 'k' }, title: { display: true, text: 'Cumulative Miles' } }
+    }
+  }
+});
+</script>
+</body>
+</html>
