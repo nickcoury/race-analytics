@@ -1,0 +1,4573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Track Buildup 2021 — Nick Coury Race Analytics</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  .legend-pill { display:inline-flex; align-items:center; gap:6px; margin-right:16px; font-size:13px; color:var(--text-muted); }
+  .legend-pill::before { content:''; width:12px; height:12px; border-radius:3px; background:currentColor; display:inline-block; }
+  .pill-track { color:#e67e22; }
+  .pill-off { color:#58a6ff; }
+  .session-row { display:grid; grid-template-columns: 110px 1fr 80px 80px 80px 60px; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); align-items:baseline; font-size:14px; }
+  .session-row .date { color:var(--text-muted); font-variant-numeric:tabular-nums; }
+  .session-row .name { color:var(--text); }
+  .session-row .num { font-variant-numeric:tabular-nums; text-align:right; }
+  .session-row.head { color:var(--text-muted); font-size:12px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:2px solid var(--border); padding-bottom:8px; }
+  .loc-row { display:grid; grid-template-columns: 1fr 80px 100px; gap:12px; padding:8px 0; border-bottom:1px solid var(--border); font-size:14px; }
+  .loc-row .num { font-variant-numeric:tabular-nums; text-align:right; color:var(--text-muted); }
+  .loc-row .num.miles { color:#e67e22; font-weight:600; }
+</style>
+</head>
+<body>
+<header>
+<div class="container">
+<h1><a href="../index.html" style="color:inherit">Race Analytics</a></h1>
+<nav>
+<a href="../index.html#fixed-time">Fixed Time</a>
+<a href="../index.html#repeat-races">Repeat Races</a>
+<a href="../training/index.html" class="active">Training</a>
+<a href="../patterns/index.html">Patterns</a>
+<a href="../records/index.html">Records</a>
+<a href="../insights/index.html">Insights</a>
+<a href="../splits/index.html">Splits</a>
+</nav>
+</div>
+</header>
+<main class="container">
+<div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../training/index.html">Training</a> / Track Buildup 2021</div>
+
+<div class="hero">
+<h2>Track Buildup to the 2021 American Record</h2>
+<p>One year of training, Dec 12, 2020 → Dec 10, 2021. Every GPS file parsed, every track lap counted. The 24-hour American Record (173 mi) capped this window — the analysis ends the day before.</p>
+</div>
+
+<div class="stats-row">
+<div class="stat"><div class="value">5,141</div><div class="label">Total Miles</div></div>
+<div class="stat"><div class="value" style="color:#e67e22">567</div><div class="label">Track Miles (11%)</div></div>
+<div class="stat"><div class="value">15</div><div class="label">Track Sessions</div></div>
+<div class="stat"><div class="value">355</div><div class="label">Total Runs</div></div>
+</div>
+
+<div class="section">
+<h2>Weekly Mileage — Track vs. Everything Else</h2>
+<p style="color:var(--text-muted);margin-bottom:8px">Stacked weekly bars: <span class="legend-pill pill-track">Track</span> <span class="legend-pill pill-off">Off-track</span>. The track spikes are races (Dec 2020 DS, May Alexander County) and the dedicated buildup block in Oct–Dec 2021.</p>
+<div style="height:340px;margin-bottom:24px"><canvas id="weeklyChart"></canvas></div>
+</div>
+
+<div class="section">
+<h2>Cumulative Track Miles</h2>
+<p style="color:var(--text-muted);margin-bottom:8px">Two giant jumps — DS 2020 (Dec 12) and Alexander County 24h (May 1) — then a smooth climb through the final two months as the AR buildup adds focused track work week over week.</p>
+<div style="height:280px;margin-bottom:24px"><canvas id="cumChart"></canvas></div>
+</div>
+
+<div class="section">
+<h2>Run Length Over the Year</h2>
+<p style="color:var(--text-muted);margin-bottom:8px">Every run plotted by date and distance. <span class="legend-pill pill-track">Track</span> sessions are highlighted; the rest are <span class="legend-pill pill-off">trail / road</span>. The two huge orange dots are the DS 2020 and Alexander County 24-hour races.</p>
+<div style="height:340px;margin-bottom:24px"><canvas id="scatterChart"></canvas></div>
+</div>
+
+<div class="section">
+<h2>Monthly Summary</h2>
+<div class="table-wrapper"><table>
+<thead><tr><th>Month</th><th style="text-align:right">Runs</th><th style="text-align:right">Total Mi</th><th style="text-align:right">Track Mi</th><th style="text-align:right">Off-track Mi</th><th style="text-align:right">Track %</th><th style="text-align:right">Track Sessions</th><th style="text-align:right">Longest Run</th></tr></thead>
+<tbody id="monthTbody"></tbody>
+</table></div>
+</div>
+
+<div class="section">
+<h2>Every Track Session</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">Auto-detected from GPS by sliding a tight bounding box (~220m) across each run, then confirming with lap count and pace. The Hotfoot Hamster 6h is a paved short-loop course — strictly not a 400m track but functionally lap-running, so it's included.</p>
+<div class="session-row head">
+  <div>Date</div>
+  <div>Activity</div>
+  <div class="num">Total Mi</div>
+  <div class="num">Track Mi</div>
+  <div class="num">Off Mi</div>
+  <div class="num">Laps</div>
+</div>
+<div id="sessionList"></div>
+</div>
+
+<div class="section">
+<h2>Where the Track Miles Happened</h2>
+<p style="color:var(--text-muted);margin-bottom:16px">GPS centroid clusters (rounded to ~100m). The Fountain Hills track absorbed almost all the focused training; the two race-only locations show up because of the 24h races held there.</p>
+<div class="loc-row" style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--border)">
+  <div>Location (lat, lon)</div>
+  <div class="num">Sessions</div>
+  <div class="num">Miles</div>
+</div>
+<div id="locList"></div>
+</div>
+
+<div class="section">
+<h2>Method &amp; Caveats</h2>
+<div class="card-grid">
+<div class="card"><h3>How &ldquo;track&rdquo; was detected</h3><div class="meta">For each run's GPS stream, a 90-second sliding window flags points where the bounding box stays under ~220m (track-sized). Adjacent flagged points become a candidate segment, which only counts if it covers ≥1.2 km, lasts ≥4 min, sustains ≥2.6 m/s (~10:20/mi), and contains ≥3 lap closures (return to within 50m of segment start after departing &gt;80m).</div></div>
+<div class="card"><h3>What it catches</h3><div class="meta">Real 400m track sessions (warm-ups, intervals, long efforts), 24-hour track races, and short-loop course races where the loop fits in the bbox window. The lap-closure check kills false positives from slow mountain trail running where GPS clusters tightly during steep climbs.</div></div>
+<div class="card"><h3>Treadmill</h3><div class="meta">Not detected as track — treadmill runs have no GPS movement at all (or fixed point). They show as off-track with reported distance from the watch.</div></div>
+<div class="card"><h3>Why 11%, not higher</h3><div class="meta">Track race days inflate the number, but the bulk of buildup training was trail and road. The dedicated track block — Oct 31 (25 mi), Nov 7 (62 mi), Nov 27 (29 mi), Dec 4 (17 mi) — added ~133 mi of focused lap work in the final 6 weeks, on top of the May/March race-pace track sessions.</div></div>
+</div>
+</div>
+
+<p style="text-align:center;color:var(--text-muted);margin:32px 0 16px;font-size:13px">Window: <strong>Dec 12, 2020 → Dec 10, 2021</strong>. Generated from 355 GPS-tracked runs (3 missing files skipped).</p>
+
+</main>
+<footer><div class="container">Built by <a href="https://github.com/nickcoury">Nick Coury</a> &amp; Claw</div></footer>
+<script id="dashboard-data" type="application/json">{
+  "meta": {
+    "window": {
+      "start": "2020-12-12",
+      "end": "2021-12-10"
+    },
+    "generated_at": "2026-04-16T16:33:24.176Z",
+    "runs_analyzed": 355,
+    "runs_skipped": 3
+  },
+  "headline": {
+    "total_runs": 355,
+    "total_miles": 5141,
+    "track_miles": 567,
+    "off_track_miles": 4574,
+    "track_pct": 11,
+    "track_sessions": 15,
+    "longest_run": 155.4,
+    "longest_track_session": 155.4,
+    "biggest_week_total": {
+      "week": "2021-04-26",
+      "miles": 166
+    },
+    "biggest_track_week": {
+      "week": "2020-12-07",
+      "miles": 156
+    }
+  },
+  "weeks": [
+    {
+      "week": "2020-12-07",
+      "total": 157.6,
+      "track": 156.4,
+      "off": 1.2,
+      "runs": 3
+    },
+    {
+      "week": "2020-12-14",
+      "total": 1,
+      "track": 0,
+      "off": 1,
+      "runs": 1
+    },
+    {
+      "week": "2020-12-21",
+      "total": 36,
+      "track": 0,
+      "off": 36,
+      "runs": 6
+    },
+    {
+      "week": "2020-12-28",
+      "total": 54.8,
+      "track": 0,
+      "off": 54.8,
+      "runs": 6
+    },
+    {
+      "week": "2021-01-04",
+      "total": 76.4,
+      "track": 0,
+      "off": 76.4,
+      "runs": 7
+    },
+    {
+      "week": "2021-01-11",
+      "total": 80.8,
+      "track": 0,
+      "off": 80.8,
+      "runs": 8
+    },
+    {
+      "week": "2021-01-18",
+      "total": 82.5,
+      "track": 0,
+      "off": 82.5,
+      "runs": 7
+    },
+    {
+      "week": "2021-01-25",
+      "total": 92,
+      "track": 0,
+      "off": 92,
+      "runs": 7
+    },
+    {
+      "week": "2021-02-01",
+      "total": 90.8,
+      "track": 0,
+      "off": 90.8,
+      "runs": 9
+    },
+    {
+      "week": "2021-02-08",
+      "total": 100,
+      "track": 0,
+      "off": 100,
+      "runs": 7
+    },
+    {
+      "week": "2021-02-15",
+      "total": 104,
+      "track": 0,
+      "off": 104,
+      "runs": 7
+    },
+    {
+      "week": "2021-02-22",
+      "total": 107.8,
+      "track": 0,
+      "off": 107.8,
+      "runs": 7
+    },
+    {
+      "week": "2021-03-01",
+      "total": 115.6,
+      "track": 0,
+      "off": 115.6,
+      "runs": 8
+    },
+    {
+      "week": "2021-03-08",
+      "total": 88.1,
+      "track": 50.8,
+      "off": 37.3,
+      "runs": 7
+    },
+    {
+      "week": "2021-03-15",
+      "total": 76.7,
+      "track": 0,
+      "off": 76.7,
+      "runs": 5
+    },
+    {
+      "week": "2021-03-22",
+      "total": 130.5,
+      "track": 0,
+      "off": 130.5,
+      "runs": 9
+    },
+    {
+      "week": "2021-03-29",
+      "total": 133.4,
+      "track": 0,
+      "off": 133.4,
+      "runs": 7
+    },
+    {
+      "week": "2021-04-05",
+      "total": 144,
+      "track": 0,
+      "off": 144,
+      "runs": 8
+    },
+    {
+      "week": "2021-04-12",
+      "total": 151.3,
+      "track": 0,
+      "off": 151.3,
+      "runs": 8
+    },
+    {
+      "week": "2021-04-19",
+      "total": 122.4,
+      "track": 30.1,
+      "off": 92.4,
+      "runs": 8
+    },
+    {
+      "week": "2021-04-26",
+      "total": 165.5,
+      "track": 149.4,
+      "off": 16.1,
+      "runs": 5
+    },
+    {
+      "week": "2021-05-03",
+      "total": 70,
+      "track": 0,
+      "off": 70,
+      "runs": 7
+    },
+    {
+      "week": "2021-05-10",
+      "total": 77.8,
+      "track": 0,
+      "off": 77.8,
+      "runs": 6
+    },
+    {
+      "week": "2021-05-17",
+      "total": 88.7,
+      "track": 1,
+      "off": 87.7,
+      "runs": 10
+    },
+    {
+      "week": "2021-05-24",
+      "total": 96.3,
+      "track": 0,
+      "off": 96.3,
+      "runs": 7
+    },
+    {
+      "week": "2021-05-31",
+      "total": 83.9,
+      "track": 0,
+      "off": 83.9,
+      "runs": 7
+    },
+    {
+      "week": "2021-06-07",
+      "total": 101.3,
+      "track": 0,
+      "off": 101.3,
+      "runs": 9
+    },
+    {
+      "week": "2021-06-14",
+      "total": 13.7,
+      "track": 0,
+      "off": 13.7,
+      "runs": 2
+    },
+    {
+      "week": "2021-06-21",
+      "total": 93.3,
+      "track": 0,
+      "off": 93.3,
+      "runs": 8
+    },
+    {
+      "week": "2021-06-28",
+      "total": 101.3,
+      "track": 0,
+      "off": 101.3,
+      "runs": 6
+    },
+    {
+      "week": "2021-07-05",
+      "total": 102.9,
+      "track": 0,
+      "off": 102.9,
+      "runs": 8
+    },
+    {
+      "week": "2021-07-12",
+      "total": 125.8,
+      "track": 0,
+      "off": 125.8,
+      "runs": 6
+    },
+    {
+      "week": "2021-07-19",
+      "total": 122.6,
+      "track": 0,
+      "off": 122.6,
+      "runs": 7
+    },
+    {
+      "week": "2021-07-26",
+      "total": 110.2,
+      "track": 0,
+      "off": 110.2,
+      "runs": 6
+    },
+    {
+      "week": "2021-08-02",
+      "total": 93.5,
+      "track": 0,
+      "off": 93.5,
+      "runs": 7
+    },
+    {
+      "week": "2021-08-09",
+      "total": 119,
+      "track": 0,
+      "off": 119,
+      "runs": 8
+    },
+    {
+      "week": "2021-08-16",
+      "total": 100.4,
+      "track": 0,
+      "off": 100.4,
+      "runs": 7
+    },
+    {
+      "week": "2021-08-23",
+      "total": 101.9,
+      "track": 24.2,
+      "off": 77.7,
+      "runs": 7
+    },
+    {
+      "week": "2021-08-30",
+      "total": 92.8,
+      "track": 0,
+      "off": 92.8,
+      "runs": 8
+    },
+    {
+      "week": "2021-09-06",
+      "total": 79.5,
+      "track": 0,
+      "off": 79.5,
+      "runs": 7
+    },
+    {
+      "week": "2021-09-13",
+      "total": 120.4,
+      "track": 0,
+      "off": 120.4,
+      "runs": 5
+    },
+    {
+      "week": "2021-09-20",
+      "total": 30.3,
+      "track": 0,
+      "off": 30.3,
+      "runs": 4
+    },
+    {
+      "week": "2021-09-27",
+      "total": 90.1,
+      "track": 18.6,
+      "off": 71.6,
+      "runs": 6
+    },
+    {
+      "week": "2021-10-04",
+      "total": 96.7,
+      "track": 0,
+      "off": 96.7,
+      "runs": 7
+    },
+    {
+      "week": "2021-10-11",
+      "total": 112.9,
+      "track": 0,
+      "off": 112.9,
+      "runs": 7
+    },
+    {
+      "week": "2021-10-18",
+      "total": 116.1,
+      "track": 0,
+      "off": 116.1,
+      "runs": 6
+    },
+    {
+      "week": "2021-10-25",
+      "total": 160.9,
+      "track": 25,
+      "off": 136,
+      "runs": 8
+    },
+    {
+      "week": "2021-11-01",
+      "total": 128.4,
+      "track": 62.1,
+      "off": 66.3,
+      "runs": 7
+    },
+    {
+      "week": "2021-11-08",
+      "total": 121.7,
+      "track": 0,
+      "off": 121.7,
+      "runs": 8
+    },
+    {
+      "week": "2021-11-15",
+      "total": 97.3,
+      "track": 0,
+      "off": 97.3,
+      "runs": 6
+    },
+    {
+      "week": "2021-11-22",
+      "total": 97.7,
+      "track": 29.1,
+      "off": 68.6,
+      "runs": 8
+    },
+    {
+      "week": "2021-11-29",
+      "total": 67.8,
+      "track": 20.1,
+      "off": 47.7,
+      "runs": 7
+    },
+    {
+      "week": "2021-12-06",
+      "total": 14.6,
+      "track": 0,
+      "off": 14.6,
+      "runs": 3
+    }
+  ],
+  "months": [
+    {
+      "month": "2020-12",
+      "total": 231.85840268234466,
+      "track": 156.36502284431404,
+      "off": 75.49337983803065,
+      "runs": 14,
+      "track_sessions": 2,
+      "longest": 155.37893700787401
+    },
+    {
+      "month": "2021-01",
+      "total": 349.26831678000474,
+      "track": 0,
+      "off": 349.26831678000474,
+      "runs": 31,
+      "track_sessions": 0,
+      "longest": 31.943742294997215
+    },
+    {
+      "month": "2021-02",
+      "total": 402.5416940069991,
+      "track": 0,
+      "off": 402.5416940069991,
+      "runs": 30,
+      "track_sessions": 0,
+      "longest": 61.50079784061083
+    },
+    {
+      "month": "2021-03",
+      "total": 462.9501150779448,
+      "track": 50.79052085818818,
+      "off": 412.15959421975674,
+      "runs": 32,
+      "track_sessions": 2,
+      "longest": 50.0390221108725
+    },
+    {
+      "month": "2021-04",
+      "total": 515.2941571224051,
+      "track": 30.084605901535035,
+      "off": 485.20955122086997,
+      "runs": 31,
+      "track_sessions": 1,
+      "longest": 57.21341117871629
+    },
+    {
+      "month": "2021-05",
+      "total": 493.8567702119621,
+      "track": 150.43199589397918,
+      "off": 343.42477431798295,
+      "runs": 33,
+      "track_sessions": 3,
+      "longest": 148.33994472281873
+    },
+    {
+      "month": "2021-06",
+      "total": 321.13652514432897,
+      "track": 0,
+      "off": 321.13652514432897,
+      "runs": 28,
+      "track_sessions": 0,
+      "longest": 33.539653424003816
+    },
+    {
+      "month": "2021-07",
+      "total": 500.0386989978526,
+      "track": 0,
+      "off": 500.0386989978526,
+      "runs": 29,
+      "track_sessions": 0,
+      "longest": 58.39816720353138
+    },
+    {
+      "month": "2021-08",
+      "total": 452.4647868945359,
+      "track": 24.197878141652748,
+      "off": 428.2669087528832,
+      "runs": 32,
+      "track_sessions": 1,
+      "longest": 48.241743219597545
+    },
+    {
+      "month": "2021-09",
+      "total": 344.37307996301587,
+      "track": 0,
+      "off": 344.37307996301587,
+      "runs": 25,
+      "track_sessions": 0,
+      "longest": 102.77926285492723
+    },
+    {
+      "month": "2021-10",
+      "total": 539.7407018014793,
+      "track": 43.555311978048195,
+      "off": 496.185389823431,
+      "runs": 31,
+      "track_sessions": 2,
+      "longest": 48.48163599578462
+    },
+    {
+      "month": "2021-11",
+      "total": 464.1016028891275,
+      "track": 91.15956563668178,
+      "off": 372.94203725244574,
+      "runs": 31,
+      "track_sessions": 2,
+      "longest": 62.2054700548795
+    },
+    {
+      "month": "2021-12",
+      "total": 63.31536327845383,
+      "track": 20.07163788475304,
+      "off": 43.243725393700785,
+      "runs": 8,
+      "track_sessions": 2,
+      "longest": 19.970870118507914
+    }
+  ],
+  "cumulative": [
+    {
+      "date": "2020-12-12",
+      "cum_track": 0
+    },
+    {
+      "date": "2020-12-12",
+      "cum_track": 0.9860858364400219
+    },
+    {
+      "date": "2020-12-12",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2020-12-18",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2020-12-22",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2020-12-23",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2020-12-24",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2020-12-25",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2020-12-26",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2020-12-27",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2020-12-28",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2020-12-29",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2020-12-30",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2020-12-31",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-01",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-02",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-04",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-05",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-06",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-07",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-09",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-09",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-10",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-11",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-12",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-13",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-14",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-15",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-16",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-16",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-17",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-18",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-19",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-20",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-21",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-22",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-23",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-24",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-25",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-26",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-27",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-28",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-29",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-30",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-01-31",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-01",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-02",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-03",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-03",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-04",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-04",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-05",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-06",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-07",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-08",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-09",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-10",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-11",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-13",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-13",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-14",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-15",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-16",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-17",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-18",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-19",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-20",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-21",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-22",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-23",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-24",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-25",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-26",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-27",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-02-28",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-03-01",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-03-02",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-03-03",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-03-03",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-03-04",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-03-05",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-03-06",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-03-07",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-03-08",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-03-09",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-03-10",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-03-11",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-03-12",
+      "cum_track": 156.36502284431404
+    },
+    {
+      "date": "2021-03-14",
+      "cum_track": 157.11394911489384
+    },
+    {
+      "date": "2021-03-14",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-15",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-16",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-19",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-20",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-21",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-22",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-23",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-24",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-25",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-26",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-27",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-27",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-27",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-28",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-29",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-30",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-03-31",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-01",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-02",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-03",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-04",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-05",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-06",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-07",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-08",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-09",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-10",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-11",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-11",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-12",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-13",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-14",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-15",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-16",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-17",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-17",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-18",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-19",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-20",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-20",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-21",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-22",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-23",
+      "cum_track": 207.1555437025022
+    },
+    {
+      "date": "2021-04-24",
+      "cum_track": 237.24014960403724
+    },
+    {
+      "date": "2021-04-25",
+      "cum_track": 237.24014960403724
+    },
+    {
+      "date": "2021-04-26",
+      "cum_track": 237.24014960403724
+    },
+    {
+      "date": "2021-04-27",
+      "cum_track": 237.24014960403724
+    },
+    {
+      "date": "2021-04-29",
+      "cum_track": 237.24014960403724
+    },
+    {
+      "date": "2021-05-01",
+      "cum_track": 238.30665247725764
+    },
+    {
+      "date": "2021-05-01",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-03",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-04",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-05",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-06",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-07",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-08",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-09",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-10",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-11",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-12",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-13",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-15",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-16",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-17",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-18",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-19",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-20",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-21",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-22",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-22",
+      "cum_track": 386.64864772501073
+    },
+    {
+      "date": "2021-05-22",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-05-22",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-05-23",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-05-24",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-05-25",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-05-26",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-05-27",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-05-28",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-05-29",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-05-30",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-05-31",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-01",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-02",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-03",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-04",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-05",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-06",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-07",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-08",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-09",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-10",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-11",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-12",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-13",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-13",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-13",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-14",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-16",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-21",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-21",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-22",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-24",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-25",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-26",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-26",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-27",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-28",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-29",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-06-30",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-01",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-03",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-04",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-05",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-06",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-07",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-08",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-09",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-10",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-11",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-11",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-12",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-13",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-14",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-15",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-17",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-18",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-19",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-20",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-21",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-22",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-23",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-24",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-25",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-27",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-28",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-29",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-30",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-07-31",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-01",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-02",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-03",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-04",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-05",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-06",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-07",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-08",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-09",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-10",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-11",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-12",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-13",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-14",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-15",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-15",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-16",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-17",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-18",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-19",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-20",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-21",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-22",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-23",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-24",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-25",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-26",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-27",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-29",
+      "cum_track": 387.6721454980164
+    },
+    {
+      "date": "2021-08-29",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-08-30",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-08-31",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-01",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-01",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-02",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-03",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-04",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-05",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-06",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-07",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-08",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-09",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-10",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-11",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-12",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-13",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-15",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-17",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-17",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-19",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-21",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-23",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-25",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-26",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-27",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-28",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-09-29",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-10-01",
+      "cum_track": 411.8700236396691
+    },
+    {
+      "date": "2021-10-02",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-03",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-04",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-05",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-06",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-08",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-09",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-09",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-10",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-11",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-12",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-13",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-14",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-15",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-16",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-17",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-19",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-20",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-21",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-22",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-23",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-24",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-25",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-26",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-27",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-28",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-29",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-30",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-31",
+      "cum_track": 430.4616299090559
+    },
+    {
+      "date": "2021-10-31",
+      "cum_track": 455.4253356177173
+    },
+    {
+      "date": "2021-11-01",
+      "cum_track": 455.4253356177173
+    },
+    {
+      "date": "2021-11-02",
+      "cum_track": 455.4253356177173
+    },
+    {
+      "date": "2021-11-03",
+      "cum_track": 455.4253356177173
+    },
+    {
+      "date": "2021-11-04",
+      "cum_track": 455.4253356177173
+    },
+    {
+      "date": "2021-11-05",
+      "cum_track": 455.4253356177173
+    },
+    {
+      "date": "2021-11-06",
+      "cum_track": 455.4253356177173
+    },
+    {
+      "date": "2021-11-07",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-09",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-09",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-10",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-11",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-11",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-13",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-13",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-14",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-15",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-16",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-17",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-19",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-20",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-21",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-22",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-23",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-24",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-25",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-25",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-25",
+      "cum_track": 517.4949739299736
+    },
+    {
+      "date": "2021-11-27",
+      "cum_track": 546.584901254399
+    },
+    {
+      "date": "2021-11-28",
+      "cum_track": 546.584901254399
+    },
+    {
+      "date": "2021-11-29",
+      "cum_track": 546.584901254399
+    },
+    {
+      "date": "2021-11-30",
+      "cum_track": 546.584901254399
+    },
+    {
+      "date": "2021-12-01",
+      "cum_track": 546.584901254399
+    },
+    {
+      "date": "2021-12-02",
+      "cum_track": 546.584901254399
+    },
+    {
+      "date": "2021-12-04",
+      "cum_track": 563.6547197643011
+    },
+    {
+      "date": "2021-12-05",
+      "cum_track": 566.6565391391521
+    },
+    {
+      "date": "2021-12-05",
+      "cum_track": 566.6565391391521
+    },
+    {
+      "date": "2021-12-06",
+      "cum_track": 566.6565391391521
+    },
+    {
+      "date": "2021-12-08",
+      "cum_track": 566.6565391391521
+    },
+    {
+      "date": "2021-12-10",
+      "cum_track": 566.6565391391521
+    }
+  ],
+  "scatter": [
+    {
+      "date": "2020-12-12",
+      "total": 1.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2020-12-12",
+      "total": 1,
+      "track": 1,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2020-12-12",
+      "total": 155.4,
+      "track": 155.4,
+      "name": "Desert Solstice 24 Hour - 1st Place"
+    },
+    {
+      "date": "2020-12-18",
+      "total": 1,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2020-12-22",
+      "total": 3.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2020-12-23",
+      "total": 3.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2020-12-24",
+      "total": 8.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2020-12-25",
+      "total": 8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2020-12-26",
+      "total": 7.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2020-12-27",
+      "total": 4.1,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2020-12-28",
+      "total": 10.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2020-12-29",
+      "total": 12.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2020-12-30",
+      "total": 9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2020-12-31",
+      "total": 5.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-01",
+      "total": 14.8,
+      "track": 0,
+      "name": "Lunch Run"
+    },
+    {
+      "date": "2021-01-02",
+      "total": 2.7,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-01-04",
+      "total": 5.8,
+      "track": 0,
+      "name": "Lunch Run"
+    },
+    {
+      "date": "2021-01-05",
+      "total": 6.6,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-06",
+      "total": 9.5,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-01-07",
+      "total": 11.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-09",
+      "total": 8.1,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-01-09",
+      "total": 18.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-10",
+      "total": 16,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-11",
+      "total": 9.6,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-12",
+      "total": 7.9,
+      "track": 0,
+      "name": "Lunch Run"
+    },
+    {
+      "date": "2021-01-13",
+      "total": 10.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-14",
+      "total": 10.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-15",
+      "total": 5.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-16",
+      "total": 1.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-16",
+      "total": 31.9,
+      "track": 0,
+      "name": "Coldwater Rumble 52k - 1st Place + Course Record"
+    },
+    {
+      "date": "2021-01-17",
+      "total": 4.3,
+      "track": 0,
+      "name": "Lunch Run"
+    },
+    {
+      "date": "2021-01-18",
+      "total": 12.7,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-19",
+      "total": 11.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-20",
+      "total": 7.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-21",
+      "total": 10.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-22",
+      "total": 5.8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-23",
+      "total": 25,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-24",
+      "total": 10.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-25",
+      "total": 11.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-26",
+      "total": 11.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-27",
+      "total": 10.8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-28",
+      "total": 11.6,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-29",
+      "total": 19.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-30",
+      "total": 5.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-01-31",
+      "total": 22.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-01",
+      "total": 10.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-02",
+      "total": 12.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-03",
+      "total": 2.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-03",
+      "total": 10.8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-04",
+      "total": 2.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-04",
+      "total": 11.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-05",
+      "total": 8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-06",
+      "total": 18.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-07",
+      "total": 15,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-08",
+      "total": 10.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-09",
+      "total": 10.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-10",
+      "total": 6.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-11",
+      "total": 4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-13",
+      "total": 2.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-13",
+      "total": 61.5,
+      "track": 0,
+      "name": "Black Canyon 100k - 3rd Place"
+    },
+    {
+      "date": "2021-02-14",
+      "total": 5.7,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-15",
+      "total": 10.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-16",
+      "total": 15.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-17",
+      "total": 18.4,
+      "track": 0,
+      "name": "Night Run"
+    },
+    {
+      "date": "2021-02-18",
+      "total": 16.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-19",
+      "total": 10.6,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-20",
+      "total": 27,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-21",
+      "total": 6.6,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-22",
+      "total": 15,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-23",
+      "total": 12.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-24",
+      "total": 14.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-25",
+      "total": 15.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-26",
+      "total": 9.7,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-27",
+      "total": 26.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-02-28",
+      "total": 14.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-01",
+      "total": 10.8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-02",
+      "total": 10.8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-03",
+      "total": 5.4,
+      "track": 0,
+      "name": "Evening Run"
+    },
+    {
+      "date": "2021-03-03",
+      "total": 17.6,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-04",
+      "total": 15,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-05",
+      "total": 10,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-06",
+      "total": 30.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-07",
+      "total": 15.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-08",
+      "total": 10.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-09",
+      "total": 10.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-10",
+      "total": 8.2,
+      "track": 0,
+      "name": "Lunch Run"
+    },
+    {
+      "date": "2021-03-11",
+      "total": 5,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-03-12",
+      "total": 3.9,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-03-14",
+      "total": 0.8,
+      "track": 0.7,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-14",
+      "total": 50,
+      "track": 50,
+      "name": "Track Workout - 1x50 Mile in 5:45"
+    },
+    {
+      "date": "2021-03-15",
+      "total": 10.1,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-03-16",
+      "total": 11,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-19",
+      "total": 4,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-03-20",
+      "total": 20.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-21",
+      "total": 31.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-22",
+      "total": 15.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-23",
+      "total": 21.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-24",
+      "total": 16.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-25",
+      "total": 11,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-03-26",
+      "total": 14.7,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-03-27",
+      "total": 1.2,
+      "track": 0,
+      "name": "Night Run"
+    },
+    {
+      "date": "2021-03-27",
+      "total": 2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-27",
+      "total": 30.2,
+      "track": 0,
+      "name": "Crown King Scramble - 3rd Place"
+    },
+    {
+      "date": "2021-03-28",
+      "total": 18.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-29",
+      "total": 15.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-30",
+      "total": 16.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-03-31",
+      "total": 20.6,
+      "track": 0,
+      "name": "Lunch Run"
+    },
+    {
+      "date": "2021-04-01",
+      "total": 15.6,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-02",
+      "total": 15.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-03",
+      "total": 25.4,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-04-04",
+      "total": 25,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-05",
+      "total": 15,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-06",
+      "total": 20,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-07",
+      "total": 21.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-08",
+      "total": 20.7,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-09",
+      "total": 15.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-10",
+      "total": 25.1,
+      "track": 0,
+      "name": "Free Soles Downhill 5k ~16:28"
+    },
+    {
+      "date": "2021-04-11",
+      "total": 2.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-11",
+      "total": 24.7,
+      "track": 0,
+      "name": "Dam Good Run - 1st Place"
+    },
+    {
+      "date": "2021-04-12",
+      "total": 10.8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-13",
+      "total": 20.6,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-14",
+      "total": 20.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-15",
+      "total": 15.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-16",
+      "total": 13.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-17",
+      "total": 1.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-17",
+      "total": 57.2,
+      "track": 0,
+      "name": "Whiskey Basin 92k - 1st Place"
+    },
+    {
+      "date": "2021-04-18",
+      "total": 13,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-19",
+      "total": 12.6,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-04-20",
+      "total": 5.4,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-04-20",
+      "total": 20,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-21",
+      "total": 19.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-22",
+      "total": 15,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-23",
+      "total": 10,
+      "track": 0,
+      "name": "Lunch Run"
+    },
+    {
+      "date": "2021-04-24",
+      "total": 30.1,
+      "track": 30.1,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-25",
+      "total": 10,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-26",
+      "total": 8.1,
+      "track": 0,
+      "name": "Lunch Run"
+    },
+    {
+      "date": "2021-04-27",
+      "total": 5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-04-29",
+      "total": 3,
+      "track": 0,
+      "name": "Evening Run"
+    },
+    {
+      "date": "2021-05-01",
+      "total": 1.1,
+      "track": 1.1,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-01",
+      "total": 148.3,
+      "track": 148.3,
+      "name": "Alexander County 24 Hour - 1st Place"
+    },
+    {
+      "date": "2021-05-03",
+      "total": 5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-04",
+      "total": 8.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-05",
+      "total": 10.8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-06",
+      "total": 5.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-07",
+      "total": 10.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-08",
+      "total": 20.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-09",
+      "total": 10.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-10",
+      "total": 10.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-11",
+      "total": 10,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-12",
+      "total": 12.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-13",
+      "total": 10,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-15",
+      "total": 20.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-16",
+      "total": 15.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-17",
+      "total": 10.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-18",
+      "total": 11.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-19",
+      "total": 15.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-20",
+      "total": 10.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-21",
+      "total": 5.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-22",
+      "total": 2.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-22",
+      "total": 2.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-22",
+      "total": 1,
+      "track": 1,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-22",
+      "total": 10.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-23",
+      "total": 20.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-24",
+      "total": 10.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-25",
+      "total": 10.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-26",
+      "total": 15.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-27",
+      "total": 22,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-28",
+      "total": 10.1,
+      "track": 0,
+      "name": "Lunch Run"
+    },
+    {
+      "date": "2021-05-29",
+      "total": 17.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-30",
+      "total": 11,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-05-31",
+      "total": 11.7,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-01",
+      "total": 11.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-02",
+      "total": 10.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-03",
+      "total": 10.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-04",
+      "total": 6,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-06-05",
+      "total": 25,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-06",
+      "total": 9.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-07",
+      "total": 15.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-08",
+      "total": 11.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-09",
+      "total": 20.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-10",
+      "total": 20.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-11",
+      "total": 5.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-12",
+      "total": 20,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-13",
+      "total": 3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-13",
+      "total": 3.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-13",
+      "total": 3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-14",
+      "total": 8.3,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-06-16",
+      "total": 5.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-21",
+      "total": 4,
+      "track": 0,
+      "name": "Evening Run"
+    },
+    {
+      "date": "2021-06-21",
+      "total": 8.2,
+      "track": 0,
+      "name": "Lunch Run"
+    },
+    {
+      "date": "2021-06-22",
+      "total": 10.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-24",
+      "total": 15.7,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-25",
+      "total": 10.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-26",
+      "total": 1.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-26",
+      "total": 33.5,
+      "track": 0,
+      "name": "2nd Place - Bears Ears 50k"
+    },
+    {
+      "date": "2021-06-27",
+      "total": 10.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-28",
+      "total": 10.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-29",
+      "total": 15.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-30",
+      "total": 15.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-01",
+      "total": 15.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-03",
+      "total": 20,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-04",
+      "total": 25.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-05",
+      "total": 10.2,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-07-06",
+      "total": 16,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-07",
+      "total": 15,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-08",
+      "total": 12.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-09",
+      "total": 16.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-10",
+      "total": 15.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-11",
+      "total": 5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-11",
+      "total": 12.4,
+      "track": 0,
+      "name": "Kendall Mountain Run"
+    },
+    {
+      "date": "2021-07-12",
+      "total": 14.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-13",
+      "total": 16.7,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-14",
+      "total": 8.6,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-15",
+      "total": 22.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-17",
+      "total": 58.4,
+      "track": 0,
+      "name": "Pacing Jamil at Hardrock"
+    },
+    {
+      "date": "2021-07-18",
+      "total": 5.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-19",
+      "total": 10.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-20",
+      "total": 15,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-21",
+      "total": 15.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-22",
+      "total": 18.8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-23",
+      "total": 13.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-24",
+      "total": 25.8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-25",
+      "total": 24.7,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-27",
+      "total": 15,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-28",
+      "total": 13.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-29",
+      "total": 15,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-07-30",
+      "total": 19.7,
+      "track": 0,
+      "name": "Kelly Canyon Trails"
+    },
+    {
+      "date": "2021-07-31",
+      "total": 25,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-01",
+      "total": 22.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-02",
+      "total": 10.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-03",
+      "total": 15.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-04",
+      "total": 10.8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-05",
+      "total": 16.7,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-06",
+      "total": 5.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-07",
+      "total": 30.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-08",
+      "total": 5.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-09",
+      "total": 15.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-10",
+      "total": 15.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-11",
+      "total": 17.1,
+      "track": 0,
+      "name": "Lunch Run"
+    },
+    {
+      "date": "2021-08-12",
+      "total": 5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-13",
+      "total": 19.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-14",
+      "total": 21.6,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-08-15",
+      "total": 20,
+      "track": 0,
+      "name": "Night Run"
+    },
+    {
+      "date": "2021-08-15",
+      "total": 5.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-16",
+      "total": 8.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-17",
+      "total": 13.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-18",
+      "total": 14,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-19",
+      "total": 12,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-20",
+      "total": 10.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-21",
+      "total": 15.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-22",
+      "total": 27,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-23",
+      "total": 5.3,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-08-24",
+      "total": 15,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-25",
+      "total": 13.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-26",
+      "total": 10.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-27",
+      "total": 8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-29",
+      "total": 2.2,
+      "track": 0,
+      "name": "Night Run"
+    },
+    {
+      "date": "2021-08-29",
+      "total": 48.2,
+      "track": 24.2,
+      "name": "Hotfoot Hamster 6 Hour - 1st Place - 50.02 Miles"
+    },
+    {
+      "date": "2021-08-30",
+      "total": 5.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-08-31",
+      "total": 10.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-01",
+      "total": 2.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-01",
+      "total": 12.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-02",
+      "total": 15.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-03",
+      "total": 10,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-04",
+      "total": 5.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-05",
+      "total": 31.8,
+      "track": 0,
+      "name": "Wow Garmin, you really lost the signal there"
+    },
+    {
+      "date": "2021-09-06",
+      "total": 13.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-07",
+      "total": 16.7,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-08",
+      "total": 13.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-09",
+      "total": 10.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-10",
+      "total": 5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-11",
+      "total": 14.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-12",
+      "total": 6.1,
+      "track": 0,
+      "name": "Lunch Run"
+    },
+    {
+      "date": "2021-09-13",
+      "total": 8.7,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-15",
+      "total": 4.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-17",
+      "total": 1.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-17",
+      "total": 102.8,
+      "track": 0,
+      "name": "Run Rabbit Run 100 - 4th Place"
+    },
+    {
+      "date": "2021-09-19",
+      "total": 3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-21",
+      "total": 5.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-23",
+      "total": 6.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-25",
+      "total": 10.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-26",
+      "total": 8,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-09-27",
+      "total": 10,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-28",
+      "total": 15,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-09-29",
+      "total": 11.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-01",
+      "total": 10.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-02",
+      "total": 31.8,
+      "track": 18.6,
+      "name": "Lunch Run"
+    },
+    {
+      "date": "2021-10-03",
+      "total": 11.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-04",
+      "total": 15,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-05",
+      "total": 11,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-06",
+      "total": 8.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-08",
+      "total": 5.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-09",
+      "total": 1.7,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-09",
+      "total": 48.5,
+      "track": 0,
+      "name": "Man Against Horse 1st Place"
+    },
+    {
+      "date": "2021-10-10",
+      "total": 7.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-11",
+      "total": 10,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-12",
+      "total": 10.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-13",
+      "total": 15.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-14",
+      "total": 15,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-15",
+      "total": 10.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-16",
+      "total": 27,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-17",
+      "total": 25.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-19",
+      "total": 15.8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-20",
+      "total": 20.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-21",
+      "total": 14.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-22",
+      "total": 11.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-23",
+      "total": 35.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-24",
+      "total": 18.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-25",
+      "total": 20.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-26",
+      "total": 20.7,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-27",
+      "total": 20,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-28",
+      "total": 22.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-29",
+      "total": 20.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-30",
+      "total": 30,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-31",
+      "total": 2.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-10-31",
+      "total": 25,
+      "track": 25,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-01",
+      "total": 15,
+      "track": 0,
+      "name": "Night Run"
+    },
+    {
+      "date": "2021-11-02",
+      "total": 16.8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-03",
+      "total": 15.3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-04",
+      "total": 10.8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-05",
+      "total": 5.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-06",
+      "total": 3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-07",
+      "total": 62.2,
+      "track": 62.1,
+      "name": "100k TT"
+    },
+    {
+      "date": "2021-11-09",
+      "total": 10,
+      "track": 0,
+      "name": "Afternoon Run"
+    },
+    {
+      "date": "2021-11-09",
+      "total": 12.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-10",
+      "total": 15.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-11",
+      "total": 3,
+      "track": 0,
+      "name": "Evening Run"
+    },
+    {
+      "date": "2021-11-11",
+      "total": 19.7,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-13",
+      "total": 0.8,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-13",
+      "total": 49.9,
+      "track": 0,
+      "name": "Pass Mountain 50 Mile - 1st Place"
+    },
+    {
+      "date": "2021-11-14",
+      "total": 10.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-15",
+      "total": 13.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-16",
+      "total": 17.6,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-17",
+      "total": 13.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-19",
+      "total": 13.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-20",
+      "total": 20.9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-21",
+      "total": 19.5,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-22",
+      "total": 12.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-23",
+      "total": 15,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-24",
+      "total": 12.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-25",
+      "total": 3.2,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-25",
+      "total": 10,
+      "track": 0,
+      "name": "Thanksgiving Day Classic 10 Mile - 2nd Place"
+    },
+    {
+      "date": "2021-11-25",
+      "total": 3,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-27",
+      "total": 30.1,
+      "track": 29.1,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-28",
+      "total": 12.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-29",
+      "total": 10.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-11-30",
+      "total": 9,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-12-01",
+      "total": 10.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-12-02",
+      "total": 8.4,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-12-04",
+      "total": 20,
+      "track": 17.1,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-12-05",
+      "total": 3,
+      "track": 3,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-12-05",
+      "total": 7,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-12-06",
+      "total": 8.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-12-08",
+      "total": 5.1,
+      "track": 0,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-12-10",
+      "total": 1.4,
+      "track": 0,
+      "name": "Morning Run"
+    }
+  ],
+  "track_sessions": [
+    {
+      "date": "2020-12-12",
+      "name": "Morning Run",
+      "total_mi": 1,
+      "track_mi": 1,
+      "off_mi": 0,
+      "laps": 3,
+      "locations": [
+        "33.501,-112.066"
+      ]
+    },
+    {
+      "date": "2020-12-12",
+      "name": "Desert Solstice 24 Hour - 1st Place",
+      "total_mi": 155.4,
+      "track_mi": 155.4,
+      "off_mi": 0,
+      "laps": 625,
+      "locations": [
+        "33.501,-112.066"
+      ]
+    },
+    {
+      "date": "2021-03-14",
+      "name": "Morning Run",
+      "total_mi": 0.8,
+      "track_mi": 0.7,
+      "off_mi": 0,
+      "laps": 3,
+      "locations": [
+        "33.627,-111.722"
+      ]
+    },
+    {
+      "date": "2021-03-14",
+      "name": "Track Workout - 1x50 Mile in 5:45",
+      "total_mi": 50,
+      "track_mi": 50,
+      "off_mi": 0,
+      "laps": 201,
+      "locations": [
+        "33.627,-111.722"
+      ]
+    },
+    {
+      "date": "2021-04-24",
+      "name": "Morning Run",
+      "total_mi": 30.1,
+      "track_mi": 30.1,
+      "off_mi": 0,
+      "laps": 121,
+      "locations": [
+        "33.627,-111.722"
+      ]
+    },
+    {
+      "date": "2021-05-01",
+      "name": "Morning Run",
+      "total_mi": 1.1,
+      "track_mi": 1.1,
+      "off_mi": 0,
+      "laps": 4,
+      "locations": [
+        "35.915,-81.189"
+      ]
+    },
+    {
+      "date": "2021-05-01",
+      "name": "Alexander County 24 Hour - 1st Place",
+      "total_mi": 148.3,
+      "track_mi": 148.3,
+      "off_mi": 0,
+      "laps": 596,
+      "locations": [
+        "35.915,-81.189"
+      ]
+    },
+    {
+      "date": "2021-05-22",
+      "name": "Morning Run",
+      "total_mi": 1,
+      "track_mi": 1,
+      "off_mi": 0,
+      "laps": 4,
+      "locations": [
+        "33.607,-111.955"
+      ]
+    },
+    {
+      "date": "2021-08-29",
+      "name": "Hotfoot Hamster 6 Hour - 1st Place - 50.02 Miles",
+      "total_mi": 48.2,
+      "track_mi": 24.2,
+      "off_mi": 24,
+      "laps": 81,
+      "locations": [
+        "33.395,-112.477"
+      ]
+    },
+    {
+      "date": "2021-10-02",
+      "name": "Lunch Run",
+      "total_mi": 31.8,
+      "track_mi": 18.6,
+      "off_mi": 13.2,
+      "laps": 74,
+      "locations": [
+        "33.627,-111.722"
+      ]
+    },
+    {
+      "date": "2021-10-31",
+      "name": "Morning Run",
+      "total_mi": 25,
+      "track_mi": 25,
+      "off_mi": 0,
+      "laps": 100,
+      "locations": [
+        "33.627,-111.722"
+      ]
+    },
+    {
+      "date": "2021-11-07",
+      "name": "100k TT",
+      "total_mi": 62.2,
+      "track_mi": 62.1,
+      "off_mi": 0.1,
+      "laps": 248,
+      "locations": [
+        "33.627,-111.722"
+      ]
+    },
+    {
+      "date": "2021-11-27",
+      "name": "Morning Run",
+      "total_mi": 30.1,
+      "track_mi": 29.1,
+      "off_mi": 1,
+      "laps": 115,
+      "locations": [
+        "33.627,-111.722",
+        "33.627,-111.721"
+      ]
+    },
+    {
+      "date": "2021-12-04",
+      "name": "Morning Run",
+      "total_mi": 20,
+      "track_mi": 17.1,
+      "off_mi": 2.9,
+      "laps": 68,
+      "locations": [
+        "33.627,-111.722"
+      ]
+    },
+    {
+      "date": "2021-12-05",
+      "name": "Morning Run",
+      "total_mi": 3,
+      "track_mi": 3,
+      "off_mi": 0,
+      "laps": 10,
+      "locations": [
+        "33.587,-111.809"
+      ]
+    }
+  ],
+  "locations": [
+    {
+      "center": "33.627,-111.722",
+      "sessions": 9,
+      "miles": 231.7,
+      "sample": [
+        "Morning Run",
+        "Track Workout - 1x50 Mile in 5:45"
+      ]
+    },
+    {
+      "center": "33.501,-112.066",
+      "sessions": 2,
+      "miles": 156.4,
+      "sample": [
+        "Morning Run",
+        "Desert Solstice 24 Hour - 1st Place"
+      ]
+    },
+    {
+      "center": "35.915,-81.189",
+      "sessions": 2,
+      "miles": 149.4,
+      "sample": [
+        "Morning Run",
+        "Alexander County 24 Hour - 1st Place"
+      ]
+    },
+    {
+      "center": "33.395,-112.477",
+      "sessions": 1,
+      "miles": 24.2,
+      "sample": [
+        "Hotfoot Hamster 6 Hour - 1st Place - 50.02 Miles"
+      ]
+    },
+    {
+      "center": "33.587,-111.809",
+      "sessions": 1,
+      "miles": 3,
+      "sample": [
+        "Morning Run"
+      ]
+    },
+    {
+      "center": "33.607,-111.955",
+      "sessions": 1,
+      "miles": 1,
+      "sample": [
+        "Morning Run"
+      ]
+    },
+    {
+      "center": "33.627,-111.721",
+      "sessions": 1,
+      "miles": 0.9,
+      "sample": [
+        "Morning Run"
+      ]
+    }
+  ]
+}</script>
+<script>
+Chart.defaults.color = '#8b949e';
+Chart.defaults.borderColor = 'rgba(139,148,158,0.15)';
+Chart.defaults.font.family = '-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif';
+
+const D = JSON.parse(document.getElementById('dashboard-data').textContent);
+
+// Weekly stacked bar
+new Chart(document.getElementById('weeklyChart'), {
+  type: 'bar',
+  data: {
+    labels: D.weeks.map(w => w.week),
+    datasets: [
+      { label: 'Track', data: D.weeks.map(w => w.track), backgroundColor: '#e67e22', stack: 'mi', borderRadius: 2 },
+      { label: 'Off-track', data: D.weeks.map(w => w.off), backgroundColor: '#58a6ff', stack: 'mi', borderRadius: 2 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true, labels: { boxWidth: 12, padding: 16 } },
+      tooltip: {
+        callbacks: {
+          title: ctx => 'Week of ' + ctx[0].label,
+          label: ctx => `${ctx.dataset.label}: ${ctx.raw.toFixed(1)} mi`,
+          footer: ctx => `Total: ${ctx.reduce((a, c) => a + c.raw, 0).toFixed(1)} mi`,
+        }
+      }
+    },
+    scales: {
+      y: { beginAtZero: true, stacked: true, ticks: { callback: v => v + ' mi' } },
+      x: { stacked: true, ticks: { maxRotation: 60, autoSkip: true, maxTicksLimit: 14 }, grid: { display: false } }
+    }
+  }
+});
+
+// Cumulative track miles
+new Chart(document.getElementById('cumChart'), {
+  type: 'line',
+  data: {
+    labels: D.cumulative.map(p => p.date),
+    datasets: [{
+      label: 'Cumulative Track Miles',
+      data: D.cumulative.map(p => p.cum_track),
+      borderColor: '#e67e22',
+      backgroundColor: 'rgba(230,126,34,0.15)',
+      fill: true, tension: 0.1, pointRadius: 0, borderWidth: 2,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.raw.toFixed(0) + ' track mi' } }
+    },
+    scales: {
+      y: { beginAtZero: true, ticks: { callback: v => v + ' mi' } },
+      x: { ticks: { maxRotation: 60, autoSkip: true, maxTicksLimit: 14 }, grid: { display: false } }
+    }
+  }
+});
+
+// Scatter: each run as a dot, x=date, y=miles, color=track or not
+const scatterTrack = D.scatter.filter(s => s.track > 0.5).map(s => ({ x: s.date, y: s.total, name: s.name, t: s.track }));
+const scatterOff   = D.scatter.filter(s => s.track <= 0.5).map(s => ({ x: s.date, y: s.total, name: s.name }));
+new Chart(document.getElementById('scatterChart'), {
+  type: 'scatter',
+  data: {
+    datasets: [
+      { label: 'Off-track run', data: scatterOff, backgroundColor: 'rgba(88,166,255,0.55)', pointRadius: 4 },
+      { label: 'Track session', data: scatterTrack, backgroundColor: 'rgba(230,126,34,0.95)', pointRadius: 6, pointHoverRadius: 8 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true, labels: { boxWidth: 10, padding: 16, usePointStyle: true } },
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            const d = ctx.raw;
+            const lines = [`${d.x}`, `${d.y.toFixed(1)} mi total`];
+            if (d.t != null) lines.push(`${d.t.toFixed(1)} mi on track`);
+            if (d.name) lines.push(d.name);
+            return lines;
+          }
+        }
+      }
+    },
+    scales: {
+      y: { beginAtZero: true, ticks: { callback: v => v + ' mi' }, title: { display: true, text: 'Run distance' } },
+      x: { type: 'category', ticks: { maxRotation: 60, autoSkip: true, maxTicksLimit: 14 }, grid: { display: false } }
+    }
+  }
+});
+
+// Monthly table
+const monthsByName = {
+  '2020-12':'Dec 2020','2021-01':'Jan 2021','2021-02':'Feb 2021','2021-03':'Mar 2021','2021-04':'Apr 2021',
+  '2021-05':'May 2021','2021-06':'Jun 2021','2021-07':'Jul 2021','2021-08':'Aug 2021','2021-09':'Sep 2021',
+  '2021-10':'Oct 2021','2021-11':'Nov 2021','2021-12':'Dec 2021'
+};
+const monthTbody = document.getElementById('monthTbody');
+for (const m of D.months) {
+  const tr = document.createElement('tr');
+  const pct = m.total > 0 ? (m.track / m.total * 100).toFixed(0) : '0';
+  const isTrackHeavy = m.track / m.total > 0.4;
+  tr.innerHTML = `
+    <td>${monthsByName[m.month] || m.month}</td>
+    <td style="text-align:right">${m.runs}</td>
+    <td style="text-align:right">${m.total.toFixed(0)}</td>
+    <td style="text-align:right;color:${m.track > 5 ? '#e67e22' : 'var(--text-muted)'};font-weight:${isTrackHeavy ? '600' : '400'}">${m.track.toFixed(0)}</td>
+    <td style="text-align:right">${m.off.toFixed(0)}</td>
+    <td style="text-align:right;color:${isTrackHeavy ? '#e67e22' : 'var(--text-muted)'}">${pct}%</td>
+    <td style="text-align:right">${m.track_sessions}</td>
+    <td style="text-align:right">${m.longest.toFixed(1)} mi</td>
+  `;
+  monthTbody.appendChild(tr);
+}
+
+// Session list
+const sessionList = document.getElementById('sessionList');
+for (const s of D.track_sessions) {
+  const row = document.createElement('div');
+  row.className = 'session-row';
+  row.innerHTML = `
+    <div class="date">${s.date}</div>
+    <div class="name">${s.name || '(unnamed)'}</div>
+    <div class="num">${s.total_mi.toFixed(1)}</div>
+    <div class="num" style="color:#e67e22;font-weight:600">${s.track_mi.toFixed(1)}</div>
+    <div class="num" style="color:var(--text-muted)">${s.off_mi.toFixed(1)}</div>
+    <div class="num" style="color:var(--text-muted)">${s.laps}</div>
+  `;
+  sessionList.appendChild(row);
+}
+
+// Locations
+const locList = document.getElementById('locList');
+for (const l of D.locations) {
+  const row = document.createElement('div');
+  row.className = 'loc-row';
+  row.innerHTML = `
+    <div>${l.center}<div style="color:var(--text-muted);font-size:12px">${(l.sample || []).join(' · ').slice(0, 100)}</div></div>
+    <div class="num">${l.sessions}</div>
+    <div class="num miles">${l.miles.toFixed(1)} mi</div>
+  `;
+  locList.appendChild(row);
+}
+</script>
+</body>
+</html>
