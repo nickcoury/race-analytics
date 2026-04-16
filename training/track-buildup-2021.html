@@ -45,10 +45,10 @@
 </div>
 
 <div class="stats-row">
-<div class="stat"><div class="value">5,141</div><div class="label">Total Miles</div></div>
-<div class="stat"><div class="value" style="color:#e67e22">567</div><div class="label">Track Miles (11%)</div></div>
-<div class="stat"><div class="value">15</div><div class="label">Track Sessions</div></div>
-<div class="stat"><div class="value">355</div><div class="label">Total Runs</div></div>
+<div class="stat"><div class="value">5,246</div><div class="label">Total Miles</div></div>
+<div class="stat"><div class="value" style="color:#e67e22">671</div><div class="label">Track Miles (12.8%)</div></div>
+<div class="stat"><div class="value">17</div><div class="label">Track Sessions</div></div>
+<div class="stat"><div class="value">357</div><div class="label">Total Runs</div></div>
 </div>
 
 <div class="section">
@@ -79,7 +79,7 @@
 
 <div class="section">
 <h2>Every Track Session</h2>
-<p style="color:var(--text-muted);margin-bottom:16px">Auto-detected from GPS by sliding a tight bounding box (~220m) across each run, then confirming with lap count and pace. The Hotfoot Hamster 6h is a paved short-loop course — strictly not a 400m track but functionally lap-running, so it's included.</p>
+<p style="color:var(--text-muted);margin-bottom:16px">Auto-detected from GPS by sliding a tight bounding box (~220m) across each run, then confirming with lap count and pace. The Hotfoot Hamster 6h is a paved short-loop course — strictly not a 400m track but functionally lap-running, so it's included. The Six Days in the Dome 100mi (Jun 19) is on a 200m indoor track — no GPS, so it's manually flagged.</p>
 <div class="session-row head">
   <div>Date</div>
   <div>Activity</div>
@@ -107,12 +107,12 @@
 <div class="card-grid">
 <div class="card"><h3>How &ldquo;track&rdquo; was detected</h3><div class="meta">For each run's GPS stream, a 90-second sliding window flags points where the bounding box stays under ~220m (track-sized). Adjacent flagged points become a candidate segment, which only counts if it covers ≥1.2 km, lasts ≥4 min, sustains ≥2.6 m/s (~10:20/mi), and contains ≥3 lap closures (return to within 50m of segment start after departing &gt;80m).</div></div>
 <div class="card"><h3>What it catches</h3><div class="meta">Real 400m track sessions (warm-ups, intervals, long efforts), 24-hour track races, and short-loop course races where the loop fits in the bbox window. The lap-closure check kills false positives from slow mountain trail running where GPS clusters tightly during steep climbs.</div></div>
-<div class="card"><h3>Treadmill</h3><div class="meta">Not detected as track — treadmill runs have no GPS movement at all (or fixed point). They show as off-track with reported distance from the watch.</div></div>
-<div class="card"><h3>Why 11%, not higher</h3><div class="meta">Track race days inflate the number, but the bulk of buildup training was trail and road. The dedicated track block — Oct 31 (25 mi), Nov 7 (62 mi), Nov 27 (29 mi), Dec 4 (17 mi) — added ~133 mi of focused lap work in the final 6 weeks, on top of the May/March race-pace track sessions.</div></div>
+<div class="card"><h3>Indoor / Treadmill</h3><div class="meta">No usable GPS, so they can't be auto-detected. The Six Days in the Dome 100mi (Jun 19, 103.4 mi on a 200m indoor track) is manually flagged in the analyzer's override list. Treadmill runs are still counted as off-track with reported distance.</div></div>
+<div class="card"><h3>Why 12.8%, not higher</h3><div class="meta">Track race days inflate the number, but the bulk of buildup training was trail and road. The dedicated track block — Oct 31 (25 mi), Nov 7 (62 mi), Nov 27 (29 mi), Dec 4 (17 mi) — added ~133 mi of focused lap work in the final 6 weeks, on top of the May/March race-pace and June Dome sessions.</div></div>
 </div>
 </div>
 
-<p style="text-align:center;color:var(--text-muted);margin:32px 0 16px;font-size:13px">Window: <strong>Dec 12, 2020 → Dec 10, 2021</strong>. Generated from 355 GPS-tracked runs (3 missing files skipped).</p>
+<p style="text-align:center;color:var(--text-muted);margin:32px 0 16px;font-size:13px">Window: <strong>Dec 12, 2020 → Dec 10, 2021</strong>. Generated from 357 runs (355 GPS-detected + 2 indoor-track manual overrides; 1 no-GPS treadmill counted as off-track).</p>
 
 </main>
 <footer><div class="container">Built by <a href="https://github.com/nickcoury">Nick Coury</a> &amp; Claw</div></footer>
@@ -122,17 +122,17 @@
       "start": "2020-12-12",
       "end": "2021-12-10"
     },
-    "generated_at": "2026-04-16T16:33:24.176Z",
-    "runs_analyzed": 355,
-    "runs_skipped": 3
+    "generated_at": "2026-04-16T18:58:23.354Z",
+    "runs_analyzed": 357,
+    "runs_skipped": 1
   },
   "headline": {
-    "total_runs": 355,
-    "total_miles": 5141,
-    "track_miles": 567,
+    "total_runs": 357,
+    "total_miles": 5246,
+    "track_miles": 671,
     "off_track_miles": 4574,
-    "track_pct": 11,
-    "track_sessions": 15,
+    "track_pct": 12.8,
+    "track_sessions": 17,
     "longest_run": 155.4,
     "longest_track_session": 155.4,
     "biggest_week_total": {
@@ -336,10 +336,10 @@
     },
     {
       "week": "2021-06-14",
-      "total": 13.7,
-      "track": 0,
+      "total": 118.3,
+      "track": 104.6,
       "off": 13.7,
-      "runs": 2
+      "runs": 4
     },
     {
       "week": "2021-06-21",
@@ -574,12 +574,12 @@
     },
     {
       "month": "2021-06",
-      "total": 321.13652514432897,
-      "track": 0,
+      "total": 425.71690075078726,
+      "track": 104.58037560645829,
       "off": 321.13652514432897,
-      "runs": 28,
-      "track_sessions": 0,
-      "longest": 33.539653424003816
+      "runs": 30,
+      "track_sessions": 2,
+      "longest": 103.42698639942735
     },
     {
       "month": "2021-07",
@@ -1390,672 +1390,680 @@
       "cum_track": 387.6721454980164
     },
     {
-      "date": "2021-06-21",
-      "cum_track": 387.6721454980164
+      "date": "2021-06-19",
+      "cum_track": 388.82553470504735
+    },
+    {
+      "date": "2021-06-19",
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-06-21",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
+    },
+    {
+      "date": "2021-06-21",
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-06-22",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-06-24",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-06-25",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-06-26",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-06-26",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-06-27",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-06-28",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-06-29",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-06-30",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-01",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-03",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-04",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-05",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-06",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-07",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-08",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-09",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-10",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-11",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-11",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-12",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-13",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-14",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-15",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-17",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-18",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-19",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-20",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-21",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-22",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-23",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-24",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-25",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-27",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-28",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-29",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-30",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-07-31",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-01",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-02",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-03",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-04",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-05",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-06",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-07",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-08",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-09",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-10",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-11",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-12",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-13",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-14",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-15",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-15",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-16",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-17",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-18",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-19",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-20",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-21",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-22",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-23",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-24",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-25",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-26",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-27",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-29",
-      "cum_track": 387.6721454980164
+      "cum_track": 492.2525211044747
     },
     {
       "date": "2021-08-29",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-08-30",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-08-31",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-01",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-01",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-02",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-03",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-04",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-05",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-06",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-07",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-08",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-09",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-10",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-11",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-12",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-13",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-15",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-17",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-17",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-19",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-21",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-23",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-25",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-26",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-27",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-28",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-09-29",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-10-01",
-      "cum_track": 411.8700236396691
+      "cum_track": 516.4503992461274
     },
     {
       "date": "2021-10-02",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-03",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-04",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-05",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-06",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-08",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-09",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-09",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-10",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-11",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-12",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-13",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-14",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-15",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-16",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-17",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-19",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-20",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-21",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-22",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-23",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-24",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-25",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-26",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-27",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-28",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-29",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-30",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-31",
-      "cum_track": 430.4616299090559
+      "cum_track": 535.0420055155142
     },
     {
       "date": "2021-10-31",
-      "cum_track": 455.4253356177173
+      "cum_track": 560.0057112241757
     },
     {
       "date": "2021-11-01",
-      "cum_track": 455.4253356177173
+      "cum_track": 560.0057112241757
     },
     {
       "date": "2021-11-02",
-      "cum_track": 455.4253356177173
+      "cum_track": 560.0057112241757
     },
     {
       "date": "2021-11-03",
-      "cum_track": 455.4253356177173
+      "cum_track": 560.0057112241757
     },
     {
       "date": "2021-11-04",
-      "cum_track": 455.4253356177173
+      "cum_track": 560.0057112241757
     },
     {
       "date": "2021-11-05",
-      "cum_track": 455.4253356177173
+      "cum_track": 560.0057112241757
     },
     {
       "date": "2021-11-06",
-      "cum_track": 455.4253356177173
+      "cum_track": 560.0057112241757
     },
     {
       "date": "2021-11-07",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-09",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-09",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-10",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-11",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-11",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-13",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-13",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-14",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-15",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-16",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-17",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-19",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-20",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-21",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-22",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-23",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-24",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-25",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-25",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-25",
-      "cum_track": 517.4949739299736
+      "cum_track": 622.0753495364321
     },
     {
       "date": "2021-11-27",
-      "cum_track": 546.584901254399
+      "cum_track": 651.1652768608575
     },
     {
       "date": "2021-11-28",
-      "cum_track": 546.584901254399
+      "cum_track": 651.1652768608575
     },
     {
       "date": "2021-11-29",
-      "cum_track": 546.584901254399
+      "cum_track": 651.1652768608575
     },
     {
       "date": "2021-11-30",
-      "cum_track": 546.584901254399
+      "cum_track": 651.1652768608575
     },
     {
       "date": "2021-12-01",
-      "cum_track": 546.584901254399
+      "cum_track": 651.1652768608575
     },
     {
       "date": "2021-12-02",
-      "cum_track": 546.584901254399
+      "cum_track": 651.1652768608575
     },
     {
       "date": "2021-12-04",
-      "cum_track": 563.6547197643011
+      "cum_track": 668.2350953707596
     },
     {
       "date": "2021-12-05",
-      "cum_track": 566.6565391391521
+      "cum_track": 671.2369147456105
     },
     {
       "date": "2021-12-05",
-      "cum_track": 566.6565391391521
+      "cum_track": 671.2369147456105
     },
     {
       "date": "2021-12-06",
-      "cum_track": 566.6565391391521
+      "cum_track": 671.2369147456105
     },
     {
       "date": "2021-12-08",
-      "cum_track": 566.6565391391521
+      "cum_track": 671.2369147456105
     },
     {
       "date": "2021-12-10",
-      "cum_track": 566.6565391391521
+      "cum_track": 671.2369147456105
     }
   ],
   "scatter": [
@@ -3188,6 +3196,18 @@
       "name": "Morning Run"
     },
     {
+      "date": "2021-06-19",
+      "total": 1.2,
+      "track": 1.2,
+      "name": "Morning Run"
+    },
+    {
+      "date": "2021-06-19",
+      "total": 103.4,
+      "track": 103.4,
+      "name": "1st Place 100 Mile & 13:21 PR - 6 Days in the Dome 24"
+    },
+    {
       "date": "2021-06-21",
       "total": 4,
       "track": 0,
@@ -4200,7 +4220,8 @@
       "laps": 3,
       "locations": [
         "33.501,-112.066"
-      ]
+      ],
+      "indoor": false
     },
     {
       "date": "2020-12-12",
@@ -4211,7 +4232,8 @@
       "laps": 625,
       "locations": [
         "33.501,-112.066"
-      ]
+      ],
+      "indoor": false
     },
     {
       "date": "2021-03-14",
@@ -4222,7 +4244,8 @@
       "laps": 3,
       "locations": [
         "33.627,-111.722"
-      ]
+      ],
+      "indoor": false
     },
     {
       "date": "2021-03-14",
@@ -4233,7 +4256,8 @@
       "laps": 201,
       "locations": [
         "33.627,-111.722"
-      ]
+      ],
+      "indoor": false
     },
     {
       "date": "2021-04-24",
@@ -4244,7 +4268,8 @@
       "laps": 121,
       "locations": [
         "33.627,-111.722"
-      ]
+      ],
+      "indoor": false
     },
     {
       "date": "2021-05-01",
@@ -4255,7 +4280,8 @@
       "laps": 4,
       "locations": [
         "35.915,-81.189"
-      ]
+      ],
+      "indoor": false
     },
     {
       "date": "2021-05-01",
@@ -4266,7 +4292,8 @@
       "laps": 596,
       "locations": [
         "35.915,-81.189"
-      ]
+      ],
+      "indoor": false
     },
     {
       "date": "2021-05-22",
@@ -4277,7 +4304,32 @@
       "laps": 4,
       "locations": [
         "33.607,-111.955"
-      ]
+      ],
+      "indoor": false
+    },
+    {
+      "date": "2021-06-19",
+      "name": "Morning Run",
+      "total_mi": 1.2,
+      "track_mi": 1.2,
+      "off_mi": 0,
+      "laps": 0,
+      "locations": [
+        "indoor:Six Days in the Dome (Milwaukee, indoor 200m)"
+      ],
+      "indoor": true
+    },
+    {
+      "date": "2021-06-19",
+      "name": "1st Place 100 Mile & 13:21 PR - 6 Days in the Dome 24",
+      "total_mi": 103.4,
+      "track_mi": 103.4,
+      "off_mi": 0,
+      "laps": 0,
+      "locations": [
+        "indoor:Six Days in the Dome (Milwaukee, indoor 200m)"
+      ],
+      "indoor": true
     },
     {
       "date": "2021-08-29",
@@ -4288,7 +4340,8 @@
       "laps": 81,
       "locations": [
         "33.395,-112.477"
-      ]
+      ],
+      "indoor": false
     },
     {
       "date": "2021-10-02",
@@ -4299,7 +4352,8 @@
       "laps": 74,
       "locations": [
         "33.627,-111.722"
-      ]
+      ],
+      "indoor": false
     },
     {
       "date": "2021-10-31",
@@ -4310,7 +4364,8 @@
       "laps": 100,
       "locations": [
         "33.627,-111.722"
-      ]
+      ],
+      "indoor": false
     },
     {
       "date": "2021-11-07",
@@ -4321,7 +4376,8 @@
       "laps": 248,
       "locations": [
         "33.627,-111.722"
-      ]
+      ],
+      "indoor": false
     },
     {
       "date": "2021-11-27",
@@ -4333,7 +4389,8 @@
       "locations": [
         "33.627,-111.722",
         "33.627,-111.721"
-      ]
+      ],
+      "indoor": false
     },
     {
       "date": "2021-12-04",
@@ -4344,7 +4401,8 @@
       "laps": 68,
       "locations": [
         "33.627,-111.722"
-      ]
+      ],
+      "indoor": false
     },
     {
       "date": "2021-12-05",
@@ -4355,7 +4413,8 @@
       "laps": 10,
       "locations": [
         "33.587,-111.809"
-      ]
+      ],
+      "indoor": false
     }
   ],
   "locations": [
@@ -4366,7 +4425,8 @@
       "sample": [
         "Morning Run",
         "Track Workout - 1x50 Mile in 5:45"
-      ]
+      ],
+      "indoor": false
     },
     {
       "center": "33.501,-112.066",
@@ -4375,7 +4435,8 @@
       "sample": [
         "Morning Run",
         "Desert Solstice 24 Hour - 1st Place"
-      ]
+      ],
+      "indoor": false
     },
     {
       "center": "35.915,-81.189",
@@ -4384,7 +4445,18 @@
       "sample": [
         "Morning Run",
         "Alexander County 24 Hour - 1st Place"
-      ]
+      ],
+      "indoor": false
+    },
+    {
+      "center": "indoor:Six Days in the Dome (Milwaukee, indoor 200m)",
+      "sessions": 2,
+      "miles": 104.6,
+      "sample": [
+        "Morning Run",
+        "1st Place 100 Mile & 13:21 PR - 6 Days in the Dome 24"
+      ],
+      "indoor": true
     },
     {
       "center": "33.395,-112.477",
@@ -4392,7 +4464,8 @@
       "miles": 24.2,
       "sample": [
         "Hotfoot Hamster 6 Hour - 1st Place - 50.02 Miles"
-      ]
+      ],
+      "indoor": false
     },
     {
       "center": "33.587,-111.809",
@@ -4400,7 +4473,8 @@
       "miles": 3,
       "sample": [
         "Morning Run"
-      ]
+      ],
+      "indoor": false
     },
     {
       "center": "33.607,-111.955",
@@ -4408,7 +4482,8 @@
       "miles": 1,
       "sample": [
         "Morning Run"
-      ]
+      ],
+      "indoor": false
     },
     {
       "center": "33.627,-111.721",
@@ -4416,7 +4491,8 @@
       "miles": 0.9,
       "sample": [
         "Morning Run"
-      ]
+      ],
+      "indoor": false
     }
   ]
 }</script>
@@ -4540,18 +4616,21 @@ for (const m of D.months) {
   monthTbody.appendChild(tr);
 }
 
-// Session list
+// Session list (chronological)
 const sessionList = document.getElementById('sessionList');
-for (const s of D.track_sessions) {
+const sortedSessions = [...D.track_sessions].sort((a, b) => a.date.localeCompare(b.date));
+for (const s of sortedSessions) {
   const row = document.createElement('div');
   row.className = 'session-row';
+  const lapsCell = s.indoor ? 'indoor' : (s.laps ?? '—');
+  const indoorBadge = s.indoor ? ' <span style="font-size:10px;color:#e67e22;background:rgba(230,126,34,0.12);padding:2px 6px;border-radius:3px;margin-left:6px;vertical-align:middle">INDOOR</span>' : '';
   row.innerHTML = `
     <div class="date">${s.date}</div>
-    <div class="name">${s.name || '(unnamed)'}</div>
+    <div class="name">${s.name || '(unnamed)'}${indoorBadge}</div>
     <div class="num">${s.total_mi.toFixed(1)}</div>
     <div class="num" style="color:#e67e22;font-weight:600">${s.track_mi.toFixed(1)}</div>
     <div class="num" style="color:var(--text-muted)">${s.off_mi.toFixed(1)}</div>
-    <div class="num" style="color:var(--text-muted)">${s.laps}</div>
+    <div class="num" style="color:var(--text-muted)">${lapsCell}</div>
   `;
   sessionList.appendChild(row);
 }
@@ -4561,8 +4640,9 @@ const locList = document.getElementById('locList');
 for (const l of D.locations) {
   const row = document.createElement('div');
   row.className = 'loc-row';
+  const label = l.indoor ? l.center.replace(/^indoor:/, '') : l.center;
   row.innerHTML = `
-    <div>${l.center}<div style="color:var(--text-muted);font-size:12px">${(l.sample || []).join(' · ').slice(0, 100)}</div></div>
+    <div>${label}<div style="color:var(--text-muted);font-size:12px">${(l.sample || []).join(' · ').slice(0, 100)}</div></div>
     <div class="num">${l.sessions}</div>
     <div class="num miles">${l.miles.toFixed(1)} mi</div>
   `;
