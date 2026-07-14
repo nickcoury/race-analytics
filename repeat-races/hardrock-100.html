@@ -227,9 +227,9 @@ var segDatasets = [
   {"label":"2022 (CW)","data":[1005,985,948,1451,654,584,1253,944,1253,805,1219,1646,1259,1063],"borderColor":"#e74c3c","backgroundColor":"#e74c3c22","pointRadius":2,"pointHoverRadius":5,"borderWidth":2,"tension":0.3},
   {"label":"2017 (CCW)","data":[883,1111,906,824,915,968,1043,751,1124,1272,540,1206,1097,1135,519],"borderColor":"#27ae60","backgroundColor":"#27ae6022","pointRadius":2,"pointHoverRadius":5,"borderWidth":2,"tension":0.3},
   {"label":"2016 (CW)","data":[931,1002,954,1535,581,607,1420,932,1437,1010,1391,1116,1406,1143],"borderColor":"#f39c12","backgroundColor":"#f39c1222","pointRadius":2,"pointHoverRadius":5,"borderWidth":2,"tension":0.3},
-  {"label":"2015 (CCW)","data":[883,1032,837,745,821,1031,1033,1974,1490,708,1709,1362,1532,842],"borderColor":"#9b59b6","backgroundColor":"#9b59b622","pointRadius":2,"pointHoverRadius":5,"borderWidth":2,"tension":0.3},
-  {"label":"2013 (CCW)","data":[832,1062,823,718,967,1024,653,1169,1618,672,1516,1140,1339,761],"borderColor":"#1abc9c","backgroundColor":"#1abc9c22","pointRadius":2,"pointHoverRadius":5,"borderWidth":2,"tension":0.3},
-  {"label":"2008 (CW)","data":[931,985,980,1523,672,546,1313,1209,1388,1325,962,1022,872],"borderColor":"#e67e22","backgroundColor":"#e67e2222","pointRadius":2,"pointHoverRadius":5,"borderWidth":2,"tension":0.3}
+  {"label":"2015 (CCW)","data":[883,1032,837,745,821,1031,1033,null,1974,1490,708,1709,1362,1532,842],"borderColor":"#9b59b6","backgroundColor":"#9b59b622","pointRadius":2,"pointHoverRadius":5,"borderWidth":2,"tension":0.3,"spanGaps":true},
+  {"label":"2013 (CCW)","data":[832,1062,823,718,null,967,1024,653,1169,1618,672,1516,1140,1339,761],"borderColor":"#1abc9c","backgroundColor":"#1abc9c22","pointRadius":2,"pointHoverRadius":5,"borderWidth":2,"tension":0.3,"spanGaps":true},
+  {"label":"2008 (CW)","data":[931,985,980,1523,672,546,1313,1209,null,1388,1325,962,1022,872],"borderColor":"#e67e22","backgroundColor":"#e67e2222","pointRadius":2,"pointHoverRadius":5,"borderWidth":2,"tension":0.3,"spanGaps":true}
 ];
 var segLabels = ["Kamm Traverse","Chapman","Telluride","Kroger","Governor","Ouray","Engineer","Animas Forks","Burrows","Sherman","Pole Creek","Maggie","Cunningham","Putnam","Finish"];
 
@@ -295,7 +295,7 @@ new Chart(document.getElementById('aidTimeChart'), {
   }
 });
 // CW Cumulative Gap (mile-aligned to 2026 baseline)
-var cwGapData = [{"year": 2026, "gaps": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"year": 2024, "gaps": [-1588.7, 11.2, 28.6, 26.0, 32.2, 25.0, 40.0, 43.7, 30.9, 32.4, 40.8, 57.8, 68.1, 65.6]}, {"year": 2022, "gaps": [-1602.7, -5.8, -5.4, -9.0, -6.8, -6.0, -0.9, 1.7, -12.1, -2.6, 21.8, 62.8, 78.1, 68.5]}, {"year": 2016, "gaps": [-1616.7, -17.8, -16.4, -14.0, -14.8, -10.0, 25.1, 38.5, 49.9, 78.4, 138.8, 144.8, 185.1, 196.5]}, {"year": 2008, "gaps": [-1616.7, -19.8, -10.4, -9.0, -5.8, -7.0, 16.1, 46.4, 58.1, 106.4, 155.8, 148.8, 137.1, 98.5]}];
+var cwGapData = [{"year": 2026, "gaps": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, {"year": 2024, "gaps": [14.7, 11.2, 28.6, 26.0, 32.2, 25.0, 40.0, 43.7, 30.9, 32.4, 40.8, 57.8, 68.1, 65.6]}, {"year": 2022, "gaps": [0.7, -5.8, -5.4, -9.0, -6.8, -6.0, -0.9, 1.7, -12.1, -2.6, 21.8, 62.8, 78.1, 68.5]}, {"year": 2016, "gaps": [-13.3, -17.8, -16.4, -14.0, -14.8, -10.0, 25.1, 38.5, 49.9, 78.4, 138.8, 144.8, 185.1, 196.5]}, {"year": 2008, "gaps": [-13.3, -19.8, -10.4, -9.0, -5.8, -7.0, 16.1, 46.4, 58.1, 106.4, 155.8, 148.8, 137.1, 98.5]}];
 var cwGapColors = ["#27ae60", "#3498db", "#e74c3c", "#f39c12", "#e67e22"];
 var cwGapLabels = ["Kamm Traverse", "Chapman", "Telluride", "Kroger", "Governor", "Ouray", "Engineer", "Animas Forks", "Burrows", "Sherman", "Pole Creek", "Maggie", "Cunningham", "Finish"];
 var cwGapBest = 2026;
