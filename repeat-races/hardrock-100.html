@@ -147,49 +147,16 @@
 <div style="height:400px;margin-bottom:24px"><canvas id="pacingChart"></canvas></div>
 </div>
 
-<div class="section">
-<h2>Difficulty-Adjusted Pacing (2026)</h2>
-<p style="color:var(--text-muted);margin-bottom:16px">Two methods to normalize segment difficulty and detect whether Nick faded or held effort relative to terrain and the field. 
-<span style="color:#27ae60">Green (GAP)</span> = elevation-based grade-adjusted pace. 
-<span style="color:#e74c3c">Red (Field)</span> = normalized against all 116 finishers' segment ratios.
-<span style="color:#3498db">Blue (Raw)</span> = unadjusted segment pace deviation.
-Values near zero = running at race-average effort. Negative = faster than expected.</p>
-
-<div style="height:350px;margin-bottom:24px"><canvas id="diffAdjChart"></canvas></div>
-
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
-<div style="background:var(--surface);border-radius:8px;padding:16px">
-<h4 style="margin:0 0 8px;font-size:14px">Option A: Elevation GAP</h4>
-<p style="color:var(--text-muted);font-size:12px;line-height:1.6;margin:0">
-Difficulty = 1 + (ascent_ft × 0.0004 + descent_ft × 0.0001) / miles.<br>
-Captures pure terrain physics. Ignores altitude, technicality, and fatigue position.<br>
-<strong>Hardest segment:</strong> Kroger (Telluride climb, 1.1× difficulty).<br>
-<strong>Easiest segment:</strong> Ouray (downhill into town, 1.1×).<br>
-<strong>Nick's GAP-adjusted pacing:</strong> variable — segments range from -9.3 to 5.6 min/mi vs avg.
-</p>
-</div>
-<div style="background:var(--surface);border-radius:8px;padding:16px">
-<h4 style="margin:0 0 8px;font-size:14px">Option B: Field-Normalized</h4>
-<p style="color:var(--text-muted);font-size:12px;line-height:1.6;margin:0">
-Difficulty = field_avg(segment_pace / overall_pace).<br>
-Captures everything — grade, altitude, technicality, fatigue, course position, weather.<br>
-Based on all 10 finishers from the 2026 Hardrock spread.<br>
-<strong>Hardest segment:</strong> Kroger (1.4×).<br>
-<strong>Easiest segment:</strong> Ouray (0.5×).<br>
-<strong>Nick vs field:</strong> Nick outperformed field expectations on 3 of the hard segments.
-</p>
-</div>
-</div>
-</div>
 
 
 <div class="section">
-<h2>Difficulty-Adjusted Pacing (2026)</h2>
-<p style="color:var(--text-muted);margin-bottom:16px">Two methods to normalize segment difficulty and detect pacing artifacts. 
-<span style="color:#27ae60">Green (GAP)</span> = elevation-based grade-adjusted pace — removes climb/descent effects using the standard trail GAP formula.
-<span style="color:#e74c3c">Red (Field)</span> = normalized against all 13 finishers' segment ratios — captures grade, altitude, technicality, fatigue position, and course conditions.
-<span style="color:#3498db">Blue (Raw)</span> = unadjusted segment pace deviation for reference.
-Flatter lines = better pacing. Deviations reveal sections where Nick over/under-performed relative to difficulty.</p>
+<h2>Difficulty-Adjusted Pacing</h2>
+<p style="color:var(--text-muted);margin-bottom:12px">Segment pace deviation from each year's overall average, adjusted for elevation (GAP) and field-normalized difficulty (2026 only). <strong>Solid lines</strong> = GAP-adjusted. <strong>Dashed lines</strong> = raw (unadjusted). Toggle years below. Flatter = better pacing relative to terrain difficulty.</p>
+
+<div style="margin-bottom:12px" id="daYearToggles">
+  <span style="font-size:13px;color:var(--text-muted);margin-right:8px">Year:</span>
+  <label style="margin-right:12px;cursor:pointer;user-select:none;font-size:12px"><input type="checkbox"  id="daToggle2008" onchange="updateDADatasets()"><span style="color:#95a5a6;font-weight:600">2008 (CW)</span></label><label style="margin-right:12px;cursor:pointer;user-select:none;font-size:12px"><input type="checkbox"  id="daToggle2013" onchange="updateDADatasets()"><span style="color:#1abc9c;font-weight:600">2013 (CCW)</span></label><label style="margin-right:12px;cursor:pointer;user-select:none;font-size:12px"><input type="checkbox"  id="daToggle2015" onchange="updateDADatasets()"><span style="color:#9b59b6;font-weight:600">2015 (CCW)</span></label><label style="margin-right:12px;cursor:pointer;user-select:none;font-size:12px"><input type="checkbox"  id="daToggle2016" onchange="updateDADatasets()"><span style="color:#f39c12;font-weight:600">2016 (CW)</span></label><label style="margin-right:12px;cursor:pointer;user-select:none;font-size:12px"><input type="checkbox"  id="daToggle2017" onchange="updateDADatasets()"><span style="color:#27ae60;font-weight:600">2017 (CCW)</span></label><label style="margin-right:12px;cursor:pointer;user-select:none;font-size:12px"><input type="checkbox"  id="daToggle2022" onchange="updateDADatasets()"><span style="color:#e67e22;font-weight:600">2022 (CW)</span></label><label style="margin-right:12px;cursor:pointer;user-select:none;font-size:12px"><input type="checkbox"  id="daToggle2024" onchange="updateDADatasets()"><span style="color:#3498db;font-weight:600">2024 (CW)</span></label><label style="margin-right:12px;cursor:pointer;user-select:none;font-size:12px"><input type="checkbox" checked id="daToggle2026" onchange="updateDADatasets()"><span style="color:#e74c3c;font-weight:600">2026 (CW)</span></label>
+</div>
 
 <div style="height:400px;margin-bottom:24px"><canvas id="diffAdjChart"></canvas></div>
 
@@ -197,19 +164,17 @@ Flatter lines = better pacing. Deviations reveal sections where Nick over/under-
 <div style="background:var(--surface);border-radius:8px;padding:16px">
 <h4 style="margin:0 0 8px;font-size:14px;color:#27ae60">Elevation GAP</h4>
 <p style="color:var(--text-muted);font-size:12px;line-height:1.6;margin:0">
-Difficulty = 1 + (gain×0.0004 + loss×0.0001) / miles.<br>
-<strong>Hardest:</strong> Governor (1.3×). <strong>Easiest:</strong> Chapman (1.01×).<br>
-<strong>Range:</strong> 1.01× – 1.3× difficulty across segments.<br>
-Captures pure terrain physics. Ignores altitude, technicality, fatigue.
+Difficulty = 1 + (ascent×0.0004 + descent×0.0001) / miles. Adjusts each segment's pace for climb/descent.<br>
+Works across all years and both directions.<br>
+<strong>Limitation:</strong> Under-penalizes Hardrock-grade vertical. Governor climb (2,900ft/3.6mi) only gets 1.3× difficulty.
 </p>
 </div>
 <div style="background:var(--surface);border-radius:8px;padding:16px">
-<h4 style="margin:0 0 8px;font-size:14px;color:#e74c3c">Field-Normalized</h4>
+<h4 style="margin:0 0 8px;font-size:14px;color:#e74c3c">Field-Normalized (2026 only)</h4>
 <p style="color:var(--text-muted);font-size:12px;line-height:1.6;margin:0">
-Difficulty = avg(segment_pace / overall_pace) across 13 finishers.<br>
-<strong>Hardest:</strong> Kroger (1.4×). <strong>Easiest:</strong> Ouray (0.52×).<br>
-<strong>Range:</strong> 0.52× – 1.4× difficulty.<br>
-Captures everything — terrain, altitude, technicality, fatigue, weather.
+Difficulty = avg(segment_pace / overall_pace) across 13 finishers from the 2026 spread.<br>
+Captures grade, altitude, technicality, fatigue position, and weather implicitly.<br>
+<strong>Hardest:</strong> Kroger (1.4×). <strong>Easiest:</strong> Ouray (0.52×).
 </p>
 </div>
 </div>
@@ -477,63 +442,7 @@ new Chart(document.getElementById('pacingChart'), {
 
 
 
-// Difficulty-Adjusted Pacing
-new Chart(document.getElementById('diffAdjChart'), {
-  type: 'line',
-  data: {
-    labels: ["Kamm Traverse", "Chapman", "Telluride", "Kroger", "Governor", "Ouray", "Engineer", "Grouse", "Burrows", "Sherman", "Pole Creek", "Maggie", "Cunningham", "Finish"],
-    datasets: [
-      {
-        label: 'Raw (unadjusted)',
-        data: [{"x": 11.3, "y": -0.9}, {"x": 17.8, "y": -0.0}, {"x": 27.3, "y": -1.6}, {"x": 32.1, "y": 8.7}, {"x": 35.7, "y": -6.8}, {"x": 43.1, "y": -8.0}, {"x": 51.0, "y": 2.9}, {"x": 57.2, "y": -2.1}, {"x": 66.6, "y": 5.3}, {"x": 70.7, "y": -6.4}, {"x": 80.1, "y": 0.7}, {"x": 85.0, "y": 0.8}, {"x": 90.9, "y": 1.7}, {"x": 100.0, "y": 1.6}, {"x": 100, "y": 0}],
-        borderColor: '#3498db',
-        backgroundColor: '#3498db22',
-        borderWidth: 2, borderDash: [5,3],
-        pointRadius: 0, pointHoverRadius: 5,
-        tension: 0.3, fill: false,
-      },
-      {
-        label: 'GAP-adjusted (elevation)',
-        data: [{"x": 11.3, "y": -2.1}, {"x": 17.8, "y": -0.2}, {"x": 27.3, "y": -2.0}, {"x": 32.1, "y": 5.6}, {"x": 35.7, "y": -9.3}, {"x": 43.1, "y": -8.6}, {"x": 51.0, "y": -1.3}, {"x": 57.2, "y": -2.5}, {"x": 66.6, "y": 4.7}, {"x": 70.7, "y": -7.0}, {"x": 80.1, "y": -0.0}, {"x": 85.0, "y": 0.3}, {"x": 90.9, "y": 0.2}, {"x": 100.0, "y": 1.0}, {"x": 100, "y": 0}],
-        borderColor: '#27ae60',
-        backgroundColor: '#27ae6022',
-        borderWidth: 2.5,
-        pointRadius: 0, pointHoverRadius: 5,
-        tension: 0.3, fill: false,
-      },
-      {
-        label: 'Field-normalized (all finishers)',
-        data: [{"x": 11.3, "y": 2.7}, {"x": 17.8, "y": 1.1}, {"x": 27.3, "y": 0.7}, {"x": 32.1, "y": 1.2}, {"x": 35.7, "y": -1.2}, {"x": 43.1, "y": 0.9}, {"x": 51.0, "y": 0.4}, {"x": 57.2, "y": -1.1}, {"x": 66.6, "y": 1.3}, {"x": 70.7, "y": -1.4}, {"x": 80.1, "y": -1.6}, {"x": 85.0, "y": -3.5}, {"x": 90.9, "y": -2.2}, {"x": 100.0, "y": 0.0}, {"x": 100, "y": 0}],
-        borderColor: '#e74c3c',
-        backgroundColor: '#e74c3c22',
-        borderWidth: 2.5,
-        pointRadius: 0, pointHoverRadius: 5,
-        tension: 0.3, fill: false,
-      }
-    ]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    parsing: false,
-    interaction: { mode: 'index', intersect: false },
-    plugins: {
-      tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + (ctx.raw.y > 0 ? '+' : '') + ctx.raw.y.toFixed(1) + ' min/mi vs avg'; } } },
-      legend: { labels: { usePointStyle: true } }
-    },
-    scales: {
-      x: {
-        type: 'linear',
-        title: { display: true, text: 'Race Progress (%)' },
-        min: 0, max: 100,
-        ticks: { callback: function(v) { return v + '%'; }, stepSize: 10 }
-      },
-      y: {
-        title: { display: true, text: 'Adjusted Pace Deviation (min/mi vs avg)' },
-        ticks: { callback: function(v) { return (v > 0 ? '+' : '') + v.toFixed(1); } }
-      }
-    }
-  }
-});
+
 
 
 // Difficulty-Adjusted Pacing
@@ -590,6 +499,144 @@ new Chart(document.getElementById('diffAdjChart'), {
     }
   }
 });
+
+
+// Difficulty-Adjusted Pacing (multi-year)
+var daRawDatasets = [{label:"2008 (CW) Raw",data:[{"x": 0, "y": -3.1, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -2.2, "station": "Chapman In / Out"}, {"x": 2, "y": -2.2, "station": "Telluride In / Out"}, {"x": 3, "y": 6.8, "station": "Kroger In / Out"}, {"x": 4, "y": -7.4, "station": "Governor In / Out"}, {"x": 5, "y": -9.5, "station": "Ouray In / Out"}, {"x": 6, "y": 3.3, "station": "Engineer In / Out"}, {"x": 7, "y": 1.6, "station": "Grouse In / Out"}, {"x": 8, "y": 4.6, "station": "Sherman In / Out"}, {"x": 9, "y": 3.5, "station": "Pole Creek In / Out"}, {"x": 10, "y": -2.5, "station": "Maggie In / Out"}, {"x": 11, "y": -1.5, "station": "Cunningham In / Out"}, {"x": 12, "y": -4.0, "station": "Finish"}, {"x": 13, "y": 0, "station": "Finish"}],borderColor:"#95a5a6",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2013 (CCW) Raw",data:[{"x": 0, "y": -3.3, "station": "Cunningham In / Out"}, {"x": 1, "y": 0.5, "station": "Maggie In / Out"}, {"x": 2, "y": -3.5, "station": "Pole Creek In / Out"}, {"x": 3, "y": -5.2, "station": "Sherman In / Out"}, {"x": 4, "y": -1.1, "station": "Grouse In / Out"}, {"x": 5, "y": -0.1, "station": "Engineer In / Out"}, {"x": 6, "y": -6.3, "station": "Ouray In / Out"}, {"x": 7, "y": 2.3, "station": "Governor In / Out"}, {"x": 8, "y": 9.7, "station": "Kroger In / Out"}, {"x": 9, "y": -6.0, "station": "Telluride In / Out"}, {"x": 10, "y": 8.0, "station": "Chapman In / Out"}, {"x": 11, "y": 1.8, "station": "Kamm Traverse In / Out"}, {"x": 12, "y": 5.1, "station": "Putnam In / Out"}, {"x": 13, "y": -4.5, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#1abc9c",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2015 (CCW) Raw",data:[{"x": 0, "y": -3.4, "station": "Cunningham In / Out"}, {"x": 1, "y": -1.0, "station": "Maggie In / Out"}, {"x": 2, "y": -4.2, "station": "Pole Creek In / Out"}, {"x": 3, "y": -5.7, "station": "Sherman In / Out"}, {"x": 4, "y": -4.5, "station": "Burrows In / Out"}, {"x": 5, "y": -1.0, "station": "Grouse In / Out"}, {"x": 6, "y": -0.9, "station": "Engineer In / Out"}, {"x": 7, "y": -113.2, "station": "Ouray In / Out"}, {"x": 8, "y": 109.8, "station": "Governor In / Out"}, {"x": 9, "y": 6.7, "station": "Kroger In / Out"}, {"x": 10, "y": -6.4, "station": "Telluride In / Out"}, {"x": 11, "y": 10.3, "station": "Chapman In / Out"}, {"x": 12, "y": 4.6, "station": "Kamm Traverse In / Out"}, {"x": 13, "y": 7.4, "station": "Putnam In / Out"}, {"x": 14, "y": -4.1, "station": "Finish"}, {"x": 15, "y": 0, "station": "Finish"}],borderColor:"#9b59b6",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2016 (CW) Raw",data:[{"x": 0, "y": -4.0, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -2.8, "station": "Chapman In / Out"}, {"x": 2, "y": -3.6, "station": "Telluride In / Out"}, {"x": 3, "y": 6.0, "station": "Kroger In / Out"}, {"x": 4, "y": -9.9, "station": "Governor In / Out"}, {"x": 5, "y": -9.4, "station": "Ouray In / Out"}, {"x": 6, "y": 4.1, "station": "Engineer In / Out"}, {"x": 7, "y": -4.0, "station": "Grouse In / Out"}, {"x": 8, "y": 4.4, "station": "Burrows In / Out"}, {"x": 9, "y": -2.7, "station": "Sherman In / Out"}, {"x": 10, "y": 3.6, "station": "Pole Creek In / Out"}, {"x": 11, "y": -0.9, "station": "Maggie In / Out"}, {"x": 12, "y": 3.9, "station": "Cunningham In / Out"}, {"x": 13, "y": -0.5, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#f39c12",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2017 (CCW) Raw",data:[{"x": 0, "y": -1.5, "station": "Cunningham In / Out"}, {"x": 1, "y": 2.3, "station": "Maggie In / Out"}, {"x": 2, "y": -1.1, "station": "Pole Creek In / Out"}, {"x": 3, "y": -2.5, "station": "Sherman In / Out"}, {"x": 4, "y": -1.0, "station": "Burrows In / Out"}, {"x": 5, "y": -0.1, "station": "Grouse In / Out"}, {"x": 6, "y": 1.1, "station": "Engineer In / Out"}, {"x": 7, "y": -3.7, "station": "Ouray In / Out"}, {"x": 8, "y": 2.5, "station": "Governor In / Out"}, {"x": 9, "y": 4.9, "station": "Kroger In / Out"}, {"x": 10, "y": -7.3, "station": "Telluride In / Out"}, {"x": 11, "y": 3.8, "station": "Chapman In / Out"}, {"x": 12, "y": 2.0, "station": "Kamm Traverse In / Out"}, {"x": 13, "y": 2.7, "station": "Putnam In / Out"}, {"x": 14, "y": -7.5, "station": "Finish"}, {"x": 15, "y": 0, "station": "Finish"}],borderColor:"#27ae60",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2022 (CW) Raw",data:[{"x": 0, "y": -1.5, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -1.7, "station": "Chapman In / Out"}, {"x": 2, "y": -2.4, "station": "Telluride In / Out"}, {"x": 3, "y": 5.9, "station": "Kroger In / Out"}, {"x": 4, "y": -7.1, "station": "Governor In / Out"}, {"x": 5, "y": -8.5, "station": "Ouray In / Out"}, {"x": 6, "y": 2.7, "station": "Engineer In / Out"}, {"x": 7, "y": -2.5, "station": "Animas Forks In / Out"}, {"x": 8, "y": 2.6, "station": "Burrows In / Out"}, {"x": 9, "y": -4.9, "station": "Sherman In / Out"}, {"x": 10, "y": 2.2, "station": "Pole Creek In / Out"}, {"x": 11, "y": 9.2, "station": "Maggie In / Out"}, {"x": 12, "y": 2.7, "station": "Cunningham In / Out"}, {"x": 13, "y": -0.5, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#e67e22",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2024 (CW) Raw",data:[{"x": 0, "y": -0.3, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -1.4, "station": "Chapman In / Out"}, {"x": 2, "y": -0.5, "station": "Telluride In / Out"}, {"x": 3, "y": 6.3, "station": "Kroger In / Out"}, {"x": 4, "y": -6.4, "station": "Governor In / Out"}, {"x": 5, "y": -9.6, "station": "Ouray In / Out"}, {"x": 6, "y": 3.0, "station": "Engineer In / Out"}, {"x": 7, "y": -2.3, "station": "Animas Forks In / Out"}, {"x": 8, "y": 2.5, "station": "Burrows In / Out"}, {"x": 9, "y": -6.9, "station": "Sherman In / Out"}, {"x": 10, "y": 0.4, "station": "Pole Creek In / Out"}, {"x": 11, "y": 3.6, "station": "Maggie In / Out"}, {"x": 12, "y": 2.1, "station": "Cunningham In / Out"}, {"x": 13, "y": 0.2, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#3498db",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2026 (CW) Raw",data:[{"x": 0, "y": -0.9, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -0.0, "station": "Chapman In / Out"}, {"x": 2, "y": -1.8, "station": "Telluride In / Out"}, {"x": 3, "y": 7.7, "station": "Kroger In / Out"}, {"x": 4, "y": -7.3, "station": "Governor In / Out"}, {"x": 5, "y": -8.1, "station": "Ouray In / Out"}, {"x": 6, "y": 2.4, "station": "Engineer In / Out"}, {"x": 7, "y": -2.4, "station": "Grouse In / Out"}, {"x": 8, "y": 5.2, "station": "Burrows In / Out"}, {"x": 9, "y": -6.7, "station": "Sherman In / Out"}, {"x": 10, "y": 0.3, "station": "Pole Creek In / Out"}, {"x": 11, "y": 0.6, "station": "Maggie In / Out"}, {"x": 12, "y": 1.5, "station": "Cunningham In / Out"}, {"x": 13, "y": 1.3, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#e74c3c",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:false}];
+var daGAPDatasets = [{label:"2008 (CW) GAP",data:[{"x": 0, "y": -3.1, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -2.2, "station": "Chapman In / Out"}, {"x": 2, "y": -2.2, "station": "Telluride In / Out"}, {"x": 3, "y": 6.8, "station": "Kroger In / Out"}, {"x": 4, "y": -7.4, "station": "Governor In / Out"}, {"x": 5, "y": -9.5, "station": "Ouray In / Out"}, {"x": 6, "y": 3.3, "station": "Engineer In / Out"}, {"x": 7, "y": -0.3, "station": "Grouse In / Out"}, {"x": 8, "y": 4.6, "station": "Sherman In / Out"}, {"x": 9, "y": 3.5, "station": "Pole Creek In / Out"}, {"x": 10, "y": -2.5, "station": "Maggie In / Out"}, {"x": 11, "y": -1.5, "station": "Cunningham In / Out"}, {"x": 12, "y": -4.3, "station": "Finish"}, {"x": 13, "y": 0, "station": "Finish"}],borderColor:"#95a5a6",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2013 (CCW) GAP",data:[{"x": 0, "y": -3.3, "station": "Cunningham In / Out"}, {"x": 1, "y": 0.5, "station": "Maggie In / Out"}, {"x": 2, "y": -3.5, "station": "Pole Creek In / Out"}, {"x": 3, "y": -5.2, "station": "Sherman In / Out"}, {"x": 4, "y": -1.9, "station": "Grouse In / Out"}, {"x": 5, "y": -0.1, "station": "Engineer In / Out"}, {"x": 6, "y": -6.3, "station": "Ouray In / Out"}, {"x": 7, "y": 2.3, "station": "Governor In / Out"}, {"x": 8, "y": 9.7, "station": "Kroger In / Out"}, {"x": 9, "y": -6.0, "station": "Telluride In / Out"}, {"x": 10, "y": 8.0, "station": "Chapman In / Out"}, {"x": 11, "y": 1.8, "station": "Kamm Traverse In / Out"}, {"x": 12, "y": 5.1, "station": "Putnam In / Out"}, {"x": 13, "y": -4.9, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#1abc9c",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2015 (CCW) GAP",data:[{"x": 0, "y": -3.4, "station": "Cunningham In / Out"}, {"x": 1, "y": -1.0, "station": "Maggie In / Out"}, {"x": 2, "y": -4.2, "station": "Pole Creek In / Out"}, {"x": 3, "y": -5.7, "station": "Sherman In / Out"}, {"x": 4, "y": -4.5, "station": "Burrows In / Out"}, {"x": 5, "y": -2.1, "station": "Grouse In / Out"}, {"x": 6, "y": -0.9, "station": "Engineer In / Out"}, {"x": 7, "y": -113.2, "station": "Ouray In / Out"}, {"x": 8, "y": 109.8, "station": "Governor In / Out"}, {"x": 9, "y": 6.7, "station": "Kroger In / Out"}, {"x": 10, "y": -6.4, "station": "Telluride In / Out"}, {"x": 11, "y": 10.3, "station": "Chapman In / Out"}, {"x": 12, "y": 4.6, "station": "Kamm Traverse In / Out"}, {"x": 13, "y": 7.4, "station": "Putnam In / Out"}, {"x": 14, "y": -4.5, "station": "Finish"}, {"x": 15, "y": 0, "station": "Finish"}],borderColor:"#9b59b6",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2016 (CW) GAP",data:[{"x": 0, "y": -4.0, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -2.8, "station": "Chapman In / Out"}, {"x": 2, "y": -3.6, "station": "Telluride In / Out"}, {"x": 3, "y": 6.0, "station": "Kroger In / Out"}, {"x": 4, "y": -9.9, "station": "Governor In / Out"}, {"x": 5, "y": -9.4, "station": "Ouray In / Out"}, {"x": 6, "y": 4.1, "station": "Engineer In / Out"}, {"x": 7, "y": -5.5, "station": "Grouse In / Out"}, {"x": 8, "y": 4.4, "station": "Burrows In / Out"}, {"x": 9, "y": -2.7, "station": "Sherman In / Out"}, {"x": 10, "y": 3.6, "station": "Pole Creek In / Out"}, {"x": 11, "y": -0.9, "station": "Maggie In / Out"}, {"x": 12, "y": 3.9, "station": "Cunningham In / Out"}, {"x": 13, "y": -0.8, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#f39c12",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2017 (CCW) GAP",data:[{"x": 0, "y": -1.5, "station": "Cunningham In / Out"}, {"x": 1, "y": 2.3, "station": "Maggie In / Out"}, {"x": 2, "y": -1.1, "station": "Pole Creek In / Out"}, {"x": 3, "y": -2.5, "station": "Sherman In / Out"}, {"x": 4, "y": -1.0, "station": "Burrows In / Out"}, {"x": 5, "y": -1.2, "station": "Grouse In / Out"}, {"x": 6, "y": 1.1, "station": "Engineer In / Out"}, {"x": 7, "y": -3.7, "station": "Ouray In / Out"}, {"x": 8, "y": 2.5, "station": "Governor In / Out"}, {"x": 9, "y": 4.9, "station": "Kroger In / Out"}, {"x": 10, "y": -7.3, "station": "Telluride In / Out"}, {"x": 11, "y": 3.8, "station": "Chapman In / Out"}, {"x": 12, "y": 2.0, "station": "Kamm Traverse In / Out"}, {"x": 13, "y": 2.7, "station": "Putnam In / Out"}, {"x": 14, "y": -7.8, "station": "Finish"}, {"x": 15, "y": 0, "station": "Finish"}],borderColor:"#27ae60",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2022 (CW) GAP",data:[{"x": 0, "y": -1.5, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -1.7, "station": "Chapman In / Out"}, {"x": 2, "y": -2.4, "station": "Telluride In / Out"}, {"x": 3, "y": 5.9, "station": "Kroger In / Out"}, {"x": 4, "y": -7.1, "station": "Governor In / Out"}, {"x": 5, "y": -8.5, "station": "Ouray In / Out"}, {"x": 6, "y": 2.7, "station": "Engineer In / Out"}, {"x": 7, "y": -4.2, "station": "Animas Forks In / Out"}, {"x": 8, "y": 2.6, "station": "Burrows In / Out"}, {"x": 9, "y": -4.9, "station": "Sherman In / Out"}, {"x": 10, "y": 2.2, "station": "Pole Creek In / Out"}, {"x": 11, "y": 9.2, "station": "Maggie In / Out"}, {"x": 12, "y": 2.7, "station": "Cunningham In / Out"}, {"x": 13, "y": -0.8, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#e67e22",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2024 (CW) GAP",data:[{"x": 0, "y": -0.3, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -1.4, "station": "Chapman In / Out"}, {"x": 2, "y": -0.5, "station": "Telluride In / Out"}, {"x": 3, "y": 6.3, "station": "Kroger In / Out"}, {"x": 4, "y": -6.4, "station": "Governor In / Out"}, {"x": 5, "y": -9.6, "station": "Ouray In / Out"}, {"x": 6, "y": 3.0, "station": "Engineer In / Out"}, {"x": 7, "y": -4.0, "station": "Animas Forks In / Out"}, {"x": 8, "y": 2.5, "station": "Burrows In / Out"}, {"x": 9, "y": -6.9, "station": "Sherman In / Out"}, {"x": 10, "y": 0.4, "station": "Pole Creek In / Out"}, {"x": 11, "y": 3.6, "station": "Maggie In / Out"}, {"x": 12, "y": 2.1, "station": "Cunningham In / Out"}, {"x": 13, "y": -0.2, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#3498db",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2026 (CW) GAP",data:[{"x": 0, "y": -0.9, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -0.0, "station": "Chapman In / Out"}, {"x": 2, "y": -1.8, "station": "Telluride In / Out"}, {"x": 3, "y": 7.7, "station": "Kroger In / Out"}, {"x": 4, "y": -7.3, "station": "Governor In / Out"}, {"x": 5, "y": -8.1, "station": "Ouray In / Out"}, {"x": 6, "y": 2.4, "station": "Engineer In / Out"}, {"x": 7, "y": -3.9, "station": "Grouse In / Out"}, {"x": 8, "y": 5.2, "station": "Burrows In / Out"}, {"x": 9, "y": -6.7, "station": "Sherman In / Out"}, {"x": 10, "y": 0.3, "station": "Pole Creek In / Out"}, {"x": 11, "y": 0.6, "station": "Maggie In / Out"}, {"x": 12, "y": 1.5, "station": "Cunningham In / Out"}, {"x": 13, "y": 0.9, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#e74c3c",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:false}];
+var daField2026 = {label:"2026 (CW) Field",data:[{"x": 0, "y": 3.3, "station": "Kamm Traverse"}, {"x": 1, "y": 1.3, "station": "Chapman"}, {"x": 2, "y": 0.3, "station": "Telluride"}, {"x": 3, "y": 0.6, "station": "Kroger"}, {"x": 4, "y": -2.5, "station": "Governor"}, {"x": 5, "y": 0.6, "station": "Ouray"}, {"x": 6, "y": -1.0, "station": "Engineer"}, {"x": 7, "y": -2.2, "station": "Grouse"}, {"x": 8, "y": 0.6, "station": "Burrows"}, {"x": 9, "y": -1.5, "station": "Sherman"}, {"x": 10, "y": -1.6, "station": "Pole Creek"}, {"x": 11, "y": -3.2, "station": "Maggie"}, {"x": 12, "y": -1.6, "station": "Cunningham"}, {"x": 13, "y": 0.2, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#e74c3c",borderWidth:2.5,pointRadius:0,pointHoverRadius:5,tension:0.2,fill:false};
+var daAllDatasets = daRawDatasets.concat(daGAPDatasets).concat([daField2026]);
+
+var daChart = new Chart(document.getElementById('diffAdjChart'), {
+  type: 'line',
+  data: {
+    labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"],
+    datasets: daAllDatasets
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    parsing: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + (ctx.raw.y > 0 ? '+' : '') + ctx.raw.y.toFixed(1) + ' min/mi'; } } },
+      legend: { display: false }
+    },
+    scales: {
+      x: {
+        type: 'linear',
+        title: { display: true, text: 'Segment Index' },
+        min: -0.5, max: 14.5,
+        ticks: { stepSize: 1 }
+      },
+      y: {
+        title: { display: true, text: 'Pace Deviation (min/mi vs race avg)' },
+        ticks: { callback: function(v) { return (v > 0 ? '+' : '') + v.toFixed(1); } }
+      }
+    }
+  }
+});
+
+function updateDADatasets() {
+  var activeYears = [];
+  for (var i = 0; i < daRawDatasets.length; i++) {
+    var year = daRawDatasets[i].label.match(/^(\d+)/)[1];
+    var cb = document.getElementById('daToggle' + year);
+    if (cb && cb.checked) activeYears.push(year);
+  }
+  for (var i = 0; i < daRawDatasets.length; i++) {
+    var year = daRawDatasets[i].label.match(/^(\d+)/)[1];
+    var visible = activeYears.indexOf(year) >= 0;
+    daChart.setDatasetVisibility(i, visible);
+    daChart.setDatasetVisibility(i + daRawDatasets.length, visible);
+  }
+  // Field 2026 is always the last dataset
+  var showField = activeYears.indexOf('2026') >= 0;
+  daChart.setDatasetVisibility(daRawDatasets.length * 2, showField);
+  daChart.update();
+}
+
+
+// Difficulty-Adjusted Pacing (multi-year)
+var daRawDatasets = [{label:"2008 (CW) Raw",data:[{"x": 0, "y": -3.1, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -2.2, "station": "Chapman In / Out"}, {"x": 2, "y": -2.2, "station": "Telluride In / Out"}, {"x": 3, "y": 6.8, "station": "Kroger In / Out"}, {"x": 4, "y": -7.4, "station": "Governor In / Out"}, {"x": 5, "y": -9.5, "station": "Ouray In / Out"}, {"x": 6, "y": 3.3, "station": "Engineer In / Out"}, {"x": 7, "y": 1.6, "station": "Grouse In / Out"}, {"x": 8, "y": 4.6, "station": "Sherman In / Out"}, {"x": 9, "y": 3.5, "station": "Pole Creek In / Out"}, {"x": 10, "y": -2.5, "station": "Maggie In / Out"}, {"x": 11, "y": -1.5, "station": "Cunningham In / Out"}, {"x": 12, "y": -4.0, "station": "Finish"}, {"x": 13, "y": 0, "station": "Finish"}],borderColor:"#95a5a6",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2013 (CCW) Raw",data:[{"x": 0, "y": -3.3, "station": "Cunningham In / Out"}, {"x": 1, "y": 0.5, "station": "Maggie In / Out"}, {"x": 2, "y": -3.5, "station": "Pole Creek In / Out"}, {"x": 3, "y": -5.2, "station": "Sherman In / Out"}, {"x": 4, "y": -1.1, "station": "Grouse In / Out"}, {"x": 5, "y": -0.1, "station": "Engineer In / Out"}, {"x": 6, "y": -6.3, "station": "Ouray In / Out"}, {"x": 7, "y": 2.3, "station": "Governor In / Out"}, {"x": 8, "y": 9.7, "station": "Kroger In / Out"}, {"x": 9, "y": -6.0, "station": "Telluride In / Out"}, {"x": 10, "y": 8.0, "station": "Chapman In / Out"}, {"x": 11, "y": 1.8, "station": "Kamm Traverse In / Out"}, {"x": 12, "y": 5.1, "station": "Putnam In / Out"}, {"x": 13, "y": -4.5, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#1abc9c",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2015 (CCW) Raw",data:[{"x": 0, "y": -3.4, "station": "Cunningham In / Out"}, {"x": 1, "y": -1.0, "station": "Maggie In / Out"}, {"x": 2, "y": -4.2, "station": "Pole Creek In / Out"}, {"x": 3, "y": -5.7, "station": "Sherman In / Out"}, {"x": 4, "y": -4.5, "station": "Burrows In / Out"}, {"x": 5, "y": -1.0, "station": "Grouse In / Out"}, {"x": 6, "y": -0.9, "station": "Engineer In / Out"}, {"x": 7, "y": -113.2, "station": "Ouray In / Out"}, {"x": 8, "y": 109.8, "station": "Governor In / Out"}, {"x": 9, "y": 6.7, "station": "Kroger In / Out"}, {"x": 10, "y": -6.4, "station": "Telluride In / Out"}, {"x": 11, "y": 10.3, "station": "Chapman In / Out"}, {"x": 12, "y": 4.6, "station": "Kamm Traverse In / Out"}, {"x": 13, "y": 7.4, "station": "Putnam In / Out"}, {"x": 14, "y": -4.1, "station": "Finish"}, {"x": 15, "y": 0, "station": "Finish"}],borderColor:"#9b59b6",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2016 (CW) Raw",data:[{"x": 0, "y": -4.0, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -2.8, "station": "Chapman In / Out"}, {"x": 2, "y": -3.6, "station": "Telluride In / Out"}, {"x": 3, "y": 6.0, "station": "Kroger In / Out"}, {"x": 4, "y": -9.9, "station": "Governor In / Out"}, {"x": 5, "y": -9.4, "station": "Ouray In / Out"}, {"x": 6, "y": 4.1, "station": "Engineer In / Out"}, {"x": 7, "y": -4.0, "station": "Grouse In / Out"}, {"x": 8, "y": 4.4, "station": "Burrows In / Out"}, {"x": 9, "y": -2.7, "station": "Sherman In / Out"}, {"x": 10, "y": 3.6, "station": "Pole Creek In / Out"}, {"x": 11, "y": -0.9, "station": "Maggie In / Out"}, {"x": 12, "y": 3.9, "station": "Cunningham In / Out"}, {"x": 13, "y": -0.5, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#f39c12",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2017 (CCW) Raw",data:[{"x": 0, "y": -1.5, "station": "Cunningham In / Out"}, {"x": 1, "y": 2.3, "station": "Maggie In / Out"}, {"x": 2, "y": -1.1, "station": "Pole Creek In / Out"}, {"x": 3, "y": -2.5, "station": "Sherman In / Out"}, {"x": 4, "y": -1.0, "station": "Burrows In / Out"}, {"x": 5, "y": -0.1, "station": "Grouse In / Out"}, {"x": 6, "y": 1.1, "station": "Engineer In / Out"}, {"x": 7, "y": -3.7, "station": "Ouray In / Out"}, {"x": 8, "y": 2.5, "station": "Governor In / Out"}, {"x": 9, "y": 4.9, "station": "Kroger In / Out"}, {"x": 10, "y": -7.3, "station": "Telluride In / Out"}, {"x": 11, "y": 3.8, "station": "Chapman In / Out"}, {"x": 12, "y": 2.0, "station": "Kamm Traverse In / Out"}, {"x": 13, "y": 2.7, "station": "Putnam In / Out"}, {"x": 14, "y": -7.5, "station": "Finish"}, {"x": 15, "y": 0, "station": "Finish"}],borderColor:"#27ae60",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2022 (CW) Raw",data:[{"x": 0, "y": -1.5, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -1.7, "station": "Chapman In / Out"}, {"x": 2, "y": -2.4, "station": "Telluride In / Out"}, {"x": 3, "y": 5.9, "station": "Kroger In / Out"}, {"x": 4, "y": -7.1, "station": "Governor In / Out"}, {"x": 5, "y": -8.5, "station": "Ouray In / Out"}, {"x": 6, "y": 2.7, "station": "Engineer In / Out"}, {"x": 7, "y": -2.5, "station": "Animas Forks In / Out"}, {"x": 8, "y": 2.6, "station": "Burrows In / Out"}, {"x": 9, "y": -4.9, "station": "Sherman In / Out"}, {"x": 10, "y": 2.2, "station": "Pole Creek In / Out"}, {"x": 11, "y": 9.2, "station": "Maggie In / Out"}, {"x": 12, "y": 2.7, "station": "Cunningham In / Out"}, {"x": 13, "y": -0.5, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#e67e22",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2024 (CW) Raw",data:[{"x": 0, "y": -0.3, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -1.4, "station": "Chapman In / Out"}, {"x": 2, "y": -0.5, "station": "Telluride In / Out"}, {"x": 3, "y": 6.3, "station": "Kroger In / Out"}, {"x": 4, "y": -6.4, "station": "Governor In / Out"}, {"x": 5, "y": -9.6, "station": "Ouray In / Out"}, {"x": 6, "y": 3.0, "station": "Engineer In / Out"}, {"x": 7, "y": -2.3, "station": "Animas Forks In / Out"}, {"x": 8, "y": 2.5, "station": "Burrows In / Out"}, {"x": 9, "y": -6.9, "station": "Sherman In / Out"}, {"x": 10, "y": 0.4, "station": "Pole Creek In / Out"}, {"x": 11, "y": 3.6, "station": "Maggie In / Out"}, {"x": 12, "y": 2.1, "station": "Cunningham In / Out"}, {"x": 13, "y": 0.2, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#3498db",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2026 (CW) Raw",data:[{"x": 0, "y": -0.9, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -0.0, "station": "Chapman In / Out"}, {"x": 2, "y": -1.8, "station": "Telluride In / Out"}, {"x": 3, "y": 7.7, "station": "Kroger In / Out"}, {"x": 4, "y": -7.3, "station": "Governor In / Out"}, {"x": 5, "y": -8.1, "station": "Ouray In / Out"}, {"x": 6, "y": 2.4, "station": "Engineer In / Out"}, {"x": 7, "y": -2.4, "station": "Grouse In / Out"}, {"x": 8, "y": 5.2, "station": "Burrows In / Out"}, {"x": 9, "y": -6.7, "station": "Sherman In / Out"}, {"x": 10, "y": 0.3, "station": "Pole Creek In / Out"}, {"x": 11, "y": 0.6, "station": "Maggie In / Out"}, {"x": 12, "y": 1.5, "station": "Cunningham In / Out"}, {"x": 13, "y": 1.3, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#e74c3c",borderWidth:1.5,borderDash:[3,2],pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:false}];
+var daGAPDatasets = [{label:"2008 (CW) GAP",data:[{"x": 0, "y": -3.1, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -2.2, "station": "Chapman In / Out"}, {"x": 2, "y": -2.2, "station": "Telluride In / Out"}, {"x": 3, "y": 6.8, "station": "Kroger In / Out"}, {"x": 4, "y": -7.4, "station": "Governor In / Out"}, {"x": 5, "y": -9.5, "station": "Ouray In / Out"}, {"x": 6, "y": 3.3, "station": "Engineer In / Out"}, {"x": 7, "y": -0.3, "station": "Grouse In / Out"}, {"x": 8, "y": 4.6, "station": "Sherman In / Out"}, {"x": 9, "y": 3.5, "station": "Pole Creek In / Out"}, {"x": 10, "y": -2.5, "station": "Maggie In / Out"}, {"x": 11, "y": -1.5, "station": "Cunningham In / Out"}, {"x": 12, "y": -4.3, "station": "Finish"}, {"x": 13, "y": 0, "station": "Finish"}],borderColor:"#95a5a6",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2013 (CCW) GAP",data:[{"x": 0, "y": -3.3, "station": "Cunningham In / Out"}, {"x": 1, "y": 0.5, "station": "Maggie In / Out"}, {"x": 2, "y": -3.5, "station": "Pole Creek In / Out"}, {"x": 3, "y": -5.2, "station": "Sherman In / Out"}, {"x": 4, "y": -1.9, "station": "Grouse In / Out"}, {"x": 5, "y": -0.1, "station": "Engineer In / Out"}, {"x": 6, "y": -6.3, "station": "Ouray In / Out"}, {"x": 7, "y": 2.3, "station": "Governor In / Out"}, {"x": 8, "y": 9.7, "station": "Kroger In / Out"}, {"x": 9, "y": -6.0, "station": "Telluride In / Out"}, {"x": 10, "y": 8.0, "station": "Chapman In / Out"}, {"x": 11, "y": 1.8, "station": "Kamm Traverse In / Out"}, {"x": 12, "y": 5.1, "station": "Putnam In / Out"}, {"x": 13, "y": -4.9, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#1abc9c",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2015 (CCW) GAP",data:[{"x": 0, "y": -3.4, "station": "Cunningham In / Out"}, {"x": 1, "y": -1.0, "station": "Maggie In / Out"}, {"x": 2, "y": -4.2, "station": "Pole Creek In / Out"}, {"x": 3, "y": -5.7, "station": "Sherman In / Out"}, {"x": 4, "y": -4.5, "station": "Burrows In / Out"}, {"x": 5, "y": -2.1, "station": "Grouse In / Out"}, {"x": 6, "y": -0.9, "station": "Engineer In / Out"}, {"x": 7, "y": -113.2, "station": "Ouray In / Out"}, {"x": 8, "y": 109.8, "station": "Governor In / Out"}, {"x": 9, "y": 6.7, "station": "Kroger In / Out"}, {"x": 10, "y": -6.4, "station": "Telluride In / Out"}, {"x": 11, "y": 10.3, "station": "Chapman In / Out"}, {"x": 12, "y": 4.6, "station": "Kamm Traverse In / Out"}, {"x": 13, "y": 7.4, "station": "Putnam In / Out"}, {"x": 14, "y": -4.5, "station": "Finish"}, {"x": 15, "y": 0, "station": "Finish"}],borderColor:"#9b59b6",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2016 (CW) GAP",data:[{"x": 0, "y": -4.0, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -2.8, "station": "Chapman In / Out"}, {"x": 2, "y": -3.6, "station": "Telluride In / Out"}, {"x": 3, "y": 6.0, "station": "Kroger In / Out"}, {"x": 4, "y": -9.9, "station": "Governor In / Out"}, {"x": 5, "y": -9.4, "station": "Ouray In / Out"}, {"x": 6, "y": 4.1, "station": "Engineer In / Out"}, {"x": 7, "y": -5.5, "station": "Grouse In / Out"}, {"x": 8, "y": 4.4, "station": "Burrows In / Out"}, {"x": 9, "y": -2.7, "station": "Sherman In / Out"}, {"x": 10, "y": 3.6, "station": "Pole Creek In / Out"}, {"x": 11, "y": -0.9, "station": "Maggie In / Out"}, {"x": 12, "y": 3.9, "station": "Cunningham In / Out"}, {"x": 13, "y": -0.8, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#f39c12",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2017 (CCW) GAP",data:[{"x": 0, "y": -1.5, "station": "Cunningham In / Out"}, {"x": 1, "y": 2.3, "station": "Maggie In / Out"}, {"x": 2, "y": -1.1, "station": "Pole Creek In / Out"}, {"x": 3, "y": -2.5, "station": "Sherman In / Out"}, {"x": 4, "y": -1.0, "station": "Burrows In / Out"}, {"x": 5, "y": -1.2, "station": "Grouse In / Out"}, {"x": 6, "y": 1.1, "station": "Engineer In / Out"}, {"x": 7, "y": -3.7, "station": "Ouray In / Out"}, {"x": 8, "y": 2.5, "station": "Governor In / Out"}, {"x": 9, "y": 4.9, "station": "Kroger In / Out"}, {"x": 10, "y": -7.3, "station": "Telluride In / Out"}, {"x": 11, "y": 3.8, "station": "Chapman In / Out"}, {"x": 12, "y": 2.0, "station": "Kamm Traverse In / Out"}, {"x": 13, "y": 2.7, "station": "Putnam In / Out"}, {"x": 14, "y": -7.8, "station": "Finish"}, {"x": 15, "y": 0, "station": "Finish"}],borderColor:"#27ae60",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2022 (CW) GAP",data:[{"x": 0, "y": -1.5, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -1.7, "station": "Chapman In / Out"}, {"x": 2, "y": -2.4, "station": "Telluride In / Out"}, {"x": 3, "y": 5.9, "station": "Kroger In / Out"}, {"x": 4, "y": -7.1, "station": "Governor In / Out"}, {"x": 5, "y": -8.5, "station": "Ouray In / Out"}, {"x": 6, "y": 2.7, "station": "Engineer In / Out"}, {"x": 7, "y": -4.2, "station": "Animas Forks In / Out"}, {"x": 8, "y": 2.6, "station": "Burrows In / Out"}, {"x": 9, "y": -4.9, "station": "Sherman In / Out"}, {"x": 10, "y": 2.2, "station": "Pole Creek In / Out"}, {"x": 11, "y": 9.2, "station": "Maggie In / Out"}, {"x": 12, "y": 2.7, "station": "Cunningham In / Out"}, {"x": 13, "y": -0.8, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#e67e22",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2024 (CW) GAP",data:[{"x": 0, "y": -0.3, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -1.4, "station": "Chapman In / Out"}, {"x": 2, "y": -0.5, "station": "Telluride In / Out"}, {"x": 3, "y": 6.3, "station": "Kroger In / Out"}, {"x": 4, "y": -6.4, "station": "Governor In / Out"}, {"x": 5, "y": -9.6, "station": "Ouray In / Out"}, {"x": 6, "y": 3.0, "station": "Engineer In / Out"}, {"x": 7, "y": -4.0, "station": "Animas Forks In / Out"}, {"x": 8, "y": 2.5, "station": "Burrows In / Out"}, {"x": 9, "y": -6.9, "station": "Sherman In / Out"}, {"x": 10, "y": 0.4, "station": "Pole Creek In / Out"}, {"x": 11, "y": 3.6, "station": "Maggie In / Out"}, {"x": 12, "y": 2.1, "station": "Cunningham In / Out"}, {"x": 13, "y": -0.2, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#3498db",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:true},
+{label:"2026 (CW) GAP",data:[{"x": 0, "y": -0.9, "station": "Kamm Traverse In / Out"}, {"x": 1, "y": -0.0, "station": "Chapman In / Out"}, {"x": 2, "y": -1.8, "station": "Telluride In / Out"}, {"x": 3, "y": 7.7, "station": "Kroger In / Out"}, {"x": 4, "y": -7.3, "station": "Governor In / Out"}, {"x": 5, "y": -8.1, "station": "Ouray In / Out"}, {"x": 6, "y": 2.4, "station": "Engineer In / Out"}, {"x": 7, "y": -3.9, "station": "Grouse In / Out"}, {"x": 8, "y": 5.2, "station": "Burrows In / Out"}, {"x": 9, "y": -6.7, "station": "Sherman In / Out"}, {"x": 10, "y": 0.3, "station": "Pole Creek In / Out"}, {"x": 11, "y": 0.6, "station": "Maggie In / Out"}, {"x": 12, "y": 1.5, "station": "Cunningham In / Out"}, {"x": 13, "y": 0.9, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#e74c3c",borderWidth:2.5,pointRadius:0,pointHoverRadius:3,tension:0.2,fill:false,hidden:false}];
+var daField2026 = {label:"2026 (CW) Field",data:[{"x": 0, "y": 3.3, "station": "Kamm Traverse"}, {"x": 1, "y": 1.3, "station": "Chapman"}, {"x": 2, "y": 0.3, "station": "Telluride"}, {"x": 3, "y": 0.6, "station": "Kroger"}, {"x": 4, "y": -2.5, "station": "Governor"}, {"x": 5, "y": 0.6, "station": "Ouray"}, {"x": 6, "y": -1.0, "station": "Engineer"}, {"x": 7, "y": -2.2, "station": "Grouse"}, {"x": 8, "y": 0.6, "station": "Burrows"}, {"x": 9, "y": -1.5, "station": "Sherman"}, {"x": 10, "y": -1.6, "station": "Pole Creek"}, {"x": 11, "y": -3.2, "station": "Maggie"}, {"x": 12, "y": -1.6, "station": "Cunningham"}, {"x": 13, "y": 0.2, "station": "Finish"}, {"x": 14, "y": 0, "station": "Finish"}],borderColor:"#e74c3c",borderWidth:2.5,pointRadius:0,pointHoverRadius:5,tension:0.2,fill:false};
+var daAllDatasets = daRawDatasets.concat(daGAPDatasets).concat([daField2026]);
+
+var daChart = new Chart(document.getElementById('diffAdjChart'), {
+  type: 'line',
+  data: {
+    labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"],
+    datasets: daAllDatasets
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    parsing: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + (ctx.raw.y > 0 ? '+' : '') + ctx.raw.y.toFixed(1) + ' min/mi'; } } },
+      legend: { display: false }
+    },
+    scales: {
+      x: {
+        type: 'linear',
+        title: { display: true, text: 'Segment Index' },
+        min: -0.5, max: 14.5,
+        ticks: { stepSize: 1 }
+      },
+      y: {
+        title: { display: true, text: 'Pace Deviation (min/mi vs race avg)' },
+        ticks: { callback: function(v) { return (v > 0 ? '+' : '') + v.toFixed(1); } }
+      }
+    }
+  }
+});
+
+function updateDADatasets() {
+  var activeYears = [];
+  for (var i = 0; i < daRawDatasets.length; i++) {
+    var year = daRawDatasets[i].label.match(/^(\d+)/)[1];
+    var cb = document.getElementById('daToggle' + year);
+    if (cb && cb.checked) activeYears.push(year);
+  }
+  for (var i = 0; i < daRawDatasets.length; i++) {
+    var year = daRawDatasets[i].label.match(/^(\d+)/)[1];
+    var visible = activeYears.indexOf(year) >= 0;
+    daChart.setDatasetVisibility(i, visible);
+    daChart.setDatasetVisibility(i + daRawDatasets.length, visible);
+  }
+  // Field 2026 is always the last dataset
+  var showField = activeYears.indexOf('2026') >= 0;
+  daChart.setDatasetVisibility(daRawDatasets.length * 2, showField);
+  daChart.update();
+}
 
 </script>
 </body>
